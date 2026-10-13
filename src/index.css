@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Hind Siliguri', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    background-color: #f8fafc;
+    overflow-x: hidden;
+  }
+}
+
+.brand-title {
+  font-size: clamp(1.05rem, 2.2vw, 1.65rem);
+  line-height: 1.2;
+}
+
+.brand-sub {
+  font-size: clamp(0.7rem, 1.2vw, 0.875rem);
+}
+
+/* Print specific styles for certificates, marksheets, admit cards, attendance sheets */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-area, .printable-area * {
+    visibility: visible;
+  }
+  .printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+}
+
+/* Luxury Watermark styling */
+.doc-watermark {
+  background-image: radial-gradient(circle at center, rgba(15, 23, 42, 0.04) 0%, transparent 70%);
+}
+
+/* Certificate border */
+.certificate-border {
+  border: 12px double #1e3a8a;
+  outline: 3px solid #d97706;
+  outline-offset: -8px;
+}
