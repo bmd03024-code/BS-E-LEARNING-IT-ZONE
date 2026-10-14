@@ -909,42 +909,21 @@ const initialCredentials: AdminCredentials = {
 };
 
 class StorageService {
-  private channel: BroadcastChannel | null = null;
-
-  constructor() {
-    if (typeof window !== 'undefined' && window.BroadcastChannel) {
-      try {
-        this.channel = new BroadcastChannel('bs_sync_channel');
-        this.channel.onmessage = () => {
-          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { updated: true } }));
-        };
-      } catch (e) {
-        console.error("BroadcastChannel error:", e);
-      }
-    }
-  }
-
-  private get<T>(key: string, fallback: T): T {
+  this.serverOrigin = (window.location.hostname === 'localhost' ? `http://localhost:4000` : `${window.location.origin}`);
+this.ws = null;
+try {
+  this.ws = new WebSocket((this.serverOrigin.startsWith('http') ? this.serverOrigin.replace(/^http/, 'ws') : this.serverOrigin) + '/');
+  this.ws.onmessage = (ev) => {
     try {
-      const data = localStorage.getItem(`bs_${key}`);
-      return data ? JSON.parse(data) : fallback;
-    } catch {
-      return fallback;
-    }
-  }
-
-  private set<T>(key: string, value: T): void {
-    try {
-      localStorage.setItem(`bs_${key}`, JSON.stringify(value));
-      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
-      if (this.channel) {
-        this.channel.postMessage({ key, value });
+      const msg = JSON.parse(ev.data);
+      if (msg.type === 'state_update' || msg.type === 'broadcast' || msg.key) {
+        window.dispatchEvent(new CustomEvent('bs_sync', { detail: { updated: true, payload: msg.payload || msg } }));
       }
-    } catch (e) {
-      console.error("Storage error:", e);
-    }
-  }
-
+    } catch (e) {}
+  };
+} catch (e) {
+  // ignore if server not running
+}
   getSettings(): InstituteSettings {
     return this.get<InstituteSettings>('settings', initialSettings);
   }
