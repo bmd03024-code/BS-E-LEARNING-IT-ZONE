@@ -1139,4 +1139,28 @@ async function idbGet(key: string) {
     req.onerror = () => rej(req.error);
   });
 }
+private async get<T>(key: string, fallback: T): Promise<T> {
+  try {
+    // Try to fetch from server state (fast path)
+    try {
+      const resp = await fetch(`${this.serverOrigin}/api/state`);
+      if (resp.ok) {
+        const state = await resp.json();
+        if (state[`bs_${key}`] !== undefined) return state[`bs_${key}`];
+      }
+    } catch (e) {
+      // server not available
+    }
+
+    // localStorage
+    const raw = localStorage.getItem(`bs_${key}`);
+    if (raw) return JSON.parse(raw);
+    // IndexedDB fallback
+    const idbVal = await idbGet(`bs_${key}`).catch(() => null);
+    if (idbVal !== undefined && idbVal !== null) return idbVal;
+    return fallback;
+  } catch {
+    return fallback;
+  }
+}
 export const storage = new StorageService();
