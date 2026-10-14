@@ -1163,4 +1163,20 @@ private async get<T>(key: string, fallback: T): Promise<T> {
     return fallback;
   }
 }
+async function uploadFile(name: string, base64: string) {
+  try {
+    const resp = await fetch(`${serverOrigin}/api/upload`, {
+      method: 'POST',
+      body: JSON.stringify({ filename: name, contentBase64: base64 }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (resp.ok) {
+      const j = await resp.json();
+      return j.url; // saved URL on server
+    }
+  } catch {}
+  // fallback to IndexedDB storage: store base64 and return a pseudo-url 'idb://<key>'
+  await idbSet(`file_${Date.now()}_${name}`, base64);
+  return `idb://file_${Date.now()}_${name}`;
+}
 export const storage = new StorageService();
