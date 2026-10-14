@@ -1,22 +1,22 @@
 import {
-  InstituteSettings,
-  HeroSlide,
-  ShortcutItem,
-  Course,
-  Mentor,
-  Student,
-  PaymentRecord,
-  RoutineItem}
-  ResultRecord,
-  AdmitCardRecord,
-  LedgerItem,
-  NoticeItem,
-  GalleryItem,
-  FreeNoteItem,
-  DemoClassItem,
-  ChatbotSettings,
-  CertificateRecord,
-  EnrollmentApplication,
+  InstituteSettings
+  HeroSlide
+  ShortcutItem
+  Course
+  Mentor
+  Student
+  PaymentRecord
+  RoutineItem
+  ResultRecord
+  AdmitCardRecord
+  LedgerItem
+  NoticeItem
+  GalleryItem
+  FreeNoteItem
+  DemoClassItem
+  ChatbotSettings
+  CertificateRecord
+  EnrollmentApplication
   AdminCredentials
 } from '../types';
 
