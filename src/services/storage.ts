@@ -305,7 +305,7 @@ const initialCourses: Course[] = [
     certificateFee: 500,
     certificateFeeSecondTime: 0,
     hasGovtCert: true,
-    paymentDetails: "ভর্তি ১,৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
+    paymentDetails: "ভর্তি ১,১৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
     category: "আইটি ও প্রফেশনাল",
     subjects: ["Computer Fundamentals & OS", "MS Word & Typing Speed", "MS Excel & Financial Formula", "MS PowerPoint & Access", "Internet & Email Communication"],
     exams: ["টাইপিং স্পিড টেস্ট", "এক্সেল প্র্যাকটিক্যাল ল্যাব", "কারিগরি বোর্ড ফাইনাল পরীক্ষা"]
@@ -909,6 +909,21 @@ const initialCredentials: AdminCredentials = {
 };
 
 class StorageService {
+  private channel: BroadcastChannel | null = null;
+
+  constructor() {
+    if (typeof window !== 'undefined' && window.BroadcastChannel) {
+      try {
+        this.channel = new BroadcastChannel('bs_sync_channel');
+        this.channel.onmessage = () => {
+          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { updated: true } }));
+        };
+      } catch (e) {
+        console.error("BroadcastChannel error:", e);
+      }
+    }
+  }
+
   private get<T>(key: string, fallback: T): T {
     try {
       const data = localStorage.getItem(`bs_${key}`);
@@ -922,6 +937,9 @@ class StorageService {
     try {
       localStorage.setItem(`bs_${key}`, JSON.stringify(value));
       window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
+      if (this.channel) {
+        this.channel.postMessage({ key, value });
+      }
     } catch (e) {
       console.error("Storage error:", e);
     }
