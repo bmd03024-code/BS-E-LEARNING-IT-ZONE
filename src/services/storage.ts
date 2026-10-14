@@ -1113,4 +1113,30 @@ private async set<T>(key: string, value: T): Promise<void> {
     console.error("Storage error:", e);
   }
 }
+function idbOpen() {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    const r = indexedDB.open('bs_repo_db_v1', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onsuccess = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+  });
+}
+async function idbSet(key: string, val: any) {
+  const db = await idbOpen();
+  return new Promise<void>((res, rej) => {
+    const tx = db.transaction('kv', 'readwrite');
+    tx.objectStore('kv').put(val, key);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbGet(key: string) {
+  const db = await idbOpen();
+  return new Promise<any>((res, rej) => {
+    const tx = db.transaction('kv', 'readonly');
+    const req = tx.objectStore('kv').get(key);
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
 export const storage = new StorageService();
