@@ -1081,5 +1081,36 @@ try {
     window.location.reload();
   }
 }
+private async set<T>(key: string, value: T): Promise<void> {
+  try {
+    // Try server first
+    const url = `${this.serverOrigin}/api/state`;
+    try {
+      await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: `bs_${key}`, value })
+      });
+      // broadcast via ws
+      if (this.ws && this.ws.readyState === 1) {
+        this.ws.send(JSON.stringify({ type: 'broadcast', key: `bs_${key}`, value }));
+      }
+      return;
+    } catch (e) {
+      // server not available, fallthrough to local save
+    }
 
+    try {
+      localStorage.setItem(`bs_${key}`, JSON.stringify(value));
+      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
+      if (this.channel) this.channel.postMessage({ key, value });
+    } catch (e) {
+      // localStorage quota — fallback to IndexedDB
+      await idbSet(`bs_${key}`, value);
+      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value, fallback: true } }));
+    }
+  } catch (e) {
+    console.error("Storage error:", e);
+  }
+}
 export const storage = new StorageService();
