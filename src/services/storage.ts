@@ -1,22 +1,22 @@
 import {
-  InstituteSettings
-  HeroSlide
-  ShortcutItem
-  Course
-  Mentor
-  Student
-  PaymentRecord
-  RoutineItem }
-  ResultRecord
-  AdmitCardRecord
-  LedgerItem
-  NoticeItem
-  GalleryItem
-  FreeNoteItem
-  DemoClassItem
-  ChatbotSettings
-  CertificateRecord
-  EnrollmentApplication
+  InstituteSettings,
+  HeroSlide,
+  ShortcutItem,
+  Course,
+  Mentor,
+  Student,
+  PaymentRecord,
+  RoutineItem,
+  ResultRecord,
+  AdmitCardRecord,
+  LedgerItem,
+  NoticeItem,
+  GalleryItem,
+  FreeNoteItem,
+  DemoClassItem,
+  ChatbotSettings,
+  CertificateRecord,
+  EnrollmentApplication,
   AdminCredentials
 } from '../types';
 
@@ -305,7 +305,7 @@ const initialCourses: Course[] = [
     certificateFee: 500,
     certificateFeeSecondTime: 0,
     hasGovtCert: true,
-    paymentDetails: "ভর্তি ১,১৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
+    paymentDetails: "ভর্তি ১,৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
     category: "আইটি ও প্রফেশনাল",
     subjects: ["Computer Fundamentals & OS", "MS Word & Typing Speed", "MS Excel & Financial Formula", "MS PowerPoint & Access", "Internet & Email Communication"],
     exams: ["টাইপিং স্পিড টেস্ট", "এক্সেল প্র্যাকটিক্যাল ল্যাব", "কারিগরি বোর্ড ফাইনাল পরীক্ষা"]
@@ -909,21 +909,24 @@ const initialCredentials: AdminCredentials = {
 };
 
 class StorageService {
-  this.serverOrigin = (window.location.hostname === 'localhost' ? `http://localhost:4000` : `${window.location.origin}`);
-this.ws = null;
-try {
-  this.ws = new WebSocket((this.serverOrigin.startsWith('http') ? this.serverOrigin.replace(/^http/, 'ws') : this.serverOrigin) + '/');
-  this.ws.onmessage = (ev) => {
+  private get<T>(key: string, fallback: T): T {
     try {
-      const msg = JSON.parse(ev.data);
-      if (msg.type === 'state_update' || msg.type === 'broadcast' || msg.key) {
-        window.dispatchEvent(new CustomEvent('bs_sync', { detail: { updated: true, payload: msg.payload || msg } }));
-      }
-    } catch (e) {}
-  };
-} catch (e) {
-  // ignore if server not running
-}
+      const data = localStorage.getItem(`bs_${key}`);
+      return data ? JSON.parse(data) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  private set<T>(key: string, value: T): void {
+    try {
+      localStorage.setItem(`bs_${key}`, JSON.stringify(value));
+      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
+    } catch (e) {
+      console.error("Storage error:", e);
+    }
+  }
+
   getSettings(): InstituteSettings {
     return this.get<InstituteSettings>('settings', initialSettings);
   }
@@ -1081,102 +1084,5 @@ try {
     window.location.reload();
   }
 }
-private async set<T>(key: string, value: T): Promise<void> {
-  try {
-    // Try server first
-    const url = `${this.serverOrigin}/api/state`;
-    try {
-      await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: `bs_${key}`, value })
-      });
-      // broadcast via ws
-      if (this.ws && this.ws.readyState === 1) {
-        this.ws.send(JSON.stringify({ type: 'broadcast', key: `bs_${key}`, value }));
-      }
-      return;
-    } catch (e) {
-      // server not available, fallthrough to local save
-    }
 
-    try {
-      localStorage.setItem(`bs_${key}`, JSON.stringify(value));
-      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
-      if (this.channel) this.channel.postMessage({ key, value });
-    } catch (e) {
-      // localStorage quota — fallback to IndexedDB
-      await idbSet(`bs_${key}`, value);
-      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value, fallback: true } }));
-    }
-  } catch (e) {
-    console.error("Storage error:", e);
-  }
-}
-function idbOpen() {
-  return new Promise<IDBDatabase>((resolve, reject) => {
-    const r = indexedDB.open('bs_repo_db_v1', 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('kv');
-    r.onsuccess = () => resolve(r.result);
-    r.onerror = () => reject(r.error);
-  });
-}
-async function idbSet(key: string, val: any) {
-  const db = await idbOpen();
-  return new Promise<void>((res, rej) => {
-    const tx = db.transaction('kv', 'readwrite');
-    tx.objectStore('kv').put(val, key);
-    tx.oncomplete = () => res();
-    tx.onerror = () => rej(tx.error);
-  });
-}
-async function idbGet(key: string) {
-  const db = await idbOpen();
-  return new Promise<any>((res, rej) => {
-    const tx = db.transaction('kv', 'readonly');
-    const req = tx.objectStore('kv').get(key);
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
-}
-private async get<T>(key: string, fallback: T): Promise<T> {
-  try {
-    // Try to fetch from server state (fast path)
-    try {
-      const resp = await fetch(`${this.serverOrigin}/api/state`);
-      if (resp.ok) {
-        const state = await resp.json();
-        if (state[`bs_${key}`] !== undefined) return state[`bs_${key}`];
-      }
-    } catch (e) {
-      // server not available
-    }
-
-    // localStorage
-    const raw = localStorage.getItem(`bs_${key}`);
-    if (raw) return JSON.parse(raw);
-    // IndexedDB fallback
-    const idbVal = await idbGet(`bs_${key}`).catch(() => null);
-    if (idbVal !== undefined && idbVal !== null) return idbVal;
-    return fallback;
-  } catch {
-    return fallback;
-  }
-}
-async function uploadFile(name: string, base64: string) {
-  try {
-    const resp = await fetch(`${serverOrigin}/api/upload`, {
-      method: 'POST',
-      body: JSON.stringify({ filename: name, contentBase64: base64 }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    if (resp.ok) {
-      const j = await resp.json();
-      return j.url; // saved URL on server
-    }
-  } catch {}
-  // fallback to IndexedDB storage: store base64 and return a pseudo-url 'idb://<key>'
-  await idbSet(`file_${Date.now()}_${name}`, base64);
-  return `idb://file_${Date.now()}_${name}`;
-}
 export const storage = new StorageService();
