@@ -1,6 +1,7 @@
 import React from 'react';
 import { Logo } from './Logo';
 import { Shield, PhoneCall, Award, BookOpen, Calendar, HelpCircle, Users } from 'lucide-react';
+import { InstituteSettings } from '../../types';
 
 interface HeaderProps {
   onOpenAdminLogin: () => void;
@@ -8,6 +9,7 @@ interface HeaderProps {
   hotline: string;
   logoUrl?: string;
   headerTextSize?: 'normal' | 'large' | 'extra-large';
+  settings?: InstituteSettings;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,7 +17,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   hotline,
   logoUrl,
-  headerTextSize
+  headerTextSize,
+  settings
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
@@ -51,8 +54,11 @@ export const Header: React.FC<HeaderProps> = ({
             <Logo
               size="md"
               showText={true}
-              customLogoUrl={logoUrl}
-              textSize={headerTextSize}
+              customLogoUrl={logoUrl || settings?.logoUrl}
+              textSize={headerTextSize || settings?.headerTextSize}
+              instituteName={settings?.name}
+              subName={settings?.subName}
+              founderName={settings?.founderName}
             />
           </div>
 

@@ -6,6 +6,9 @@ interface LogoProps {
   className?: string;
   customLogoUrl?: string;
   textSize?: 'normal' | 'large' | 'extra-large';
+  instituteName?: string;
+  subName?: string;
+  founderName?: string;
 }
 
 export const Logo: React.FC<LogoProps> = ({
@@ -13,7 +16,10 @@ export const Logo: React.FC<LogoProps> = ({
   showText = true,
   className = '',
   customLogoUrl,
-  textSize = 'normal'
+  textSize = 'normal',
+  instituteName,
+  subName,
+  founderName
 }) => {
   const sizeMap = {
     sm: { box: 'w-9 h-9', text: 'text-sm' },
@@ -59,10 +65,20 @@ export const Logo: React.FC<LogoProps> = ({
       {showText && (
         <div className="flex flex-col min-w-0">
           <h1 className={`${titleScaleClass} font-bold text-slate-900 tracking-tight leading-tight whitespace-nowrap`}>
-            <span className="text-blue-900">BS</span> <span className="text-amber-600">E-Learning</span> &amp; <span className="text-slate-900">IT Zone</span>
+            {instituteName ? (
+              <span className="text-blue-900">{instituteName}</span>
+            ) : (
+              <>
+                <span className="text-blue-900">BS</span> <span className="text-amber-600">E-Learning</span> &amp; <span className="text-slate-900">IT Zone</span>
+              </>
+            )}
           </h1>
           <p className="brand-sub font-medium text-slate-600 tracking-normal whitespace-nowrap hidden sm:block">
-            প্রতিষ্ঠাতা ও প্রধান শিক্ষক: <span className="text-blue-900 font-semibold">বোরহানউদ্দিন মহিম</span>
+            {subName || (
+              <>
+                প্রতিষ্ঠাতা ও প্রধান শিক্ষক: <span className="text-blue-900 font-semibold">{founderName || 'বোরহানউদ্দিন মহিম'}</span>
+              </>
+            )}
           </p>
         </div>
       )}

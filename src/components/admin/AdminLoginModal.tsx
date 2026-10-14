@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { storage } from '../../services/storage';
-import { Shield, Lock, Mail, Eye, EyeOff, X, KeyRound, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Shield, Lock, Mail, X, KeyRound, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
 
 interface AdminLoginModalProps {
   isOpen: boolean;
@@ -9,16 +9,14 @@ interface AdminLoginModalProps {
 }
 
 export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
-  const [email, setEmail] = useState('onlinetutionbyborhansir@gmail.com');
-  const [password, setPassword] = useState('01612118307');
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   // Master PIN recovery state
   const [isForgotMode, setIsForgotMode] = useState(false);
   const [enteredPin, setEnteredPin] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [showNewPassword, setShowNewPassword] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
   if (!isOpen) return null;
@@ -72,13 +70,24 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
     }, 2000);
   };
 
+  const handleClose = () => {
+    setEmail('');
+    setPassword('');
+    setEnteredPin('');
+    setNewPassword('');
+    setError(null);
+    setIsForgotMode(false);
+    setResetSuccess(false);
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md">
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Top Header */}
         <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-blue-900 text-white p-6 relative text-center">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
             <X className="w-5 h-5" />
@@ -118,29 +127,27 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
           ) : isForgotMode ? (
             /* Master PIN Recovery Form */
             <form onSubmit={handleMasterPinReset} className="space-y-4">
-              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-950 space-y-1">
-                <p className="font-bold flex items-center gap-1.5 text-amber-900">
-                  <KeyRound className="w-4 h-4 text-amber-700" />
+              <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-950 space-y-1">
+                <p className="font-bold flex items-center gap-1.5 text-blue-900">
+                  <KeyRound className="w-4 h-4 text-blue-700" />
                   <span>মাস্টার পিন (Master PIN) রিকভারি</span>
                 </p>
                 <p className="text-[11px] text-slate-700">
-                  অ্যাডমিন প্যানেলে সেট করা ৬-১১ ডিজিটের মাস্টার পিন ব্যবহার করে তাৎক্ষণিক নতুন পাসওয়ার্ড সেট করুন।
-                </p>
-                <p className="text-[10px] text-slate-500 font-mono pt-0.5">
-                  ডিফল্ট মাস্টার পিন: <b className="text-blue-900">{creds.masterPin || '992288'}</b> (৬-১১ ডিজিট)
+                  অ্যাডমিন প্যানেলে নির্ধারিত ৬-১১ ডিজিটের সুরক্ষিত ও গোপন মাস্টার পিন ব্যবহার করে তাৎক্ষণিক পাসওয়ার্ড রিসেট করুন।
                 </p>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  মাস্টার পিন (Master PIN) লিখুন * (৬-১১ ডিজিট)
+                  গোপন মাস্টার পিন (Master PIN) লিখুন * (৬-১১ ডিজিট)
                 </label>
                 <input
                   type="password"
                   required
                   minLength={6}
                   maxLength={11}
-                  placeholder="যেমন: 992288 (৬ থেকে ১১ ডিজিট)"
+                  autoComplete="new-password"
+                  placeholder="••••••••"
                   value={enteredPin}
                   onChange={(e) => setEnteredPin(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono tracking-widest text-center font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-600"
@@ -148,25 +155,16 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-700">
-                    নতুন গোপন পাসওয়ার্ড *
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="text-[11px] text-slate-500 hover:text-slate-800"
-                  >
-                    {showNewPassword ? 'লুকান' : 'দেখুন'}
-                  </button>
-                </div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  নতুন গোপন পাসওয়ার্ড * (সর্বদা মাস্কড)
+                </label>
                 <input
-                  type={showNewPassword ? 'text' : 'password'}
+                  type="password"
                   required
-                  placeholder="নতুন পাসওয়ার্ড দিন"
+                  placeholder="••••••••••••"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono tracking-widest focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                 />
               </div>
 
@@ -201,6 +199,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
                   <input
                     type="email"
                     required
+                    autoComplete="off"
+                    placeholder="অ্যাডমিন ইমেইল / ইউজার আইডি"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
@@ -227,24 +227,15 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ isOpen, onClos
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type="password"
                     required
+                    autoComplete="new-password"
+                    placeholder="••••••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-sm font-mono tracking-widest text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-mono tracking-widest text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="p-1 text-slate-400 hover:text-slate-600 absolute right-3 top-1/2 -translate-y-1/2"
-                    title={showPassword ? 'লুকান' : 'দেখুন'}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">
-                  ডিফল্ট আইডি: onlinetutionbyborhansir@gmail.com | পাসওয়ার্ড: 01612118307
-                </p>
               </div>
 
               <button

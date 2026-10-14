@@ -69,13 +69,23 @@ export const FloatingChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [chatbotSettings, setChatbotSettings] = useState(storage.getChatbot());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Sync with storage updates when admin edits chatbot
+  useEffect(() => {
+    const handleSync = () => {
+      setChatbotSettings(storage.getChatbot());
+    };
+    window.addEventListener('bs_sync', handleSync);
+    return () => window.removeEventListener('bs_sync', handleSync);
+  }, []);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'm-1',
       sender: 'bot',
-      text: 'আসসালামু আলাইকুম! আমি "BS Learning & IT Zone"-এর নিজস্ব স্মার্ট এআই সহকারী।\n\nওয়েবসাইটের যেকোনো নোটিস, হ্যান্ডনোট, পরীক্ষার রুটিন, কোর্স ফি জানতে আমাকে প্রশ্ন করতে পারেন। এছাড়া আমার কাছে যেকোনো গণিত বা অংক (যোগ, বিয়োগ, গুণ, ভাগ, রুট) সমাধান করিয়ে নিতে পারেন!',
+      text: chatbotSettings.welcomeMessage || 'আসসালামু আলাইকুম! আমি "BS Learning & IT Zone"-এর নিজস্ব স্মার্ট এআই সহকারী।\n\nওয়েবসাইটের যেকোনো নোটিস, হ্যান্ডনোট, পরীক্ষার রুটিন, কোর্স ফি জানতে আমাকে প্রশ্ন করতে পারেন। এছাড়া আমার কাছে যেকোনো গণিত বা অংক (যোগ, বিয়োগ, গুণ, ভাগ, রুট) সমাধান করিয়ে নিতে পারেন!',
       timestamp: 'এখন'
     }
   ]);
@@ -90,14 +100,16 @@ export const FloatingChatbot: React.FC = () => {
     }
   }, [messages, isOpen]);
 
-  const quickChips = [
-    'কম্পিউটার কোর্সের ফি কত?',
-    '২৫০ + ৩৫০ কত হয়?',
-    'বাংলা কিউআর দিয়ে পেমেন্ট নিয়ম',
-    'সহীহ কুরআন শিক্ষার ক্লাস সময়',
-    '√৬২৫ এর বর্গমূল কত?',
-    'নতুন কোনো নোটিস আছে?'
-  ];
+  const quickChips = chatbotSettings.quickChips && chatbotSettings.quickChips.length > 0
+    ? chatbotSettings.quickChips
+    : [
+        'কম্পিউটার কোর্সের ফি কত?',
+        '২৫০ + ৩৫০ কত হয়?',
+        'বাংলা কিউআর দিয়ে পেমেন্ট নিয়ম',
+        'সহীহ কুরআন শিক্ষার ক্লাস সময়',
+        '√৬২৫ এর বর্গমূল কত?',
+        'নতুন কোনো নোটিস আছে?'
+      ];
 
   const handleSend = (textToSend?: string) => {
     const query = (textToSend || input).trim();
@@ -132,7 +144,7 @@ export const FloatingChatbot: React.FC = () => {
         return;
       }
 
-      // 2. Read live website data (Courses, Notices, Notes, Routines, Settings)
+      // 2. Read live website data (Courses, Notices, Notes, Routines, Settings, KnowledgeBase)
       const courses = storage.getCourses();
       const notices = storage.getNotices();
       const notes = storage.getNotes();
@@ -143,33 +155,77 @@ export const FloatingChatbot: React.FC = () => {
       const lowerQuery = query.toLowerCase();
       let matchedAnswer: string | null = null;
 
-      // Check notices
-      if (lowerQuery.includes('নোটিস') || lowerQuery.includes('বিজ্ঞপ্তি') || lowerQuery.includes('notice')) {
-        const topNotices = notices.slice(0, 2).map((n, i) => `${i + 1}. ${n.title} (${n.date})`).join('\n');
+      // 3. Search Admin's Custom Info Blocks (Module 15)
+      if (chatbotData.infoBlocks && chatbotData.infoBlocks.length > 0) {
+        for (const block of chatbotData.infoBlocks) {
+          if (!block.isActive) continue;
+          const blockTitle = block.title.toLowerCase();
+          const matchesKeyword = block.keywords?.some(k => k.trim() && lowerQuery.includes(k.trim().toLowerCase()));
+          const titleWords = blockTitle.split(/[\s,–-]+/).filter(w => w.length > 2);
+          const matchesTitle = titleWords.some(w => lowerQuery.includes(w));
+          const queryIncludesTitle = lowerQuery.includes(blockTitle);
+
+          if (matchesKeyword || queryIncludesTitle || matchesTitle) {
+            matchedAnswer = `📌 [${block.title}]\n\n${block.content}`;
+            break;
+          }
+        }
+      }
+
+      // 4. Search Admin's Large 50,000-Word Knowledge Base Text
+      if (!matchedAnswer && chatbotData.knowledgeBaseText) {
+        const sections = chatbotData.knowledgeBaseText.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+        const queryTerms = lowerQuery.split(/[\s,?!;।]+/).filter(w => w.length > 1);
+
+        let bestSection = '';
+        let highestMatches = 0;
+
+        for (const sec of sections) {
+          const lowerSec = sec.toLowerCase();
+          let matchCount = 0;
+          for (const term of queryTerms) {
+            if (lowerSec.includes(term)) {
+              matchCount++;
+            }
+          }
+          if (matchCount > highestMatches) {
+            highestMatches = matchCount;
+            bestSection = sec;
+          }
+        }
+
+        // If at least 2 words match or section strongly relevant
+        if (highestMatches >= 2 && bestSection) {
+          matchedAnswer = bestSection;
+        } else if (highestMatches === 1 && bestSection && queryTerms.length <= 3) {
+          matchedAnswer = bestSection;
+        }
+      }
+
+      // 5. Check notices
+      if (!matchedAnswer && (lowerQuery.includes('নোটিস') || lowerQuery.includes('বিজ্ঞপ্তি') || lowerQuery.includes('notice'))) {
+        const topNotices = notices.slice(0, 3).map((n, i) => `${i + 1}. ${n.title} (${n.date})`).join('\n');
         matchedAnswer = `📢 বর্তমান সক্রিয় নোটিসসমূহ:\n${topNotices}\n\nবিস্তারিত দেখতে হোম পেজের নোটিস বোর্ডে ক্লিক করুন।`;
       }
-      // Check free notes
-      else if (lowerQuery.includes('নোট') || lowerQuery.includes('সাজেশন') || lowerQuery.includes('note') || lowerQuery.includes('pdf')) {
+      // 6. Check free notes
+      else if (!matchedAnswer && (lowerQuery.includes('নোট') || lowerQuery.includes('সাজেশন') || lowerQuery.includes('note') || lowerQuery.includes('pdf'))) {
         const topNotes = notes.slice(0, 3).map((n, i) => `${i + 1}. ${n.title} (${n.subject})`).join('\n');
         matchedAnswer = `📚 আমাদের ফ্রি নোট ও সাজেশনসমূহ:\n${topNotes}\n\nহোম পেজের "ফ্রি নোট ও সাজেশন" অপশন থেকে যেকোনো সময় পিডিএফ ডাউনলোড করতে পারবেন।`;
       }
-      // Check QR / Payment
-      else if (lowerQuery.includes('কিউআর') || lowerQuery.includes('qr') || lowerQuery.includes('পেমেন্ট') || lowerQuery.includes('বিকাশ') || lowerQuery.includes('নগদ')) {
+      // 7. Check QR / Payment
+      else if (!matchedAnswer && (lowerQuery.includes('কিউআর') || lowerQuery.includes('qr') || lowerQuery.includes('পেমেন্ট') || lowerQuery.includes('বিকাশ') || lowerQuery.includes('নগদ'))) {
         matchedAnswer = `💳 পেমেন্ট তথ্য:\nআমাদের প্রতিষ্ঠানে "বাংলা কিউআর (Bangla QR)"-এর মাধ্যমে পেমেন্ট গ্রহণ করা হয়। কোনো নির্দিষ্ট ফোন নম্বর ছাড়াই যেকোনো ব্যাংক অ্যাপ বা বিকাশ/নগদ দিয়ে কিউআর স্ক্যান করে পেমেন্ট করতে পারবেন। এরপর TrxID সাবমিট করলেই আবেদন প্রসেস হবে।`;
       }
-      // Check courses
-      else if (lowerQuery.includes('কম্পিউটার') || lowerQuery.includes('computer')) {
-        const comp = courses.find(c => c.id.includes('computer'));
-        matchedAnswer = `💻 কম্পিউটার অফিস অ্যাপ্লিকেশন (৬ মাস):\nভর্তি ফি: মাত্র ${toBengaliNum(comp?.admissionFee || 1500)} টাকা (অফার মূল্য: ৩,৫০০৳)। পরীক্ষা দেওয়ার পূর্বে বাকি ফি এবং সরকারি সনদ উত্তোলনের সময় ৫০০ টাকা। এই কোর্সে সরকার-অনুমোদিত সার্টিফিকেট অর্জনের বিশেষ সুবিধা রয়েছে।`;
+      // 8. Check specific courses dynamically
+      else if (!matchedAnswer) {
+        const matchedCourse = courses.find(c => lowerQuery.includes(c.title.toLowerCase()) || c.title.toLowerCase().includes(lowerQuery));
+        if (matchedCourse) {
+          matchedAnswer = `🎓 ${matchedCourse.title}:\n• কোর্স মেয়াদ: ${matchedCourse.duration}\n• অফার ভর্তি ফি: ${toBengaliNum(matchedCourse.admissionFee)} টাকা\n• নিয়মিত মাসিক ফি: ${toBengaliNum(matchedCourse.monthlyFee)} টাকা\n• কোর্স বিবরণ: ${matchedCourse.description}`;
+        }
       }
-      else if (lowerQuery.includes('কুরআন') || lowerQuery.includes('quran')) {
-        matchedAnswer = `📖 সহীহ কুরআন শিক্ষা কোর্স:\nভর্তি ফি: ৫০০ টাকা (প্রথম মাস সম্পূর্ণ অন্তর্ভুক্ত)। দ্বিতীয় মাস থেকে মাসিক ফি ৫০০ টাকা। এই কোর্সের সার্টিফিকেট আজীবন সম্পূর্ণ ফ্রি!`;
-      }
-      else if (lowerQuery.includes('হিসাববিজ্ঞান') || lowerQuery.includes('accounting')) {
-        matchedAnswer = `📊 এসএসসি ও এইচএসসি হিসাববিজ্ঞান:\nঅফার ভর্তি ফি: ৮০০ টাকা (কাটা মূল্য ১,০০০৳)। নিয়মিত মাসিক ফি ৫০০ টাকা করে প্রযোজ্য। জাবেদা, খতিয়ান, রেওয়ামিল ও আর্থিক বিবরণী হাতে-কলমে শেখানো হয়।`;
-      }
-      // Match custom FAQs in storage
-      else {
+
+      // 9. Match custom FAQs in storage
+      if (!matchedAnswer) {
         for (const faq of chatbotData.faqs || []) {
           if (faq.question.toLowerCase().includes(lowerQuery) || lowerQuery.includes(faq.question.toLowerCase())) {
             matchedAnswer = faq.answer;
@@ -185,9 +241,9 @@ export const FloatingChatbot: React.FC = () => {
       // Fallback: General Education knowledge or Founder guidance
       if (!matchedAnswer) {
         if (lowerQuery.includes('প্রধান শিক্ষক') || lowerQuery.includes('বোরহানউদ্দিন') || lowerQuery.includes('মহিম') || lowerQuery.includes('প্রতিষ্ঠাতা')) {
-          matchedAnswer = `BS Learning & IT Zone-এর প্রতিষ্ঠাতা ও প্রধান শিক্ষক হলেন জনাব বোরহানউদ্দিন মহিম। তিনি দীর্ঘ ১০+ বছর ধরে সফলভাবে হাজারো শিক্ষার্থীকে জিপিএ-৫ ও দক্ষ জনশক্তিতে রূপান্তর করেছেন।`;
+          matchedAnswer = `${settings.name}-এর প্রতিষ্ঠাতা ও প্রধান শিক্ষক হলেন জনাব ${settings.founderName}। তিনি দীর্ঘ ১০+ বছর ধরে সফলভাবে হাজারো শিক্ষার্থীকে জিপিএ-৫ ও দক্ষ জনশক্তিতে রূপান্তর করেছেন।`;
         } else {
-          matchedAnswer = `ধন্যবাদ আপনার বার্তার জন্য! BS Learning & IT Zone-এর নিজস্ব এআই সহকারী হিসেবে আমি আপনার সেবায় নিয়োজিত। আপনি যেকোনো কোর্স, নোটিস, রুটিন বা গাণিতিক সমস্যার জন্য প্রশ্ন করতে পারেন।`;
+          matchedAnswer = `ধন্যবাদ আপনার বার্তার জন্য! ${chatbotData.botName || 'BS Learning AI'}-এর কাছে আপনি যেকোনো কোর্স, ভর্তি ফি, নোটিস, রুটিন বা গাণিতিক সমস্যার জন্য প্রশ্ন করতে পারেন।`;
         }
       }
 
@@ -217,7 +273,7 @@ export const FloatingChatbot: React.FC = () => {
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-900 animate-pulse" />
           </div>
           <div className="text-left hidden sm:block">
-            <span className="block text-xs font-bold leading-none text-white">BS নিজস্ব স্মার্ট AI</span>
+            <span className="block text-xs font-bold leading-none text-white">{chatbotSettings.botName || 'BS নিজস্ব স্মার্ট AI'}</span>
             <span className="block text-[10px] text-amber-300 font-semibold leading-none mt-1">অংক সমাধান ও তথ্য</span>
           </div>
         </button>
@@ -233,7 +289,7 @@ export const FloatingChatbot: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
-                  <span>BS Learning নিজস্ব এআই</span>
+                  <span>{chatbotSettings.botName || 'BS Learning নিজস্ব এআই'}</span>
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                 </h4>
                 <p className="text-[10px] text-amber-300 font-medium">লাইভ ডাটা রিডার • বিল্ট-ইন ক্যালকুলেটর</p>

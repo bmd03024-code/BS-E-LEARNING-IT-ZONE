@@ -64,9 +64,12 @@ export default function App() {
       setDemoClasses(storage.getDemoClasses());
     };
 
+    // Immediate initial sync
+    handleStorageSync();
+
     window.addEventListener('bs_sync', handleStorageSync);
     return () => window.removeEventListener('bs_sync', handleStorageSync);
-  }, []);
+  }, [isAdminLoggedIn]);
 
   // Universal Navigation & Shortcut Handler
   const handleNavigate = (target: string) => {
@@ -163,6 +166,9 @@ export default function App() {
         onOpenAdminLogin={() => setIsAdminLoginModalOpen(true)}
         onNavigate={handleNavigate}
         hotline={settings.hotline}
+        logoUrl={settings.logoUrl}
+        headerTextSize={settings.headerTextSize}
+        settings={settings}
       />
 
       {/* Main Frontend Page Flow */}

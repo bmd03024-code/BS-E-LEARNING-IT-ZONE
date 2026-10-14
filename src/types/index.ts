@@ -189,6 +189,7 @@ export interface ResultRecord {
 
 export interface AdmitCardRecord {
   id: string;
+  studentId?: string;
   academicYear: string;
   courseId: string;
   roll: string;
@@ -197,9 +198,11 @@ export interface AdmitCardRecord {
   motherName: string;
   examType: string;
   examDate: string;
+  examTime?: string;
   examCenter: string;
   published: boolean;
   instructions: string[];
+  studentPhoto?: string;
   feeCleared?: boolean;
   isBlocked?: boolean;
   blockedReason?: string;
@@ -210,6 +213,7 @@ export interface LedgerItem {
   type: 'income' | 'expense';
   category: string;
   description: string;
+  title?: string;
   amount: number;
   date: string;
   academicYear: string;
@@ -229,6 +233,7 @@ export interface NoticeItem {
 export interface GalleryItem {
   id: string;
   title: string;
+  caption?: string;
   type: 'image' | 'video' | 'embed';
   url: string;
   category: string;
@@ -260,6 +265,16 @@ export interface DemoClassItem {
   description: string;
 }
 
+export interface ChatbotInfoBlock {
+  id: string;
+  title: string;
+  category: string;
+  content: string;
+  keywords?: string[];
+  isActive: boolean;
+  updatedAt?: string;
+}
+
 export interface ChatbotFAQ {
   id: string;
   question: string;
@@ -268,8 +283,15 @@ export interface ChatbotFAQ {
 }
 
 export interface ChatbotSettings {
+  botName?: string;
+  welcomeMessage?: string;
   basePrompt: string;
+  // Large comprehensive knowledge base text (capacity ~50,000 words)
+  knowledgeBaseText?: string;
+  // Multiple distinct information blocks added by admin
+  infoBlocks?: ChatbotInfoBlock[];
   faqs: ChatbotFAQ[];
+  quickChips?: string[];
 }
 
 export interface CertificateRecord {

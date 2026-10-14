@@ -30,6 +30,9 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                 showText={true}
                 customLogoUrl={settings.logoUrl}
                 textSize={settings.headerTextSize}
+                instituteName={settings.name}
+                subName={settings.subName}
+                founderName={settings.founderName}
               />
             </div>
 
