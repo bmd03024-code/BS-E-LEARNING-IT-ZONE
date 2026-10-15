@@ -649,7 +649,7 @@ const initialCertificates: CertificateRecord[] = [
     feePaid: true,
     isFree: false,
     feeAmount: 500,
-    hasEverPaid: true, // Already paid! All subsequent downloads are 100% FREE!
+    hasEverPaid: true,
     hasGovtCert: true
   },
   {
@@ -666,7 +666,7 @@ const initialCertificates: CertificateRecord[] = [
     grade: "মুমতাজ (Excellent)",
     isFirstIssue: true,
     feePaid: true,
-    isFree: true, // Always completely free
+    isFree: true,
     feeAmount: 0,
     hasEverPaid: true,
     hasGovtCert: false
@@ -905,7 +905,7 @@ BS E-Learning & IT Zone একটি আধুনিক ও সরকারি �
 const initialCredentials: AdminCredentials = {
   email: "onlinetutionbyborhansir@gmail.com",
   password: "01612118307",
-  masterPin: "992288" // Master PIN (6 to 11 digits) for instant password recovery
+  masterPin: "992288"
 };
 
 class StorageService {
@@ -1083,9 +1083,12 @@ class StorageService {
     localStorage.clear();
     window.location.reload();
   }
+}
+
 const originalSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function (key: string, value: string) {
   originalSetItem(key, value);
   window.dispatchEvent(new Event('bs_sync'));
-}
+};
+
 export const storage = new StorageService();
