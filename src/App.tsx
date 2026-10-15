@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { storage } from './services/storage';
-import { Course, Student } from './types';
+import { Course } from './types';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
 import { HeroSlider } from './components/home/HeroSlider';
@@ -29,16 +29,16 @@ export default function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
 
-  // App Data with Real-Time Synced State
-  const [settings, setSettings] = useState(storage.getSettings());
-  const [slides, setSlides] = useState(storage.getSlides());
-  const [shortcuts, setShortcuts] = useState(storage.getShortcuts());
-  const [courses, setCourses] = useState(storage.getCourses());
-  const [mentors, setMentors] = useState(storage.getMentors());
-  const [notices, setNotices] = useState(storage.getNotices());
-  const [gallery, setGallery] = useState(storage.getGallery());
-  const [notes, setNotes] = useState(storage.getNotes());
-  const [demoClasses, setDemoClasses] = useState(storage.getDemoClasses());
+  // App Data States
+  const [settings, setSettings] = useState(() => storage.getSettings());
+  const [slides, setSlides] = useState(() => storage.getSlides());
+  const [shortcuts, setShortcuts] = useState(() => storage.getShortcuts());
+  const [courses, setCourses] = useState(() => storage.getCourses());
+  const [mentors, setMentors] = useState(() => storage.getMentors());
+  const [notices, setNotices] = useState(() => storage.getNotices());
+  const [gallery, setGallery] = useState(() => storage.getGallery());
+  const [notes, setNotes] = useState(() => storage.getNotes());
+  const [demoClasses, setDemoClasses] = useState(() => storage.getDemoClasses());
 
   // Modals state
   const [enrollModalOpen, setEnrollModalOpen] = useState(false);
@@ -50,31 +50,47 @@ export default function App() {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [idCardModalOpen, setIdCardModalOpen] = useState(false);
 
-  // Sync listener to immediately reflect admin changes on the frontend across tabs/events
+  // Robust Real-Time Sync function for all tabs and admin updates
+  const refreshAppData = () => {
+    setSettings(storage.getSettings());
+    setSlides(storage.getSlides());
+    setShortcuts(storage.getShortcuts());
+    setCourses(storage.getCourses());
+    setMentors(storage.getMentors());
+    setNotices(storage.getNotices());
+    setGallery(storage.getGallery());
+    setNotes(storage.getNotes());
+    setDemoClasses(storage.getDemoClasses());
+  };
+
   useEffect(() => {
-    const handleStorageSync = () => {
-      setSettings(storage.getSettings());
-      setSlides(storage.getSlides());
-      setShortcuts(storage.getShortcuts());
-      setCourses(storage.getCourses());
-      setMentors(storage.getMentors());
-      setNotices(storage.getNotices());
-      setGallery(storage.getGallery());
-      setNotes(storage.getNotes());
-      setDemoClasses(storage.getDemoClasses());
+    // Immediate initial sync on mount
+    refreshAppData();
+
+    // Listen to custom sync events triggered from admin panel or storage service
+    const handleCustomSync = () => {
+      refreshAppData();
     };
 
-    // Immediate initial sync
-    handleStorageSync();
+    // Listen to cross-tab storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key && e.key.startsWith('bs_')) {
+        refreshAppData();
+      }
+    };
 
-    window.addEventListener('bs_sync', handleStorageSync);
-    window.addEventListener('storage', handleStorageSync);
+    window.addEventListener('bs_sync', handleCustomSync);
+    window.addEventListener('storage', handleStorageChange);
     
+    // Also poll slightly or listen to focus event to catch instant updates if needed
+    window.addEventListener('focus', handleCustomSync);
+
     return () => {
-      window.removeEventListener('bs_sync', handleStorageSync);
-      window.removeEventListener('storage', handleStorageSync);
+      window.removeEventListener('bs_sync', handleCustomSync);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleCustomSync);
     };
-  }, [isAdminLoggedIn]);
+  }, []);
 
   // Universal Navigation & Shortcut Handler
   const handleNavigate = (target: string) => {
@@ -141,7 +157,6 @@ export default function App() {
         setContactModalOpen(true);
         break;
       case 'chatbot':
-        // Let user scroll to bottom or floating chatbot
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         break;
       default:
@@ -158,15 +173,20 @@ export default function App() {
   if (isAdminLoggedIn) {
     return (
       <AdminDashboard
-        onLogout={() => setIsAdminLoggedIn(false)}
-        onViewWebsite={() => setIsAdminLoggedIn(false)}
+        onLogout={() => {
+          setIsAdminLoggedIn(false);
+          refreshAppData();
+        }}
+        onViewWebsite={() => {
+          setIsAdminLoggedIn(false);
+          refreshAppData();
+        }}
       />
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-amber-400 selection:text-slate-950">
-      {/* 1. Header & Branding with CSS clamp and Admin Panel Entry Button */}
       <Header
         onOpenAdminLogin={() => setIsAdminLoginModalOpen(true)}
         onNavigate={handleNavigate}
@@ -176,68 +196,56 @@ export default function App() {
         settings={settings}
       />
 
-      {/* Main Frontend Page Flow */}
       <main className="grow">
-        {/* 2. Hero Slider (3 slides dynamic) */}
         <HeroSlider
           slides={slides}
           onCtaClick={handleNavigate}
         />
 
-        {/* 3. Quick Action Shortcuts Grid (13 Items) */}
         <QuickActionGrid
           shortcuts={shortcuts}
           onActionClick={handleNavigate}
         />
 
-        {/* 4. Principal / Founder Message Section (বোরহানউদ্দিন মহিম) */}
         <FounderMessage
           settings={settings}
           onExploreCourses={() => handleNavigate('courses')}
         />
 
-        {/* 6. Courses Section with Dynamic Pricing & Countdown Timer */}
         <CoursesSection
           courses={courses}
           onEnrollCourse={handleEnrollCourse}
         />
 
-        {/* 7. Directly Visible Monthly Fee Payment Section with QR Code */}
         <MonthlyFeePaymentSection
           courses={courses}
           settings={settings}
         />
 
-        {/* 5. Mentors / Faculty Section with Popup Biography */}
         <MentorsSection
           mentors={mentors}
         />
 
-        {/* 10. Official Notice Board with Collapsible Images & Videos */}
         <NoticeSection
           notices={notices}
         />
 
-        {/* 13. Free Study Notes & Video Demo Lectures */}
         <FreeResourcesSection
           notes={notes}
           demoClasses={demoClasses}
         />
 
-        {/* 10. Gallery (Photos, Videos, Embeds) */}
         <GallerySection
           gallery={gallery}
         />
       </main>
 
-      {/* 12. Footer with Google Maps, Social Media & Dynamic Welcome Text */}
       <Footer
         settings={settings}
         onOpenAdminLogin={() => setIsAdminLoginModalOpen(true)}
         onNavigate={handleNavigate}
       />
 
-      {/* 11. Floating Smart Chatbot Widget */}
       <FloatingChatbot />
 
       {/* Modals */}
@@ -247,9 +255,7 @@ export default function App() {
         courses={courses}
         settings={settings}
         onClose={() => setEnrollModalOpen(false)}
-        onSuccess={() => {
-          // Success callback
-        }}
+        onSuccess={() => {}}
       />
 
       <AdmitCardModal
@@ -288,7 +294,6 @@ export default function App() {
         courses={courses}
       />
 
-      {/* Admin Login Gateway Modal */}
       <AdminLoginModal
         isOpen={isAdminLoginModalOpen}
         onClose={() => setIsAdminLoginModalOpen(false)}
@@ -299,4 +304,4 @@ export default function App() {
       />
     </div>
   );
-}
+         }
