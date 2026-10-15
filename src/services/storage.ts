@@ -1083,10 +1083,9 @@ class StorageService {
     localStorage.clear();
     window.location.reload();
   }
-}
 const originalSetItem = localStorage.setItem.bind(localStorage);
 localStorage.setItem = function (key: string, value: string) {
   originalSetItem(key, value);
   window.dispatchEvent(new Event('bs_sync'));
-};
+}
 export const storage = new StorageService();
