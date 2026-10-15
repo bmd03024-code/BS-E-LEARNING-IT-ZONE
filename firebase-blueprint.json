@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "InstituteModuleData": {
+      "title": "Institute Module Data",
+      "description": "Dynamic synchronized institutional state record for BS E-Learning & IT Zone",
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Identifier key for the module (e.g., settings, courses, notices)"
+        },
+        "data": {
+          "type": "object",
+          "description": "Payload contents or array of entities for the module"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server ISO timestamp when the record was last saved"
+        }
+      },
+      "required": ["key", "data"]
+    },
+    "OnlineApplication": {
+      "title": "Online Admission Application",
+      "description": "Student admission application submitted via Bangla QR payment",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique application identifier"
+        },
+        "studentName": {
+          "type": "string",
+          "description": "Full name of applicant"
+        },
+        "courseId": {
+          "type": "string",
+          "description": "Target course ID"
+        },
+        "trxId": {
+          "type": "string",
+          "description": "Bangla QR transaction reference"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected"],
+          "description": "Review status of application"
+        }
+      },
+      "required": ["id", "studentName", "courseId", "trxId", "status"]
+    }
+  },
+  "firestore": {
+    "/institute_data/{moduleKey}": {
+      "schema": "InstituteModuleData",
+      "description": "Global institutional database storing settings, courses, students, mentors, notices, and all admin modules"
+    },
+    "/applications/{applicationId}": {
+      "schema": "OnlineApplication",
+      "description": "Online student admission applications"
+    }
+  }
+}

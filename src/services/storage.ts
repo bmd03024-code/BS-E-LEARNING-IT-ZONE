@@ -19,6 +19,8 @@ import {
   EnrollmentApplication,
   AdminCredentials
 } from '../types';
+import { db, handleFirestoreError, OperationType } from '../firebase/config';
+import { collection, doc, onSnapshot, setDoc, getDocs, Unsubscribe } from 'firebase/firestore';
 
 // Default SVG assets for seals, signature, logos, and Bangla QR
 export const DEFAULT_ASSETS = {
@@ -975,9 +977,109 @@ export const compressImage = (file: File | string, maxWidth = 800, quality = 0.7
 class StorageService {
   private liveEventSource: EventSource | null = null;
   private currentDbVersion = 0;
+  private unsubscribeFirestore: Unsubscribe | null = null;
+  private isFirestoreReady = false;
 
   constructor() {
+    this.initFirestoreSync();
+    this.seedFirestoreIfEmpty();
     this.initLiveSync();
+  }
+
+  // 1. Firebase Firestore Real-Time Global Synchronization
+  public initFirestoreSync() {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const colRef = collection(db, 'institute_data');
+      this.unsubscribeFirestore = onSnapshot(
+        colRef,
+        (snapshot) => {
+          this.isFirestoreReady = true;
+          let changedCount = 0;
+
+          // Hydrate all documents on snapshot
+          snapshot.docs.forEach((d) => {
+            const key = d.id;
+            const docData = d.data();
+            if (docData && docData.data !== undefined) {
+              this.setLocalSilently(key, docData.data);
+              changedCount++;
+            }
+          });
+
+          // Immediate notification on changes across application
+          if (changedCount > 0 || !snapshot.empty) {
+            window.dispatchEvent(
+              new CustomEvent('bs_sync', {
+                detail: { fromFirestore: true, count: changedCount }
+              })
+            );
+          }
+        },
+        (error) => {
+          handleFirestoreError(error, OperationType.GET, 'institute_data');
+        }
+      );
+    } catch (e) {
+      console.warn('[Firestore] Real-time listener init notice:', e);
+    }
+  }
+
+  // Push individual document to Firestore Cloud
+  private async pushToFirestore<T>(key: string, value: T): Promise<void> {
+    try {
+      const docRef = doc(db, 'institute_data', key);
+      await setDoc(
+        docRef,
+        {
+          key,
+          data: value,
+          updatedAt: new Date().toISOString()
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, `institute_data/${key}`);
+    }
+  }
+
+  // Auto-seed Firestore on initial launch if empty
+  public async seedFirestoreIfEmpty(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const colRef = collection(db, 'institute_data');
+      const snap = await getDocs(colRef);
+      if (snap.empty) {
+        console.log('[Firestore] Seeding default institutional data to cloud...');
+        const initialMap: Record<string, any> = {
+          settings: initialSettings,
+          slides: initialSlides,
+          shortcuts: initialShortcuts,
+          courses: initialCourses,
+          mentors: initialMentors,
+          students: initialStudents,
+          routines: initialRoutines,
+          results: initialResults,
+          admit_cards: initialAdmitCards,
+          certificates: initialCertificates,
+          ledger: initialLedger,
+          notices: initialNotices,
+          notes: initialNotes,
+          demo_classes: initialDemoClasses,
+          gallery: initialGallery,
+          chatbot: initialChatbot,
+          applications: initialApplications,
+          admin_creds: initialCredentials
+        };
+
+        for (const [k, v] of Object.entries(initialMap)) {
+          await this.pushToFirestore(k, v);
+        }
+      }
+    } catch (e) {
+      console.warn('[Firestore] Seed check caught:', e);
+    }
   }
 
   // Real-time synchronization across all browsers worldwide
@@ -987,7 +1089,7 @@ class StorageService {
     // 1. Initial hydration from server database
     this.hydrateFromServer();
 
-    // 2. Establish live SSE stream
+    // 2. Establish live SSE stream as secondary channel
     try {
       this.liveEventSource = new EventSource('/api/live-sync');
 
@@ -1066,6 +1168,7 @@ class StorageService {
   private set<T>(key: string, value: T): void {
     this.setLocalSilently(key, value);
     window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
+    this.pushToFirestore(key, value);
     this.pushToServer(key, value);
   }
 
@@ -1103,6 +1206,11 @@ class StorageService {
         chatbot: this.getChatbot(),
         admin_creds: this.getAdminCredentials()
       };
+
+      // Push all records to Cloud Firestore
+      for (const [k, v] of Object.entries(fullDb)) {
+        this.pushToFirestore(k, v);
+      }
 
       await fetch('/api/sync/bulk', {
         method: 'POST',
