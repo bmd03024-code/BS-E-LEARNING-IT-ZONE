@@ -2,6 +2,14 @@
 // Supports 200,000+ words capacity, structured training chunks (1,000 words each),
 // and autonomous teacher Q&A pair learning.
 
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
+// @ts-ignore
+import firebaseConfig from '../firebase-applet-config.json';
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 export interface QAItem {
   id: string;
   question: string;
@@ -117,6 +125,7 @@ class AIKnowledgeStoreService {
 
   constructor() {
     this.init();
+    this.initRealtimeSync();
   }
 
   private init() {
@@ -136,12 +145,34 @@ class AIKnowledgeStoreService {
     }
   }
 
-  // Save QA items to local storage and sync to backend
+  // Real-time Firestore synchronization listener
+  private initRealtimeSync() {
+    try {
+      onSnapshot(doc(db, 'ai_kb', 'main_data'), (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          const remoteData = docSnapshot.data() as { qa?: QAItem[]; chunks?: TrainingChunk[] };
+          if (remoteData.qa && Array.isArray(remoteData.qa)) {
+            this.qaCache = remoteData.qa;
+            localStorage.setItem('bs_ai_qa_kb', JSON.stringify(this.qaCache));
+          }
+          if (remoteData.chunks && Array.isArray(remoteData.chunks)) {
+            this.chunksCache = remoteData.chunks;
+            localStorage.setItem('bs_ai_training_chunks', JSON.stringify(this.chunksCache));
+          }
+          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'ai_realtime_synced' } }));
+        }
+      });
+    } catch (e) {
+      console.warn('Realtime sync listener error:', e);
+    }
+  }
+
+  // Save QA items to local storage and sync to Firestore
   private persistQA() {
     try {
       localStorage.setItem('bs_ai_qa_kb', JSON.stringify(this.qaCache));
       window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'ai_qa_kb' } }));
-      this.syncToBackend('qa', this.qaCache);
+      this.syncToFirestore();
     } catch (e) {
       console.warn('Persist QA error:', e);
     }
@@ -152,22 +183,22 @@ class AIKnowledgeStoreService {
     try {
       localStorage.setItem('bs_ai_training_chunks', JSON.stringify(this.chunksCache));
       window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'ai_training_chunks' } }));
-      this.syncToBackend('chunks', this.chunksCache);
+      this.syncToFirestore();
     } catch (e) {
       console.warn('Persist chunks error:', e);
     }
   }
 
-  // Async backend sync to keep all worldwide clients in real-time sync
-  private async syncToBackend(type: 'qa' | 'chunks', data: any) {
+  // Sync current state to Firestore
+  private async syncToFirestore() {
     try {
-      await fetch('/api/ai/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, data })
-      });
-    } catch {
-      // Offline or local mode is fine
+      await setDoc(doc(db, 'ai_kb', 'main_data'), {
+        qa: this.qaCache,
+        chunks: this.chunksCache,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (e) {
+      console.warn('Firestore sync error:', e);
     }
   }
 
@@ -308,14 +339,12 @@ class AIKnowledgeStoreService {
       const lowerQ = item.question.toLowerCase();
       let score = 0;
 
-      // Exact or very close match
       if (lowerQ === lowerQuery) {
         score += 100;
       } else if (lowerQ.includes(lowerQuery) || lowerQuery.includes(lowerQ)) {
         score += 50;
       }
 
-      // Check keyword overlap
       for (const term of queryTerms) {
         if (item.keywords.some(k => k.toLowerCase() === term)) {
           score += 15;
@@ -331,7 +360,6 @@ class AIKnowledgeStoreService {
     }
 
     if (bestQA && highestQAScore >= 20) {
-      // Mark as used
       bestQA.timesUsed = (bestQA.timesUsed || 0) + 1;
       bestQA.lastUsedAt = new Date().toISOString();
       this.persistQA();
@@ -369,7 +397,6 @@ class AIKnowledgeStoreService {
         highestChunkScore = score;
         bestChunk = chunk;
 
-        // Extract most relevant sentence/paragraph
         const sentences = chunk.content.split(/[।.\n]+/).map(s => s.trim()).filter(Boolean);
         let bestSentence = sentences[0] || chunk.content;
         let bestSentScore = 0;
