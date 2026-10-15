@@ -17,19 +17,7 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- ফিক্সড স্ক্রিপ্ট: পাসওয়ার্ড মাস্কিং এবং সংরক্ষণ বাটন সচল করার জন্য -->
     <script>
-      document.addEventListener("click", function(e) {
-        // সংরক্ষণ করুন বাটন হ্যান্ডেল করা
-        const target = e.target;
-        if (target && (target.innerText.includes("সংরক্ষণ") || target.id.toLowerCase().includes("save") || target.classList.contains("save-btn"))) {
-          // রিয়্যাক্টের ডিফল্ট সাবমিশন বা রিফ্রেশ আটকাতে
-          setTimeout(() => {
-            alert("সফলভাবে সংরক্ষণ করা হয়েছে!");
-          }, 200);
-        }
-      });
-
       // লগইন বা পাসওয়ার্ড ইনপুট ফিল্ডগুলো অটো সিকিউর করার জন্য অবজার্ভার
       const observer = new MutationObserver(() => {
         const inputs = document.querySelectorAll('input');

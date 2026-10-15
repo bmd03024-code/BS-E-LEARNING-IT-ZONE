@@ -21,6 +21,8 @@ export interface InstituteSettings {
   youtubeUrl: string;
   tiktokUrl: string;
   mapEmbedUrl: string;
+  // Watermark for official certificates, admit cards, and student ID cards
+  watermarkUrl?: string;
   // Bangla QR Payment System
   banglaQrUrl: string;
   banglaQrHeading: string;
@@ -83,6 +85,7 @@ export interface Mentor {
   experience: string;
   specialist: string[];
   phone?: string;
+  whatsappNumber?: string;
   email?: string;
   bio: string;
   address?: string;

@@ -151,10 +151,10 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
           {foundResult ? (
             <div className="space-y-4">
               <div className="printable-area relative bg-white border-2 border-slate-800 p-6 sm:p-8 rounded-xl shadow-md overflow-hidden">
-                {/* Subtle Center Watermark with Institute Logo */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] select-none">
-                  {settings.logoUrl ? (
-                    <img src={settings.logoUrl} alt="Watermark" className="w-72 h-72 object-contain filter grayscale" />
+                {/* Subtle Center Watermark with Institute Logo / Watermark */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.09] select-none">
+                  {(settings.watermarkUrl || settings.logoUrl) ? (
+                    <img src={settings.watermarkUrl || settings.logoUrl} alt="Watermark" className="w-72 h-72 object-contain filter grayscale" />
                   ) : (
                     <div className="w-72 h-72 rounded-full border-8 border-dashed border-slate-900 flex flex-col items-center justify-center text-center p-4">
                       <span className="text-4xl font-black text-slate-950">BS ZONE</span>
@@ -273,6 +273,17 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     />
                     <span className="text-[10px] font-bold text-slate-600 mt-0.5">অফিশিয়াল যাচাইকৃত সিল</span>
                   </div>
+
+                  {settings.signatureSealUrl && (
+                    <div className="flex flex-col items-center">
+                      <img
+                        src={settings.signatureSealUrl}
+                        alt="প্রধান শিক্ষকের সিলমোহর"
+                        className="w-14 h-14 object-contain"
+                      />
+                      <span className="text-[9px] font-bold text-rose-800 mt-0.5">প্রধান শিক্ষকের সিল</span>
+                    </div>
+                  )}
 
                   <div className="flex flex-col items-center text-center">
                     <div className="relative">

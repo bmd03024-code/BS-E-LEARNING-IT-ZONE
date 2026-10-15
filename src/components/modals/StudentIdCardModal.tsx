@@ -157,8 +157,8 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({
               <div className="printable-area relative bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white rounded-3xl p-6 sm:p-7 shadow-2xl border-2 border-amber-400 overflow-hidden">
                 {/* Background Subtle Watermark */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 select-none">
-                  {settings.logoUrl ? (
-                    <img src={settings.logoUrl} alt="Watermark" className="w-56 h-56 object-contain" />
+                  {(settings.watermarkUrl || settings.logoUrl) ? (
+                    <img src={settings.watermarkUrl || settings.logoUrl} alt="Watermark" className="w-56 h-56 object-contain" />
                   ) : (
                     <div className="w-56 h-56 rounded-full border-8 border-dashed border-amber-400 flex flex-col items-center justify-center text-center p-4">
                       <span className="text-2xl font-black text-amber-300">BS ZONE</span>
@@ -248,10 +248,21 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({
                     <img
                       src={settings.institutionSealUrl}
                       alt="সিল"
-                      className="w-12 h-12 object-contain filter drop-shadow"
+                      className="w-11 h-11 object-contain filter drop-shadow"
                     />
-                    <span className="text-[9px] text-amber-300 font-semibold mt-0.5">অফিশিয়াল সিল</span>
+                    <span className="text-[8px] text-amber-300 font-semibold mt-0.5">অফিশিয়াল সিল</span>
                   </div>
+
+                  {settings.signatureSealUrl && (
+                    <div className="flex flex-col items-center">
+                      <img
+                        src={settings.signatureSealUrl}
+                        alt="প্রধান শিক্ষকের সিলমোহর"
+                        className="w-10 h-10 object-contain filter drop-shadow"
+                      />
+                      <span className="text-[8px] text-rose-300 font-semibold mt-0.5">শিক্ষকের সিল</span>
+                    </div>
+                  )}
 
                   <div className="flex flex-col items-center text-center">
                     <img
@@ -259,7 +270,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({
                       alt="স্বাক্ষর"
                       className="h-7 w-auto object-contain filter invert brightness-200"
                     />
-                    <div className="w-28 border-t border-slate-600 mt-0.5 pt-0.5">
+                    <div className="w-24 border-t border-slate-600 mt-0.5 pt-0.5">
                       <p className="text-[10px] font-bold text-white">{settings.founderName}</p>
                       <p className="text-[8px] text-amber-300 font-medium">প্রধান শিক্ষক</p>
                     </div>

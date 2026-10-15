@@ -1,7 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { storage } from '../../services/storage';
-import { MessageSquare, X, Send, Sparkles, Bot, User, Calculator, Globe, BookOpen } from 'lucide-react';
+import { aiKnowledgeStore } from '../../services/aiKnowledgeStore';
+import { MessageSquare, X, Send, Sparkles, Bot, User, Calculator, Globe, BookOpen, ExternalLink, Phone, MessageCircle, HelpCircle } from 'lucide-react';
 import { toBengaliNum } from '../home/CoursesSection';
+
+interface WhatsAppButtonInfo {
+  teacherName: string;
+  designation: string;
+  phone: string;
+  whatsappUrl: string;
+}
 
 interface ChatMessage {
   id: string;
@@ -9,18 +17,21 @@ interface ChatMessage {
   text: string;
   timestamp: string;
   isMath?: boolean;
+  isWiki?: boolean;
+  isTeacherQA?: boolean;
+  sourceBadge?: string;
+  sourceUrl?: string;
+  whatsappButtons?: WhatsAppButtonInfo[];
 }
 
 // Built-in arithmetic solver for BS Learning AI
 const evaluateMathExpression = (expr: string): string | null => {
-  // Convert Bengali numerals to English numerals for calculation
   const bnToEnMap: Record<string, string> = {
     '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
     '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
   };
   let normalized = expr.replace(/[০-৯]/g, (match) => bnToEnMap[match] || match);
 
-  // Replace Bangla operators with standard math symbols
   normalized = normalized
     .replace(/যোগ/g, '+')
     .replace(/বিয়োগ|বিয়োগ/g, '-')
@@ -29,7 +40,6 @@ const evaluateMathExpression = (expr: string): string | null => {
     .replace(/বর্গমূল/g, 'sqrt')
     .replace(/এর/g, '*');
 
-  // Check for square root: sqrt(X) or root X
   const sqrtMatch = normalized.match(/(?:sqrt|রুট)\s*\(?(\d+(?:\.\d+)?)\)?/i);
   if (sqrtMatch) {
     const val = parseFloat(sqrtMatch[1]);
@@ -37,7 +47,6 @@ const evaluateMathExpression = (expr: string): string | null => {
     return `√${toBengaliNum(val)} এর বর্গমূল = ${toBengaliNum(res.toFixed(2).replace(/\.00$/, ''))}`;
   }
 
-  // Check for percentage: X% of Y or X এর Y%
   const pctMatch = normalized.match(/(\d+(?:\.\d+)?)\s*%\s*(?:of|\*)\s*(\d+(?:\.\d+)?)/i) ||
                    normalized.match(/(\d+(?:\.\d+)?)\s*\*\s*(\d+(?:\.\d+)?)\s*%/i);
   if (pctMatch) {
@@ -47,11 +56,9 @@ const evaluateMathExpression = (expr: string): string | null => {
     return `${toBengaliNum(total)} এর ${toBengaliNum(p)}% = ${toBengaliNum(ans)}`;
   }
 
-  // Check for basic arithmetic e.g. 50 + 20, 100 * 5, (20 + 30) / 2
   const mathSanitized = normalized.replace(/[^0-9+\-*/().]/g, '');
   if (mathSanitized.length >= 3 && /[+\-*/]/.test(mathSanitized)) {
     try {
-      // Safe evaluation using Function with strict bounds
       const sanitized = mathSanitized.replace(/[^0-9+\-*/().\s]/g, '');
       const result = new Function(`return (${sanitized})`)();
       if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
@@ -65,6 +72,18 @@ const evaluateMathExpression = (expr: string): string | null => {
   return null;
 };
 
+// Helper to format Bangladeshi phone numbers to international WhatsApp format
+export const formatWhatsAppLink = (phone: string, text: string): string => {
+  const digitsOnly = phone.replace(/[^0-9]/g, '');
+  let fullNumber = digitsOnly;
+  if (digitsOnly.startsWith('01')) {
+    fullNumber = '88' + digitsOnly;
+  } else if (!digitsOnly.startsWith('88') && digitsOnly.length === 11) {
+    fullNumber = '88' + digitsOnly;
+  }
+  return `https://wa.me/${fullNumber}?text=${encodeURIComponent(text)}`;
+};
+
 export const FloatingChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -72,7 +91,6 @@ export const FloatingChatbot: React.FC = () => {
   const [chatbotSettings, setChatbotSettings] = useState(storage.getChatbot());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Sync with storage updates when admin edits chatbot
   useEffect(() => {
     const handleSync = () => {
       setChatbotSettings(storage.getChatbot());
@@ -85,7 +103,7 @@ export const FloatingChatbot: React.FC = () => {
     {
       id: 'm-1',
       sender: 'bot',
-      text: chatbotSettings.welcomeMessage || 'আসসালামু আলাইকুম! আমি "BS Learning & IT Zone"-এর নিজস্ব স্মার্ট এআই সহকারী।\n\nওয়েবসাইটের যেকোনো নোটিস, হ্যান্ডনোট, পরীক্ষার রুটিন, কোর্স ফি জানতে আমাকে প্রশ্ন করতে পারেন। এছাড়া আমার কাছে যেকোনো গণিত বা অংক (যোগ, বিয়োগ, গুণ, ভাগ, রুট) সমাধান করিয়ে নিতে পারেন!',
+      text: chatbotSettings.welcomeMessage || 'আসসালামু আলাইকুম! আমি "BS Learning & IT Zone"-এর নিজস্ব স্মার্ট এআই সহকারী।\n\nওয়েবসাইটের যেকোনো নোটিস, কোর্স ফি, পরীক্ষার রুটিন, ফলাফল অথবা যেকোনো শিক্ষকের সাথে সরাসরি হোয়াটসঅ্যাপে যোগাযোগ করতে আমাকে প্রশ্ন করুন। এছাড়া যেকোনো অংক ও উইকিপিডিয়া সাধারণ জ্ঞানও জানতে পারেন!',
       timestamp: 'এখন'
     }
   ]);
@@ -103,15 +121,15 @@ export const FloatingChatbot: React.FC = () => {
   const quickChips = chatbotSettings.quickChips && chatbotSettings.quickChips.length > 0
     ? chatbotSettings.quickChips
     : [
+        'প্রধান শিক্ষকের সাথে হোয়াটসঅ্যাপে কথা বলব',
         'কম্পিউটার কোর্সের ফি কত?',
         '২৫০ + ৩৫০ কত হয়?',
         'বাংলা কিউআর দিয়ে পেমেন্ট নিয়ম',
-        'সহীহ কুরআন শিক্ষার ক্লাস সময়',
-        '√৬২৫ এর বর্গমূল কত?',
+        'আইসিটি (ICT) কি?',
         'নতুন কোনো নোটিস আছে?'
       ];
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const query = (textToSend || input).trim();
     if (!query) return;
 
@@ -126,10 +144,12 @@ export const FloatingChatbot: React.FC = () => {
     if (!textToSend) setInput('');
     setLoading(true);
 
-    setTimeout(() => {
-      // 1. Check if user is asking for Math Calculation
-      const mathResult = evaluateMathExpression(query);
-      if (mathResult) {
+    const lowerQuery = query.toLowerCase();
+
+    // 1. Math calculation
+    const mathResult = evaluateMathExpression(query);
+    if (mathResult) {
+      setTimeout(() => {
         setMessages((prev) => [
           ...prev,
           {
@@ -141,119 +161,220 @@ export const FloatingChatbot: React.FC = () => {
           }
         ]);
         setLoading(false);
-        return;
-      }
+      }, 250);
+      return;
+    }
 
-      // 2. Read live website data (Courses, Notices, Notes, Routines, Settings, KnowledgeBase)
-      const courses = storage.getCourses();
-      const notices = storage.getNotices();
-      const notes = storage.getNotes();
-      const routines = storage.getRoutines();
-      const settings = storage.getSettings();
-      const chatbotData = storage.getChatbot();
+    // 2. Teacher-Specific WhatsApp Direct Connectivity Check
+    const mentors = storage.getMentors();
+    const isAskingForTeacher = 
+      lowerQuery.includes('whatsapp') ||
+      lowerQuery.includes('হোয়াটসঅ্যাপ') ||
+      lowerQuery.includes('হোয়াটসঅ্যাপ') ||
+      lowerQuery.includes('কথা বলতে চাই') ||
+      lowerQuery.includes('যোগাযোগ') ||
+      lowerQuery.includes('শিক্ষক') ||
+      lowerQuery.includes('স্যার') ||
+      lowerQuery.includes('টিচার');
 
-      const lowerQuery = query.toLowerCase();
-      let matchedAnswer: string | null = null;
+    let matchedMentors = mentors.filter(m => {
+      const nameParts = m.name.toLowerCase().split(/\s+/);
+      return nameParts.some(part => part.length > 2 && lowerQuery.includes(part));
+    });
 
-      // 3. Search Admin's Custom Info Blocks (Module 15)
-      if (chatbotData.infoBlocks && chatbotData.infoBlocks.length > 0) {
-        for (const block of chatbotData.infoBlocks) {
-          if (!block.isActive) continue;
-          const blockTitle = block.title.toLowerCase();
-          const matchesKeyword = block.keywords?.some(k => k.trim() && lowerQuery.includes(k.trim().toLowerCase()));
-          const titleWords = blockTitle.split(/[\s,–-]+/).filter(w => w.length > 2);
-          const matchesTitle = titleWords.some(w => lowerQuery.includes(w));
-          const queryIncludesTitle = lowerQuery.includes(blockTitle);
+    if (matchedMentors.length === 0 && isAskingForTeacher) {
+      matchedMentors = mentors; // Show all teachers if user asked generally
+    }
 
-          if (matchesKeyword || queryIncludesTitle || matchesTitle) {
-            matchedAnswer = `📌 [${block.title}]\n\n${block.content}`;
-            break;
+    if (matchedMentors.length > 0 && (isAskingForTeacher || lowerQuery.includes('নাম্বার') || lowerQuery.includes('ফোন'))) {
+      const whatsappButtons: WhatsAppButtonInfo[] = matchedMentors.map(m => {
+        const phone = m.whatsappNumber || m.phone || '01612118307';
+        const msg = `আসসালামু আলাইকুম ${m.name} স্যার। আমি BS E-Learning & IT Zone ওয়েবসাইট থেকে যোগাযোগ করছি। আমি আপনার সাথে কথা বলতে চাই।`;
+        return {
+          teacherName: m.name,
+          designation: m.designation,
+          phone,
+          whatsappUrl: formatWhatsAppLink(phone, msg)
+        };
+      });
+
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            sender: 'bot',
+            text: `📞 আমাদের শিক্ষক মণ্ডলীর সরাসরি হোয়াটসঅ্যাপ সংযোগ:\nনিচের যেকোনো শিক্ষকের নামের পাশে "হোয়াটসঅ্যাপে চ্যাট করুন" বাটনে ক্লিক করলে সরাসরি তাঁর ব্যক্তিগত হোয়াটসঅ্যাপ নাম্বারে চ্যাট শুরু হবে।`,
+            timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+            whatsappButtons
           }
+        ]);
+        setLoading(false);
+      }, 300);
+      return;
+    }
+
+    // 3. Check Self-Learning Smart Knowledge Store (200,000+ words & Teacher-verified Q&As)
+    const learnedResult = aiKnowledgeStore.searchLearnedAnswer(query);
+    if (learnedResult) {
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            sender: 'bot',
+            text: learnedResult.answer,
+            timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+            isTeacherQA: true,
+            sourceBadge: learnedResult.source
+          }
+        ]);
+        setLoading(false);
+      }, 300);
+      return;
+    }
+
+    // 4. Paid Content Policy & Rule Filter (Strict Institutional Policy)
+    const isAskingFreePaid = (
+      (lowerQuery.includes('ফ্রি') || lowerQuery.includes('বিনামূল্যে') || lowerQuery.includes('free')) &&
+      (lowerQuery.includes('কোর্স') || lowerQuery.includes('পেইড') || lowerQuery.includes('ম্যাটেরিয়াল') || lowerQuery.includes('সার্ভিস') || lowerQuery.includes('ক্লাস লিংক') || lowerQuery.includes('সাজেশন'))
+    );
+    const isAskingPaidDetails = lowerQuery.includes('পেইড') || lowerQuery.includes('প্রিমিয়াম') || lowerQuery.includes('paid');
+
+    if (isAskingFreePaid || isAskingPaidDetails) {
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            sender: 'bot',
+            text: `⚠️ পেইড কন্টেন্ট পলিসি (Paid Content Policy):\nএটি একটি "পেইড (Paid)" বিষয়। প্রতিষ্ঠানের কঠোর নীতিমালা অনুযায়ী কোনো পেইড কোর্স, প্রিমিয়াম স্টাডি ম্যাটেরিয়াল বা পেইড সার্ভিস ফ্রিতে প্রদান করা যাবে না।\n\n📌 যুক্ত হওয়ার নিয়মাবলী:\n১. হোম পেজে নির্দিষ্ট কোর্সটি নির্বাচন করুন।\n২. আমাদের ইন্টারঅপারেবল "বাংলা কিউআর (Bangla QR)" স্ক্যান করে ভর্তি ফি ও নিয়মিত মাসিক ফি পরিশোধ করুন।\n৩. পেমেন্টের ট্রানজেকশন আইডি (TrxID) দিয়ে আবেদন সাবমিট করলেই অ্যাডমিন যাচাই করে পেইড ক্লাসের পারমিশন ও স্টুডেন্ট আইডি প্রদান করবেন।`,
+            timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+            sourceBadge: 'পেইড কন্টেন্ট পলিসি'
+          }
+        ]);
+        setLoading(false);
+      }, 300);
+      return;
+    }
+
+    // 5. Institutional Database Check (Courses, Notices, Notes, Settings, Routines, Payment)
+    const courses = storage.getCourses();
+    const notices = storage.getNotices();
+    const notes = storage.getNotes();
+    const settings = storage.getSettings();
+    const chatbotData = storage.getChatbot();
+
+    let matchedAnswer: string | null = null;
+    let sourceBadge: string | undefined;
+
+    // A. Check Notices
+    if (lowerQuery.includes('নোটিস') || lowerQuery.includes('বিজ্ঞপ্তি') || lowerQuery.includes('notice')) {
+      const topNotices = notices.slice(0, 3).map((n, i) => `${i + 1}. ${n.title} (${n.date})`).join('\n');
+      matchedAnswer = `📢 বর্তমান সক্রিয় নোটিসসমূহ:\n${topNotices}\n\nবিস্তারিত দেখতে হোম পেজের নোটিস বোর্ডে ক্লিক করুন।`;
+      sourceBadge = 'অফিশিয়াল নোটিস বোর্ড';
+    }
+    // B. Check Free Notes
+    else if (lowerQuery.includes('নোট') || lowerQuery.includes('সাজেশন') || lowerQuery.includes('note') || lowerQuery.includes('pdf')) {
+      const topNotes = notes.slice(0, 3).map((n, i) => `${i + 1}. ${n.title} (${n.subject})`).join('\n');
+      matchedAnswer = `📚 আমাদের ফ্রি নোট ও সাজেশনসমূহ:\n${topNotes}\n\nহোম পেজের "ফ্রি নোট ও সাজেশন" অপশন থেকে যেকোনো সময় ডাউনলোড করতে পারবেন।`;
+      sourceBadge = 'ফ্রি রিসোর্স ও হ্যান্ডনোট';
+    }
+    // C. Check QR & Payment
+    else if (lowerQuery.includes('কিউআর') || lowerQuery.includes('qr') || lowerQuery.includes('পেমেন্ট') || lowerQuery.includes('বিকাশ') || lowerQuery.includes('নগদ')) {
+      matchedAnswer = `💳 পেমেন্ট নিয়মাবলী:\nআমাদের প্রতিষ্ঠানে "বাংলা কিউআর (Bangla QR)" ব্যবহৃত হয়। কোনো নির্দিষ্ট ফোন নম্বরে ক্যাশআউট না করে আপনার বিকাশ, নগদ, রকেট বা যেকোনো ব্যাংক অ্যাপ দিয়ে বাংলা কিউআর স্ক্যান করে সহজে পেমেন্ট করতে পারবেন। এরপর TrxID টি ফর্মে সাবমিট করলেই আবেদন স্বয়ংক্রিয়ভাবে প্রসেস হবে।`;
+      sourceBadge = 'বাংলা কিউআর সিস্টেম';
+    }
+    // D. Check Specific Courses
+    else {
+      const matchedCourse = courses.find(c => lowerQuery.includes(c.title.toLowerCase()) || c.title.toLowerCase().includes(lowerQuery));
+      if (matchedCourse) {
+        matchedAnswer = `🎓 ${matchedCourse.title}:\n• মেয়াদ: ${matchedCourse.duration}\n• অফার ভর্তি ফি: ${toBengaliNum(matchedCourse.admissionFee)} টাকা\n• নিয়মিত মাসিক ফি: ${toBengaliNum(matchedCourse.monthlyFee)} টাকা\n• কোর্স বিবরণ: ${matchedCourse.description}`;
+        sourceBadge = 'কোর্স ক্যাটালগ';
+      }
+    }
+
+    // E. Check Admin Custom Info Blocks & 50,000 words text
+    if (!matchedAnswer && chatbotData.infoBlocks && chatbotData.infoBlocks.length > 0) {
+      for (const block of chatbotData.infoBlocks) {
+        if (!block.isActive) continue;
+        const blockTitle = block.title.toLowerCase();
+        const matchesKeyword = block.keywords?.some(k => k.trim() && lowerQuery.includes(k.trim().toLowerCase()));
+        if (matchesKeyword || lowerQuery.includes(blockTitle)) {
+          matchedAnswer = `📌 [${block.title}]\n\n${block.content}`;
+          sourceBadge = 'অ্যাডমিন তথ্য বক্স';
+          break;
         }
       }
+    }
 
-      // 4. Search Admin's Large 50,000-Word Knowledge Base Text
-      if (!matchedAnswer && chatbotData.knowledgeBaseText) {
-        const sections = chatbotData.knowledgeBaseText.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
-        const queryTerms = lowerQuery.split(/[\s,?!;।]+/).filter(w => w.length > 1);
+    if (matchedAnswer) {
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            sender: 'bot',
+            text: matchedAnswer!,
+            timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+            sourceBadge
+          }
+        ]);
+        setLoading(false);
+      }, 300);
+      return;
+    }
 
-        let bestSection = '';
-        let highestMatches = 0;
-
-        for (const sec of sections) {
-          const lowerSec = sec.toLowerCase();
-          let matchCount = 0;
-          for (const term of queryTerms) {
-            if (lowerSec.includes(term)) {
-              matchCount++;
+    // 5. Autonomous Wikipedia Integration (100% Free Knowledge Retrieval)
+    try {
+      const wikiRes = await fetch(`/api/wiki?q=${encodeURIComponent(query)}`);
+      if (wikiRes.ok) {
+        const wikiData = await wikiRes.json();
+        if (wikiData.success && wikiData.extract) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `b-${Date.now()}`,
+              sender: 'bot',
+              text: `🌐 [উইকিপিডিয়া সাধারণ জ্ঞান: ${wikiData.title}]\n\n${wikiData.extract}`,
+              timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+              isWiki: true,
+              sourceBadge: 'উইকিপিডিয়া সাধারণ জ্ঞান',
+              sourceUrl: wikiData.url
             }
-          }
-          if (matchCount > highestMatches) {
-            highestMatches = matchCount;
-            bestSection = sec;
-          }
-        }
-
-        // If at least 2 words match or section strongly relevant
-        if (highestMatches >= 2 && bestSection) {
-          matchedAnswer = bestSection;
-        } else if (highestMatches === 1 && bestSection && queryTerms.length <= 3) {
-          matchedAnswer = bestSection;
+          ]);
+          setLoading(false);
+          return;
         }
       }
+    } catch {
+      // Wiki offline or error, proceed to fallback
+    }
 
-      // 5. Check notices
-      if (!matchedAnswer && (lowerQuery.includes('নোটিস') || lowerQuery.includes('বিজ্ঞপ্তি') || lowerQuery.includes('notice'))) {
-        const topNotices = notices.slice(0, 3).map((n, i) => `${i + 1}. ${n.title} (${n.date})`).join('\n');
-        matchedAnswer = `📢 বর্তমান সক্রিয় নোটিসসমূহ:\n${topNotices}\n\nবিস্তারিত দেখতে হোম পেজের নোটিস বোর্ডে ক্লিক করুন।`;
-      }
-      // 6. Check free notes
-      else if (!matchedAnswer && (lowerQuery.includes('নোট') || lowerQuery.includes('সাজেশন') || lowerQuery.includes('note') || lowerQuery.includes('pdf'))) {
-        const topNotes = notes.slice(0, 3).map((n, i) => `${i + 1}. ${n.title} (${n.subject})`).join('\n');
-        matchedAnswer = `📚 আমাদের ফ্রি নোট ও সাজেশনসমূহ:\n${topNotes}\n\nহোম পেজের "ফ্রি নোট ও সাজেশন" অপশন থেকে যেকোনো সময় পিডিএফ ডাউনলোড করতে পারবেন।`;
-      }
-      // 7. Check QR / Payment
-      else if (!matchedAnswer && (lowerQuery.includes('কিউআর') || lowerQuery.includes('qr') || lowerQuery.includes('পেমেন্ট') || lowerQuery.includes('বিকাশ') || lowerQuery.includes('নগদ'))) {
-        matchedAnswer = `💳 পেমেন্ট তথ্য:\nআমাদের প্রতিষ্ঠানে "বাংলা কিউআর (Bangla QR)"-এর মাধ্যমে পেমেন্ট গ্রহণ করা হয়। কোনো নির্দিষ্ট ফোন নম্বর ছাড়াই যেকোনো ব্যাংক অ্যাপ বা বিকাশ/নগদ দিয়ে কিউআর স্ক্যান করে পেমেন্ট করতে পারবেন। এরপর TrxID সাবমিট করলেই আবেদন প্রসেস হবে।`;
-      }
-      // 8. Check specific courses dynamically
-      else if (!matchedAnswer) {
-        const matchedCourse = courses.find(c => lowerQuery.includes(c.title.toLowerCase()) || c.title.toLowerCase().includes(lowerQuery));
-        if (matchedCourse) {
-          matchedAnswer = `🎓 ${matchedCourse.title}:\n• কোর্স মেয়াদ: ${matchedCourse.duration}\n• অফার ভর্তি ফি: ${toBengaliNum(matchedCourse.admissionFee)} টাকা\n• নিয়মিত মাসিক ফি: ${toBengaliNum(matchedCourse.monthlyFee)} টাকা\n• কোর্স বিবরণ: ${matchedCourse.description}`;
-        }
-      }
+    // 6. Intelligent Fallback with Teacher Direct Routing Option
+    const borhanMentor = mentors.find(m => m.id === 'mentor-borhan') || mentors[0];
+    const defaultWhatsApp = borhanMentor?.whatsappNumber || '01612118307';
+    const fallbackWhatsAppUrl = formatWhatsAppLink(
+      defaultWhatsApp,
+      `আসসালামু আলাইকুম প্রধান শিক্ষক স্যার। আমার প্রশ্ন: "${query}"। অনুগ্রহ করে একটু বুঝিয়ে বলবেন কি?`
+    );
 
-      // 9. Match custom FAQs in storage
-      if (!matchedAnswer) {
-        for (const faq of chatbotData.faqs || []) {
-          if (faq.question.toLowerCase().includes(lowerQuery) || lowerQuery.includes(faq.question.toLowerCase())) {
-            matchedAnswer = faq.answer;
-            break;
-          }
-          if (faq.keywords && faq.keywords.some(k => lowerQuery.includes(k.toLowerCase()))) {
-            matchedAnswer = faq.answer;
-            break;
-          }
-        }
-      }
-
-      // Fallback: General Education knowledge or Founder guidance
-      if (!matchedAnswer) {
-        if (lowerQuery.includes('প্রধান শিক্ষক') || lowerQuery.includes('বোরহানউদ্দিন') || lowerQuery.includes('মহিম') || lowerQuery.includes('প্রতিষ্ঠাতা')) {
-          matchedAnswer = `${settings.name}-এর প্রতিষ্ঠাতা ও প্রধান শিক্ষক হলেন জনাব ${settings.founderName}। তিনি দীর্ঘ ১০+ বছর ধরে সফলভাবে হাজারো শিক্ষার্থীকে জিপিএ-৫ ও দক্ষ জনশক্তিতে রূপান্তর করেছেন।`;
-        } else {
-          matchedAnswer = `ধন্যবাদ আপনার বার্তার জন্য! ${chatbotData.botName || 'BS Learning AI'}-এর কাছে আপনি যেকোনো কোর্স, ভর্তি ফি, নোটিস, রুটিন বা গাণিতিক সমস্যার জন্য প্রশ্ন করতে পারেন।`;
-        }
-      }
-
+    setTimeout(() => {
       setMessages((prev) => [
         ...prev,
         {
           id: `b-${Date.now()}`,
           sender: 'bot',
-          text: matchedAnswer,
-          timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' })
+          text: `ধন্যবাদ আপনার প্রশ্নের জন্য! এই নির্দিষ্ট বিষয়ে আরও বিস্তারিত জানতে বা শিক্ষকের সাথে সরাসরি পরামর্শ করতে নিচের বাটনে চাপ দিন। আপনার প্রশ্নটি শিক্ষকের সাথে সংযুক্ত করার পর সিস্টেম স্বয়ংক্রিয়ভাবে ভবিষ্যতে এই উত্তরটি মনে রাখবে।`,
+          timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+          whatsappButtons: [
+            {
+              teacherName: borhanMentor?.name || 'বোরহানউদ্দিন মহিম',
+              designation: 'প্রতিষ্ঠাতা ও প্রধান শিক্ষক',
+              phone: defaultWhatsApp,
+              whatsappUrl: fallbackWhatsAppUrl
+            }
+          ]
         }
       ]);
       setLoading(false);
@@ -274,13 +395,13 @@ export const FloatingChatbot: React.FC = () => {
           </div>
           <div className="text-left hidden sm:block">
             <span className="block text-xs font-bold leading-none text-white">{chatbotSettings.botName || 'BS নিজস্ব স্মার্ট AI'}</span>
-            <span className="block text-[10px] text-amber-300 font-semibold leading-none mt-1">অংক সমাধান ও তথ্য</span>
+            <span className="block text-[10px] text-amber-300 font-semibold leading-none mt-1">স্বয়ংক্রিয় শিখন ও হোয়াটসঅ্যাপ</span>
           </div>
         </button>
       )}
 
       {isOpen && (
-        <div className="relative w-[340px] sm:w-[410px] h-[540px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-200">
+        <div className="relative w-[340px] sm:w-[420px] h-[560px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-200">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-blue-900 text-white p-4 flex items-center justify-between shrink-0 shadow-sm">
             <div className="flex items-center gap-3">
@@ -292,7 +413,7 @@ export const FloatingChatbot: React.FC = () => {
                   <span>{chatbotSettings.botName || 'BS Learning নিজস্ব এআই'}</span>
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                 </h4>
-                <p className="text-[10px] text-amber-300 font-medium">লাইভ ডাটা রিডার • বিল্ট-ইন ক্যালকুলেটর</p>
+                <p className="text-[10px] text-amber-300 font-medium">স্বয়ংক্রিয় শিখন • শিক্ষক হোয়াটসঅ্যাপ • উইকিপিডিয়া</p>
               </div>
             </div>
 
@@ -318,15 +439,66 @@ export const FloatingChatbot: React.FC = () => {
                 )}
 
                 <div
-                  className={`max-w-[82%] rounded-2xl p-3 leading-relaxed shadow-xs ${
+                  className={`max-w-[85%] rounded-2xl p-3 leading-relaxed shadow-xs ${
                     msg.sender === 'user'
                       ? 'bg-blue-900 text-white rounded-br-xs'
                       : msg.isMath
                       ? 'bg-emerald-50 text-emerald-950 border border-emerald-300 rounded-bl-xs font-semibold'
+                      : msg.isWiki
+                      ? 'bg-sky-50 text-sky-950 border border-sky-300 rounded-bl-xs'
+                      : msg.isTeacherQA
+                      ? 'bg-amber-50/70 text-slate-900 border border-amber-300 rounded-bl-xs'
                       : 'bg-white text-slate-800 border border-slate-200/80 rounded-bl-xs'
                   }`}
                 >
+                  {msg.sourceBadge && (
+                    <div className="inline-block px-2 py-0.5 rounded-full bg-blue-100 text-blue-900 text-[10px] font-bold mb-1.5">
+                      {msg.sourceBadge}
+                    </div>
+                  )}
+
                   <p className="whitespace-pre-line">{msg.text}</p>
+
+                  {/* Wikipedia External Link if present */}
+                  {msg.sourceUrl && (
+                    <a
+                      href={msg.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:text-sky-900 mt-2 underline"
+                    >
+                      <Globe className="w-3 h-3" />
+                      <span>উইকিপিডিয়ায় বিস্তারিত পড়ুন</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+                  )}
+
+                  {/* Teacher WhatsApp Direct Buttons */}
+                  {msg.whatsappButtons && msg.whatsappButtons.length > 0 && (
+                    <div className="mt-2.5 space-y-1.5 pt-2 border-t border-slate-200">
+                      {msg.whatsappButtons.map((btn, idx) => (
+                        <a
+                          key={idx}
+                          href={btn.whatsappUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-xs group"
+                        >
+                          <div className="flex items-center gap-2">
+                            <MessageCircle className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
+                            <div className="text-left">
+                              <span className="block text-xs leading-none">{btn.teacherName}</span>
+                              <span className="block text-[9px] text-emerald-100 leading-none mt-0.5">{btn.designation}</span>
+                            </div>
+                          </div>
+                          <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] tracking-wide">
+                            চ্যাট করুন &rarr;
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+
                   <span
                     className={`block text-[9px] mt-1 text-right ${
                       msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400'
@@ -347,7 +519,7 @@ export const FloatingChatbot: React.FC = () => {
             {loading && (
               <div className="flex items-center gap-2 text-slate-500 text-xs italic">
                 <Sparkles className="w-3.5 h-3.5 animate-spin text-blue-900" />
-                <span>উত্তর বিশ্লেষণ হচ্ছে...</span>
+                <span>এআই নলেজবেস ও উইকিপিডিয়া বিশ্লেষণ হচ্ছে...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -377,7 +549,7 @@ export const FloatingChatbot: React.FC = () => {
             >
               <input
                 type="text"
-                placeholder="প্রশ্ন করুন বা অংক লিখুন (যেমন: ২৫ * ৪০)..."
+                placeholder="প্রশ্ন করুন বা শিক্ষকের সাথে কথা বলুন..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 className="grow px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-slate-50"

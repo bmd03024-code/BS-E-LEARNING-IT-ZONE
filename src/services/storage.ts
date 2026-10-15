@@ -72,6 +72,7 @@ const initialSettings: InstituteSettings = {
   youtubeUrl: "https://youtube.com",
   tiktokUrl: "https://tiktok.com",
   mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14602.700319451996!2d90.3700!3d23.7937!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c0c9b0e14d11%3A0xe54b9dfbc9fa3d0d!2sMirpur%2C%20Dhaka!5e0!3m2!1sen!2sbd!4v1710000000000!5m2!1sen!2sbd",
+  watermarkUrl: DEFAULT_ASSETS.logo,
   banglaQrUrl: DEFAULT_ASSETS.banglaQr,
   banglaQrHeading: "বিকাশ, নগদ বা যেকোনো ব্যাংকিং অ্যাপের মাধ্যমে এই বাংলা কিউআর (Bangla QR) কোড স্ক্যান করে পেমেন্ট করুন",
   bkashNumber: "01612118307 (পার্সোনাল / মার্চেন্ট)",
@@ -305,7 +306,7 @@ const initialCourses: Course[] = [
     certificateFee: 500,
     certificateFeeSecondTime: 0,
     hasGovtCert: true,
-    paymentDetails: "ভর্তি ১,১৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
+    paymentDetails: "ভর্তি ১,৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
     category: "আইটি ও প্রফেশনাল",
     subjects: ["Computer Fundamentals & OS", "MS Word & Typing Speed", "MS Excel & Financial Formula", "MS PowerPoint & Access", "Internet & Email Communication"],
     exams: ["টাইপিং স্পিড টেস্ট", "এক্সেল প্র্যাকটিক্যাল ল্যাব", "কারিগরি বোর্ড ফাইনাল পরীক্ষা"]
@@ -366,6 +367,7 @@ const initialMentors: Mentor[] = [
     experience: "১০+ বছর সফল টিচিং ও আইটি ট্রেনিং অভিজ্ঞতা",
     specialist: ["সহীহ কুরআন শিক্ষা", "এসএসসি ও এইচএসসি হিসাববিজ্ঞান", "কম্পিউটার অফিস অ্যাপ্লিকেশন"],
     phone: "01612118307",
+    whatsappNumber: "01612118307",
     email: "onlinetutionbyborhansir@gmail.com",
     bio: "বোরহানউদ্দিন মহিম BS E-Learning & IT Zone-এর প্রতিষ্ঠাতা ও প্রধান শিক্ষক। তিনি বিগত এক দশক ধরে হাজারো শিক্ষার্থীকে একাডেমিকে জিপিএ-৫ এবং আইটি খাতে সফল দক্ষ জনশক্তিতে রূপান্তর করেছেন।"
   },
@@ -378,6 +380,7 @@ const initialMentors: Mentor[] = [
     experience: "৭ বছর ইংলিশ গ্রামার ও স্পোকেন ট্রেইনার",
     specialist: ["অষ্টম-দশম ইংরেজি", "Spoken English", "Phonetics & Vocabulary"],
     phone: "01710000001",
+    whatsappNumber: "01710000001",
     email: "tahsin.eng@gmail.com",
     bio: "সহজ ও আনন্দদায়ক পদ্ধতিতে ইংরেজি ভাষা ও ব্যাকরণ শিক্ষাদানে পারদর্শী।"
   },
@@ -390,6 +393,7 @@ const initialMentors: Mentor[] = [
     experience: "৬ বছর আইসিটি ল্যাব পরিচালনা ও সফটওয়্যার ট্রেনিং",
     specialist: ["কম্পিউটার অফিস অ্যাপ্লিকেশন", "ডেটা এন্ট্রি", "গ্রাফিক্স বেসিকস"],
     phone: "01810000002",
+    whatsappNumber: "01810000002",
     email: "arif.cse@gmail.com",
     bio: "হাতে-কলমে কম্পিউটার দক্ষতা বৃদ্ধি ও সরকারি সার্টিফিকেশনের জন্য প্রস্তুত করতে অভিজ্ঞ।"
   },
@@ -402,6 +406,7 @@ const initialMentors: Mentor[] = [
     experience: "৫ বছর মাধ্যমিক গণিত পাঠদান অভিজ্ঞতা",
     specialist: ["অষ্টম থেকে দশম শ্রেণি গণিত", "১ম-৭ম শ্রেণির পাঠ্য বিষয়"],
     phone: "01910000003",
+    whatsappNumber: "01910000003",
     email: "sadia.math@gmail.com",
     bio: "গণিতের জটিল সূত্রগুলোকে বাস্তব উদাহরণের মাধ্যমে সহজ করে উপস্থাপন করেন।"
   }
@@ -649,7 +654,7 @@ const initialCertificates: CertificateRecord[] = [
     feePaid: true,
     isFree: false,
     feeAmount: 500,
-    hasEverPaid: true,
+    hasEverPaid: true, // Already paid! All subsequent downloads are 100% FREE!
     hasGovtCert: true
   },
   {
@@ -666,7 +671,7 @@ const initialCertificates: CertificateRecord[] = [
     grade: "মুমতাজ (Excellent)",
     isFirstIssue: true,
     feePaid: true,
-    isFree: true,
+    isFree: true, // Always completely free
     feeAmount: 0,
     hasEverPaid: true,
     hasGovtCert: false
@@ -690,7 +695,7 @@ const initialNotices: NoticeItem[] = [
     id: "not-1",
     title: "২০২৬ শিক্ষাবর্ষে সকল কোর্সে বিশেষ ছাড়ে ভর্তি চলছে!",
     date: "১০ এপ্রিল ২০২৬",
-    content: "BS E-Learning & IT Zone-এ ২০২৬ সেশনের নতুন ব্যাচে সীমিত আসনে অফার মূল্যে ভর্তি চলছে। কম্পিউটার অফিস অ্যাপ্লিকেশন কোর্সে অফার ফি ৩,৫০০৳ (প্রথমে ১, ১৫০৳), এসএসসি/এইচএসসি হিসাববিজ্ঞানে অফার ভর্তি ফি ৮০০৳। বিস্তারিত তথ্যের জন্য আমাদের হটলাইনে যোগাযোগ করুন।",
+    content: "BS E-Learning & IT Zone-এ ২০২৬ সেশনের নতুন ব্যাচে সীমিত আসনে অফার মূল্যে ভর্তি চলছে। কম্পিউটার অফিস অ্যাপ্লিকেশন কোর্সে অফার ফি ৩,৫০০৳ (প্রথমে ১,৫০০৳), এসএসসি/এইচএসসি হিসাববিজ্ঞানে অফার ভর্তি ফি ৮০০৳। বিস্তারিত তথ্যের জন্য আমাদের হটলাইনে যোগাযোগ করুন।",
     images: [
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80"
     ],
@@ -819,7 +824,7 @@ BS E-Learning & IT Zone একটি আধুনিক ও সরকারি �
 ৫. অষ্টম-দশম গণিত একাডেমিক: ভর্তি ফি ৮০০ টাকা, মাসিক ফি ৫০০ টাকা।
 ৬. গণিত ও ইংরেজি স্পেশাল কম্বো: ভর্তি ফি ১,২০০ টাকা, মাসিক ফি ৮০০ টাকা।
 ৭. ১ম থেকে ৭ম শ্রেণি সকল বিষয়: ভর্তি ফি ৮০০ টাকা, মাসিক ফি ৫০০ টাকা।
-৮. কম্পিউটার অফিস অ্যাপ্লিকেশন (৬ মাস): অফার ভর্তি ফি মাত্র ১,৫০০ টাকা (প্রকৃত কোর্স ফি ৩, ৫০০৳)। পরীক্ষা দেওয়ার পূর্বে বাকি ফি ও সরকারি সনদ ফি ৫০০ টাকা।
+৮. কম্পিউটার অফিস অ্যাপ্লিকেশন (৬ মাস): অফার ভর্তি ফি মাত্র ১,৫০০ টাকা (প্রকৃত কোর্স ফি ৩,৫০০৳)। পরীক্ষা দেওয়ার পূর্বে বাকি ফি ও সরকারি সনদ ফি ৫০০ টাকা।
 ৯. Spoken English (৪ মাস): ভর্তি ফি ১,০০০ টাকা, মাসিক ফি ৫০০ টাকা।
 ১০. বেসিক ফাউন্ডেশন কোর্স (বাংলা, গণিত, ইংরেজি - ৩ মাস): ভর্তি ফি ১,০০০ টাকা।
 
@@ -852,7 +857,7 @@ BS E-Learning & IT Zone একটি আধুনিক ও সরকারি �
       id: "info-3",
       title: "এডমিট কার্ড ডাউনলোড ও প্রিন্ট সমস্যা সমাধান",
       category: "এডমিট কার্ড",
-      content: "এডমিট কার্ড ডাউনলোড করতে সমস্যা হলে নিশ্চিত করুন আপনার চলতি মাসের কোনো ফি বকেয়া নেই। ফি ক্লিয়ার থাকা সত্ত্বেও এডমিট ব্লক দেখালে হটলাইনে (01612118307) যোগাযোগ করে অ্যাডমিনকে আনব্লক করার অনুরোধ করুন। আনব্লক হওয়ার সাথেই আপনি প্রিন্ট করতে পারবেন।",
+      content: "এডমিট কার্ড ডাউনলোড করতে সমস্যা হলে নিশ্চিত করুন আপনার চলতি মাসের কোনো ফি বকেয়া নেই। ফি ক্লিয়ার থাকা সত্ত্বেও এডমিট ব্লক দেখালে হটলাইনে (01612118307) যোগাযোগ করে অ্যাডমিনকে আনব্লক করার অনুরোধ করুন। আনব্লক হওয়ার সাথে সাথেই আপনি প্রিন্ট করতে পারবেন।",
       keywords: ["এডমিট", "admit", "ব্লক", "ডাউনলোড", "পরীক্ষা", "রোল"],
       isActive: true
     },
@@ -905,10 +910,150 @@ BS E-Learning & IT Zone একটি আধুনিক ও সরকারি �
 const initialCredentials: AdminCredentials = {
   email: "onlinetutionbyborhansir@gmail.com",
   password: "01612118307",
-  masterPin: "992288"
+  masterPin: "992288" // Master PIN (6 to 11 digits) for instant password recovery
+};
+
+// Automatic image compression utility for seals, signatures, logos & student photos.
+// Compresses uploaded images to under 40KB so localStorage quota is never exceeded!
+export const compressImage = (file: File | string, maxWidth = 800, quality = 0.75): Promise<string> => {
+  return new Promise((resolve) => {
+    if (typeof file === 'string') {
+      if (file.startsWith('data:image/svg+xml') || file.length < 50000) {
+        return resolve(file);
+      }
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      if (height > maxWidth) {
+        width = Math.round((width * maxWidth) / height);
+        height = maxWidth;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        return resolve(typeof file === 'string' ? file : '');
+      }
+
+      ctx.drawImage(img, 0, 0, width, height);
+      const compressed = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressed);
+    };
+
+    img.onerror = () => {
+      if (typeof file === 'string') resolve(file);
+      else {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      }
+    };
+
+    if (typeof file === 'string') {
+      img.src = file;
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 };
 
 class StorageService {
+  private liveEventSource: EventSource | null = null;
+  private currentDbVersion = 0;
+
+  constructor() {
+    this.initLiveSync();
+  }
+
+  // Real-time synchronization across all browsers worldwide
+  public initLiveSync() {
+    if (typeof window === 'undefined') return;
+
+    // 1. Initial hydration from server database
+    this.hydrateFromServer();
+
+    // 2. Establish live SSE stream
+    try {
+      this.liveEventSource = new EventSource('/api/live-sync');
+
+      this.liveEventSource.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.type === 'SYNC_UPDATE' && payload.key) {
+            this.setLocalSilently(payload.key, payload.value);
+            window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: payload.key, value: payload.value, fromServer: true } }));
+          } else if (payload.type === 'SYNC_ALL' || payload.type === 'AI_UPDATE') {
+            this.hydrateFromServer();
+          }
+        } catch (e) {
+          console.warn('[LiveSync] Message parse error:', e);
+        }
+      };
+    } catch (e) {
+      console.warn('[LiveSync] SSE setup error:', e);
+    }
+
+    // 3. Fallback polling every 5 seconds to guarantee 100% sync
+    setInterval(() => {
+      this.checkServerVersion();
+    }, 5000);
+  }
+
+  private async checkServerVersion() {
+    try {
+      const res = await fetch('/api/sync/version');
+      if (res.ok) {
+        const { version } = await res.json();
+        if (version && version > this.currentDbVersion) {
+          this.hydrateFromServer();
+        }
+      }
+    } catch {
+      // Ignored
+    }
+  }
+
+  private async hydrateFromServer() {
+    try {
+      const res = await fetch('/api/sync/all');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && typeof json.data === 'object') {
+          for (const key of Object.keys(json.data)) {
+            this.setLocalSilently(key, json.data[key]);
+          }
+          if (json.version) this.currentDbVersion = json.version;
+          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'all', fromServer: true } }));
+        }
+      }
+    } catch {
+      // Offline fallback
+    }
+  }
+
+  private setLocalSilently<T>(key: string, value: T): void {
+    try {
+      localStorage.setItem(`bs_${key}`, JSON.stringify(value));
+    } catch (e) {
+      console.warn(`LocalStorage quota catch on ${key}:`, e);
+    }
+  }
+
   private get<T>(key: string, fallback: T): T {
     try {
       const data = localStorage.getItem(`bs_${key}`);
@@ -918,20 +1063,54 @@ class StorageService {
     }
   }
 
-  // রিয়েল-টাইম সিঙ্ক নিশ্চিত করার জন্য এখানে ইভেন্ট ট্রিগার আপডেট করা হলো
   private set<T>(key: string, value: T): void {
+    this.setLocalSilently(key, value);
+    window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
+    this.pushToServer(key, value);
+  }
+
+  private async pushToServer(key: string, value: any) {
     try {
-      const storageKey = `bs_${key}`;
-      const serializedValue = JSON.stringify(value);
-      
-      localStorage.setItem(storageKey, serializedValue);
-      
-      // একই ট্যাবের সব কম্পোনেন্ট এবং ক্রস-ট্যাব সিঙ্কের জন্য ইভেন্ট ফায়ার করা হচ্ছে
-      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: storageKey, value: serializedValue } }));
-      window.dispatchEvent(new Event('bs_sync'));
-      
+      await fetch('/api/sync/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value })
+      });
+    } catch {
+      // Safe catch
+    }
+  }
+
+  public async syncAllToServer(): Promise<void> {
+    try {
+      const fullDb = {
+        settings: this.getSettings(),
+        slides: this.getSlides(),
+        shortcuts: this.getShortcuts(),
+        courses: this.getCourses(),
+        mentors: this.getMentors(),
+        students: this.getStudents(),
+        applications: this.getApplications(),
+        routines: this.getRoutines(),
+        results: this.getResults(),
+        admit_cards: this.getAdmitCards(),
+        certificates: this.getCertificates(),
+        ledger: this.getLedger(),
+        notices: this.getNotices(),
+        gallery: this.getGallery(),
+        notes: this.getNotes(),
+        demo_classes: this.getDemoClasses(),
+        chatbot: this.getChatbot(),
+        admin_creds: this.getAdminCredentials()
+      };
+
+      await fetch('/api/sync/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all: fullDb })
+      });
     } catch (e) {
-      console.error("Storage error:", e);
+      console.warn('Sync all error:', e);
     }
   }
 

@@ -20,7 +20,8 @@ import {
   AdminCredentials,
   CertificateRecord
 } from '../../types';
-import { storage, DEFAULT_ASSETS } from '../../services/storage';
+import { storage, DEFAULT_ASSETS, compressImage } from '../../services/storage';
+import { aiKnowledgeStore, QAItem, TrainingChunk } from '../../services/aiKnowledgeStore';
 import {
   Settings,
   Sliders,
@@ -212,59 +213,90 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   ];
 
   /* ---------------- MODULE 1: GENERAL SETTINGS, LOGO, FOOTER & SEALS ---------------- */
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setSettings(prev => ({ ...prev, logoUrl: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 600, 0.8);
+        setSettings(prev => ({ ...prev, logoUrl: compressed, watermarkUrl: prev.watermarkUrl || compressed }));
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => setSettings(prev => ({ ...prev, logoUrl: reader.result as string }));
+        reader.readAsDataURL(file);
+      }
     }
   };
 
-  const handleFounderPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWatermarkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setSettings(prev => ({ ...prev, founderPhotoUrl: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 600, 0.7);
+        setSettings(prev => ({ ...prev, watermarkUrl: compressed }));
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => setSettings(prev => ({ ...prev, watermarkUrl: reader.result as string }));
+        reader.readAsDataURL(file);
+      }
     }
   };
 
-  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFounderPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const sig = reader.result as string;
-        setSettings(prev => ({ ...prev, signatureUrl: sig, signatureSealUrl: sig }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 600, 0.8);
+        setSettings(prev => ({ ...prev, founderPhotoUrl: compressed }));
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => setSettings(prev => ({ ...prev, founderPhotoUrl: reader.result as string }));
+        reader.readAsDataURL(file);
+      }
     }
   };
 
-  const handleSealUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSignatureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setSettings(prev => ({ ...prev, institutionSealUrl: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 500, 0.85);
+        setSettings(prev => ({ ...prev, signatureUrl: compressed, signatureSealUrl: compressed }));
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const sig = reader.result as string;
+          setSettings(prev => ({ ...prev, signatureUrl: sig, signatureSealUrl: sig }));
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
-  const handleBanglaQrUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSealUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setSettings(prev => ({ ...prev, banglaQrUrl: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 500, 0.85);
+        setSettings(prev => ({ ...prev, institutionSealUrl: compressed }));
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => setSettings(prev => ({ ...prev, institutionSealUrl: reader.result as string }));
+        reader.readAsDataURL(file);
+      }
+    }
+  };
+
+  const handleBanglaQrUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const compressed = await compressImage(file, 600, 0.85);
+        setSettings(prev => ({ ...prev, banglaQrUrl: compressed }));
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => setSettings(prev => ({ ...prev, banglaQrUrl: reader.result as string }));
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -277,10 +309,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           <span>লোগো পরিবর্তন ও ব্র্যান্ড টেক্সট সাইজ কাস্টমাইজার</span>
         </h3>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center">
+          {/* Main Logo */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">ওয়েবসাইটের মূল লোগো পরিবর্তন (Logo Upload & URL)</label>
-            <div className="flex items-center gap-4">
+            <label className="block text-xs font-bold text-slate-700 mb-1">১. মূল প্রাতিষ্ঠানিক লোগো (Institutional Logo)</label>
+            <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-full border-2 border-amber-400 p-0.5 bg-slate-900 overflow-hidden shrink-0 shadow-md">
                 <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover" />
               </div>
@@ -289,22 +322,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   type="file"
                   accept="image/*"
                   onChange={handleLogoUpload}
-                  className="text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-900 file:text-white hover:file:bg-blue-800 cursor-pointer"
+                  className="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-900 file:text-white cursor-pointer"
                 />
                 <input
                   type="text"
-                  placeholder="অথবা লোগো ইমেজ URL..."
+                  placeholder="লোগো URL..."
                   value={settings.logoUrl}
                   onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
                   className="w-full px-2 py-1 rounded-lg border border-slate-300 text-xs font-mono"
                 />
-                <p className="text-[10px] text-slate-500">সরাসরি ডিভাইস থেকে ছবি আপলোড করুন অথবা লিংক দিন</p>
               </div>
             </div>
+            <p className="text-[10px] text-slate-500 mt-1">হেডার, ফুটার ও নোটিসে স্বয়ংক্রিয়ভাবে দেখাবে</p>
           </div>
 
+          {/* Background Watermark Logo */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">হেডার ব্র্যান্ড টেক্সট সাইজ স্কেলার</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">২. ব্যাকগ্রাউন্ড ওয়াটারমার্ক (Watermark for Documents)</label>
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-2xl border-2 border-dashed border-blue-400 p-1 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                <img src={settings.watermarkUrl || settings.logoUrl} alt="Watermark" className="max-h-full max-w-full object-contain opacity-50" />
+              </div>
+              <div className="space-y-1.5 grow">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleWatermarkUpload}
+                  className="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-900 file:text-white cursor-pointer"
+                />
+                <input
+                  type="text"
+                  placeholder="ওয়াটারমার্ক URL..."
+                  value={settings.watermarkUrl || ''}
+                  onChange={(e) => setSettings({ ...settings, watermarkUrl: e.target.value })}
+                  className="w-full px-2 py-1 rounded-lg border border-slate-300 text-xs font-mono"
+                />
+              </div>
+            </div>
+            <p className="text-[10px] text-slate-500 mt-1">সনদপত্র, এডমিট কার্ড, মার্কশিট ও আইডি কার্ডের মাঝে ওয়াটারমার্ক হিসেবে ভাসবে</p>
+          </div>
+
+          {/* Text Size */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">৩. হেডার ব্র্যান্ড টেক্সট সাইজ স্কেলার</label>
             <select
               value={settings.headerTextSize || 'normal'}
               onChange={(e) => setSettings({ ...settings, headerTextSize: e.target.value as any })}
@@ -372,7 +432,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
           {/* Founder Signature Upload & URL */}
           <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <label className="block text-xs font-bold text-slate-700 mb-2">প্রধান শিক্ষকের অনুমোদিত স্বাক্ষর (Signature)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-2">১. প্রধান শিক্ষকের সিগনেচার (Headmaster's Signature)</label>
             <div className="flex items-center gap-4">
               <div className="w-24 h-14 bg-white rounded-lg border border-slate-300 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
                 <img src={settings.signatureUrl} alt="Signature" className="max-h-full max-w-full object-contain" />
@@ -388,17 +448,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   type="text"
                   placeholder="স্বাক্ষরের URL..."
                   value={settings.signatureUrl}
-                  onChange={(e) => setSettings({ ...settings, signatureUrl: e.target.value, signatureSealUrl: e.target.value })}
+                  onChange={(e) => setSettings({ ...settings, signatureUrl: e.target.value })}
                   className="w-full px-2 py-1 rounded-lg border border-slate-300 text-xs font-mono"
                 />
               </div>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1">এডমিট কার্ড, রেজাল্ট শিট, সার্টিফিকেট ও আইডি কার্ডে স্বয়ংক্রিয়ভাবে বসবে</p>
+            <p className="text-[10px] text-slate-500 mt-1">এডমিট কার্ড, রেজাল্ট শিট, সার্টিফিকেট ও আইডি কার্ডে প্রধান শিক্ষকের স্বাক্ষর হিসেবে বসবে</p>
+          </div>
+
+          {/* Headmaster's Personal Seal (সিল) */}
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <label className="block text-xs font-bold text-slate-700 mb-2">২. প্রধান শিক্ষকের ব্যক্তিগত সিল (Headmaster's Seal)</label>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-white rounded-full border border-slate-300 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
+                <img src={settings.signatureSealUrl || DEFAULT_ASSETS.signatureSeal} alt="Headmaster Seal" className="max-h-full max-w-full object-contain" />
+              </div>
+              <div className="space-y-1.5 grow">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const compressed = await compressImage(file, 500, 0.85);
+                      setSettings(prev => ({ ...prev, signatureSealUrl: compressed }));
+                    }
+                  }}
+                  className="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-rose-900 file:text-white cursor-pointer"
+                />
+                <input
+                  type="text"
+                  placeholder="প্রধান শিক্ষকের সিলের URL..."
+                  value={settings.signatureSealUrl || ''}
+                  onChange={(e) => setSettings({ ...settings, signatureSealUrl: e.target.value })}
+                  className="w-full px-2 py-1 rounded-lg border border-slate-300 text-xs font-mono"
+                />
+              </div>
+            </div>
+            <p className="text-[10px] text-slate-500 mt-1">প্রধান শিক্ষকের নাম ও পদবি খচিত সিলমোহর</p>
           </div>
 
           {/* Institute Official Seal Upload & URL */}
           <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <label className="block text-xs font-bold text-slate-700 mb-2">প্রতিষ্ঠানের অফিশিয়াল সিল / স্ট্যাম্প (Seal)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-2">৩. প্রতিষ্ঠানের অফিশিয়াল সিল / স্ট্যাম্প (Institutional Seal)</label>
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white rounded-full border border-slate-300 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
                 <img src={settings.institutionSealUrl} alt="Seal" className="max-h-full max-w-full object-contain" />
@@ -412,14 +504,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 />
                 <input
                   type="text"
-                  placeholder="সিলের URL..."
+                  placeholder="প্রতিষ্ঠানের সিলের URL..."
                   value={settings.institutionSealUrl}
                   onChange={(e) => setSettings({ ...settings, institutionSealUrl: e.target.value })}
                   className="w-full px-2 py-1 rounded-lg border border-slate-300 text-xs font-mono"
                 />
               </div>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1">সব সনদে ও অফিশিয়াল নথিতে অফিশিয়াল যাচাই সিল হিসেবে প্রদর্শিত হবে</p>
+            <p className="text-[10px] text-slate-500 mt-1">সব সনদপত্র, এডমিট কার্ড ও নথিপত্রে প্রতিষ্ঠান কর্তৃক যাচাইকৃত সরকারি সিল</p>
+          </div>
+
+          {/* Restore Default Official Assets Button */}
+          <div className="sm:col-span-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                setSettings(prev => ({
+                  ...prev,
+                  signatureUrl: DEFAULT_ASSETS.signature,
+                  signatureSealUrl: DEFAULT_ASSETS.signatureSeal,
+                  institutionSealUrl: DEFAULT_ASSETS.institutionSeal,
+                  logoUrl: DEFAULT_ASSETS.logo,
+                  watermarkUrl: DEFAULT_ASSETS.logo
+                }));
+                triggerSaveNotification('ডিফল্ট অফিশিয়াল সিল ও সিগনেচার রিস্টোর হয়েছে!');
+                alert('অফিশিয়াল গোল্ড লোগো, প্রধান শিক্ষকের সিল ও সিগনেচার সফলভাবে রিস্টোর হয়েছে!');
+              }}
+              className="px-4 py-2 text-xs font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 flex items-center gap-1.5 transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>ডিফল্ট ভেক্টর সিল ও সিগনেচার রিস্টোর করুন</span>
+            </button>
           </div>
 
           <div className="sm:col-span-2">
@@ -920,7 +1035,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div>
                   <label className="text-[10px] font-bold text-slate-500">মোবাইল নম্বর:</label>
                   <input
@@ -931,6 +1046,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       setMentors(updated);
                     }}
                     className="text-xs border rounded-lg px-2 py-1 w-full font-mono"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold text-emerald-700">হোয়াটসঅ্যাপ নম্বর:</label>
+                    {m.whatsappNumber && (
+                      <a
+                        href={`https://wa.me/88${(m.whatsappNumber || '').replace(/[^0-9]/g, '').replace(/^88/, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[9px] text-emerald-600 hover:underline font-bold"
+                      >
+                        টেস্ট চ্যাট &rarr;
+                      </a>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="01XXXXXXXXX"
+                    value={m.whatsappNumber || m.phone || ''}
+                    onChange={(e) => {
+                      const updated = mentors.map(item => item.id === m.id ? { ...item, whatsappNumber: e.target.value } : item);
+                      setMentors(updated);
+                    }}
+                    className="text-xs border border-emerald-300 bg-emerald-50/50 rounded-lg px-2 py-1 w-full font-mono font-bold text-emerald-950"
                   />
                 </div>
                 <div>
@@ -3501,7 +3641,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [infoBlocks, setInfoBlocks] = useState<ChatbotInfoBlock[]>(chatbot.infoBlocks || []);
   const [botName, setBotName] = useState(chatbot.botName || 'BS Learning নিজস্ব AI সহকারী');
   const [welcomeMsg, setWelcomeMsg] = useState(chatbot.welcomeMessage || '');
-  const [activeChatTab, setActiveChatTab] = useState<'knowledge' | 'blocks' | 'settings' | 'test'>('knowledge');
+  const [activeChatTab, setActiveChatTab] = useState<'knowledge' | 'chunks' | 'qa' | 'blocks' | 'settings' | 'test'>('knowledge');
+
+  // 1,000-Word Structured Training Chunks State (Up to 200,000+ Words total)
+  const [trainingChunks, setTrainingChunks] = useState<TrainingChunk[]>(aiKnowledgeStore.getTrainingChunks());
+  const [newChunkTitle, setNewChunkTitle] = useState('');
+  const [newChunkCategory, setNewChunkCategory] = useState('কোর্স তথ্য ও কারিকুলাম');
+  const [newChunkContent, setNewChunkContent] = useState('');
+  const [newChunkTags, setNewChunkTags] = useState('');
+
+  // Self-Learning Q&A Pairs (Teacher-Verified Dynamic Learning)
+  const [qaList, setQaList] = useState<QAItem[]>(aiKnowledgeStore.getKnowledgeBase());
+  const [newQAQuestion, setNewQAQuestion] = useState('');
+  const [newQAAnswer, setNewQAAnswer] = useState('');
+  const [newQATeacher, setNewQATeacher] = useState('বোরহানউদ্দিন মহিম');
 
   // New Info Block Form State
   const [newBlockTitle, setNewBlockTitle] = useState('');
@@ -3513,17 +3666,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   // Quick Test Simulator State
   const [testQuestion, setTestQuestion] = useState('');
   const [testResponse, setTestResponse] = useState<string | null>(null);
+  const [testSource, setTestSource] = useState<string | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
 
-  // Word count calculations
+  // Word count calculations across the massive 200,000+ words store
   const countWords = (text: string) => {
     if (!text) return 0;
     return text.trim().split(/\s+/).filter(Boolean).length;
   };
   const kbWordCount = countWords(kbText);
   const blocksWordCount = infoBlocks.reduce((acc, b) => acc + countWords(b.title + ' ' + b.content), 0);
-  const totalWordCount = kbWordCount + blocksWordCount;
-  const maxWords = 50000;
+  const chunksWordCount = trainingChunks.reduce((acc, c) => acc + countWords(c.title + ' ' + c.content), 0);
+  const qaWordCount = qaList.reduce((acc, q) => acc + countWords(q.question + ' ' + q.answer), 0);
+  const totalWordCount = kbWordCount + blocksWordCount + chunksWordCount + qaWordCount;
+  const maxWords = 200000;
   const percentUsed = Math.min(100, Math.round((totalWordCount / maxWords) * 100));
 
   // Master Chatbot Save
@@ -3538,7 +3694,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     setChatbot(updated);
     storage.saveChatbot(updated);
     triggerSaveNotification(customMsg || 'চ্যাটবটের ডাটা সফলভাবে সংরক্ষিত হয়েছে!');
-    alert(customMsg || '✅ আলহামদুলিল্লাহ! চ্যাটবট কনফিগারেশন, ৫০,০০০ শব্দের নলেজবেস এবং সকল তথ্য বক্স সফলভাবে সংরক্ষিত হয়েছে এবং লাইভ ওয়েবসাইটে সক্রিয়!');
+    alert(customMsg || '✅ আলহামদুলিল্লাহ! ২০০,০০০+ শব্দের নলেজবেস ও সকল ট্রেনিং ডাটা সফলভাবে সংরক্ষিত হয়েছে এবং লাইভ ওয়েবসাইটে সক্রিয়!');
+  };
+
+  // Add 1,000-Word Structured Training Chunk
+  const handleAddTrainingChunk = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newChunkTitle.trim() || !newChunkContent.trim()) {
+      alert('অনুগ্রহ করে ট্রেনিং বক্সের শিরোনাম ও বিবরণ পূরণ করুন!');
+      return;
+    }
+    const tags = newChunkTags.split(',').map(t => t.trim()).filter(Boolean);
+    aiKnowledgeStore.saveTrainingChunk({
+      title: newChunkTitle.trim(),
+      category: newChunkCategory.trim() || 'সাধারণ জ্ঞান ও নীতি',
+      content: newChunkContent.trim(),
+      tags
+    });
+    setTrainingChunks([...aiKnowledgeStore.getTrainingChunks()]);
+    setNewChunkTitle('');
+    setNewChunkContent('');
+    setNewChunkTags('');
+    triggerSaveNotification('১,০০০ শব্দের ট্রেনিং বক্স ডাটাবেজে যুক্ত হয়েছে!');
+    alert('✅ ১,০০০ শব্দের ট্রেনিং বক্স সফলভাবে সংরক্ষিত হয়েছে!');
+  };
+
+  // Delete Training Chunk
+  const handleDeleteTrainingChunk = (id: string) => {
+    if (!confirm('আপনি কি এই ট্রেনিং বক্সটি মুছে ফেলতে চান?')) return;
+    aiKnowledgeStore.deleteTrainingChunk(id);
+    setTrainingChunks([...aiKnowledgeStore.getTrainingChunks()]);
+    triggerSaveNotification('ট্রেনিং বক্স মুছে ফেলা হয়েছে!');
+  };
+
+  // Add Self-Learning Teacher Q&A Pair
+  const handleAddQA = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newQAQuestion.trim() || !newQAAnswer.trim()) {
+      alert('প্রশ্ন এবং শিক্ষকের উত্তর উভয়ই দেওয়া আবশ্যক!');
+      return;
+    }
+    aiKnowledgeStore.addQAPair(newQAQuestion.trim(), newQAAnswer.trim(), newQATeacher.trim(), true);
+    setQaList([...aiKnowledgeStore.getKnowledgeBase()]);
+    setNewQAQuestion('');
+    setNewQAAnswer('');
+    triggerSaveNotification('শিক্ষক প্রশ্নোত্তর সফলভাবে সেভ হয়েছে!');
+    alert('✅ আলহামদুলিল্লাহ! শিক্ষক-যাচাইকৃত প্রশ্নোত্তর সফলভাবে যুক্ত হয়েছে। পরবর্তীতে কোনো শিক্ষার্থী একই বা অনুরূপ প্রশ্ন করলে এআই স্বয়ংক্রিয়ভাবে উত্তর দেবে।');
+  };
+
+  // Delete Q&A Pair
+  const handleDeleteQA = (id: string) => {
+    if (!confirm('আপনি কি এই প্রশ্নোত্তরটি মুছে ফেলতে চান?')) return;
+    aiKnowledgeStore.deleteQAPair(id);
+    setQaList([...aiKnowledgeStore.getKnowledgeBase()]);
+    triggerSaveNotification('প্রশ্নোত্তর মুছে ফেলা হয়েছে!');
   };
 
   // Add new Info Block
@@ -3608,53 +3817,90 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     triggerSaveNotification('তথ্য বক্স মুছে ফেলা হয়েছে!');
   };
 
-  // Test Simulator
-  const handleTestChatbot = (e: React.FormEvent) => {
+  // Test Simulator (Tests Math, Learned QA, Training Chunks, Info blocks & Wikipedia)
+  const handleTestChatbot = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!testQuestion.trim()) return;
     setIsSimulating(true);
-    setTimeout(() => {
-      const q = testQuestion.toLowerCase();
-      let ans = null;
+    setTestResponse(null);
+    setTestSource(null);
 
-      // 1. Info blocks
-      for (const b of infoBlocks) {
-        if (!b.isActive) continue;
-        const matchesKeyword = b.keywords?.some(k => k && q.includes(k.toLowerCase()));
-        const matchesTitle = b.title.toLowerCase().split(/\s+/).some(w => w.length > 2 && q.includes(w));
-        if (matchesKeyword || q.includes(b.title.toLowerCase()) || matchesTitle) {
-          ans = `📌 [তথ্য বক্স: ${b.title}]\n\n${b.content}`;
-          break;
-        }
-      }
+    const q = testQuestion.toLowerCase();
 
-      // 2. Large Knowledge Base
-      if (!ans && kbText) {
-        const sections = kbText.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
-        const queryTerms = q.split(/[\s,?!;।]+/).filter(w => w.length > 1);
-        let bestSec = '';
-        let highest = 0;
-        for (const sec of sections) {
-          let count = 0;
-          for (const t of queryTerms) {
-            if (sec.toLowerCase().includes(t)) count++;
-          }
-          if (count > highest) {
-            highest = count;
-            bestSec = sec;
-          }
-        }
-        if (highest > 0 && bestSec) {
-          ans = bestSec;
-        }
-      }
-
-      if (!ans) {
-        ans = `ধন্যবাদ! ${botName}-এর কাছে আপনি প্রতিষ্ঠান সম্পর্কিত যেকোনো বিষয় বা ৫০,০০০ শব্দের নলেজবেসে সংরক্ষিত যেকোনো বিষয়ের উপর প্রশ্ন করতে পারেন।`;
-      }
-      setTestResponse(ans);
+    // 1. Math
+    const math = (window as any).evaluateMathExpression ? (window as any).evaluateMathExpression(testQuestion) : null;
+    if (math) {
+      setTestResponse(`🧮 ${math}`);
+      setTestSource('বিল্ট-ইন ক্যালকুলেটর');
       setIsSimulating(false);
-    }, 250);
+      return;
+    }
+
+    // 2. Self-learning Teacher-verified Q&A and 200,000+ words store
+    const learned = aiKnowledgeStore.searchLearnedAnswer(testQuestion);
+    if (learned) {
+      setTestResponse(learned.answer);
+      setTestSource(learned.source);
+      setIsSimulating(false);
+      return;
+    }
+
+    // 3. Info blocks
+    for (const b of infoBlocks) {
+      if (!b.isActive) continue;
+      const matchesKeyword = b.keywords?.some(k => k && q.includes(k.toLowerCase()));
+      const matchesTitle = b.title.toLowerCase().split(/\s+/).some(w => w.length > 2 && q.includes(w));
+      if (matchesKeyword || q.includes(b.title.toLowerCase()) || matchesTitle) {
+        setTestResponse(`📌 [তথ্য বক্স: ${b.title}]\n\n${b.content}`);
+        setTestSource('অ্যাডমিন তথ্য বক্স');
+        setIsSimulating(false);
+        return;
+      }
+    }
+
+    // 4. Large Central Knowledge Base
+    if (kbText) {
+      const sections = kbText.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+      const queryTerms = q.split(/[\s,?!;।]+/).filter(w => w.length > 1);
+      let bestSec = '';
+      let highest = 0;
+      for (const sec of sections) {
+        let count = 0;
+        for (const t of queryTerms) {
+          if (sec.toLowerCase().includes(t)) count++;
+        }
+        if (count > highest) {
+          highest = count;
+          bestSec = sec;
+        }
+      }
+      if (highest > 0 && bestSec) {
+        setTestResponse(bestSec);
+        setTestSource('সেন্ট্রাল নলেজবেস');
+        setIsSimulating(false);
+        return;
+      }
+    }
+
+    // 5. Autonomous Wikipedia Integration Test
+    try {
+      const res = await fetch(`/api/wiki?q=${encodeURIComponent(testQuestion)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.extract) {
+          setTestResponse(`🌐 [উইকিপিডিয়া: ${data.title}]\n\n${data.extract}`);
+          setTestSource('উইকিপিডিয়া সাধারণ জ্ঞান API');
+          setIsSimulating(false);
+          return;
+        }
+      }
+    } catch {
+      // Fallback
+    }
+
+    setTestResponse(`ধন্যবাদ! ${botName}-এর কাছে আপনি প্রতিষ্ঠান সম্পর্কিত যেকোনো কোর্স, ফি, নোটিস, রুটিন বা সাধারণ জ্ঞানের প্রশ্ন করতে পারেন।`);
+    setTestSource('সাধারণ রেসপন্স');
+    setIsSimulating(false);
   };
 
   const renderModule15 = () => (
@@ -3720,7 +3966,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>১. বৃহৎ নলেজবেস টেক্সটবক্স (৫০,০০০ শব্দ)</span>
+            <span>১. কেন্দ্রীয় নলেজবেস (২০০,০০০+ শব্দ)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveChatTab('chunks')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+              activeChatTab === 'chunks'
+                ? 'bg-amber-400 text-slate-950 shadow-md font-extrabold'
+                : 'bg-white/10 text-white hover:bg-white/20'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>২. ১,০০০ শব্দের ট্রেনিং প্যানেল ({toBengaliNum(trainingChunks.length)}টি সংরক্ষিত)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveChatTab('qa')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+              activeChatTab === 'qa'
+                ? 'bg-amber-400 text-slate-950 shadow-md font-extrabold'
+                : 'bg-white/10 text-white hover:bg-white/20'
+            }`}
+          >
+            <Bot className="w-3.5 h-3.5" />
+            <span>৩. স্বয়ংক্রিয় শিখন ও প্রশ্নোত্তর ব্যাংক ({toBengaliNum(qaList.length)}টি Q&A)</span>
           </button>
 
           <button
@@ -3732,7 +4002,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>২. একাধিক তথ্য বক্স ({toBengaliNum(infoBlocks.length)}টি বক্স)</span>
+            <span>৪. একাধিক তথ্য বক্স ({toBengaliNum(infoBlocks.length)}টি বক্স)</span>
           </button>
 
           <button
@@ -3744,7 +4014,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             }`}
           >
             <Settings className="w-3.5 h-3.5" />
-            <span>৩. চ্যাটবট নাম ও বার্তা সেটিংস</span>
+            <span>৫. চ্যাটবট নাম ও বার্তা সেটিংস</span>
           </button>
 
           <button
@@ -3755,8 +4025,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 : 'bg-white/10 text-white hover:bg-white/20'
             }`}
           >
-            <Bot className="w-3.5 h-3.5" />
-            <span>৪. লাইভ চ্যাট টেস্ট সিমুলেটর</span>
+            <Send className="w-3.5 h-3.5" />
+            <span>৬. লাইভ চ্যাট টেস্ট ও উইকিপিডিয়া</span>
           </button>
         </div>
       </div>
@@ -3844,7 +4114,312 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         </div>
       )}
 
-      {/* ================= TAB 2: MULTIPLE INFO BOXES (MULTI-BOX SYSTEM) ================= */}
+      {/* ================= TAB 2: 1,000-WORD STRUCTURED TRAINING PANELS (UP TO 200,000+ WORDS) ================= */}
+      {activeChatTab === 'chunks' && (
+        <div className="space-y-6">
+          {/* Add 1,000-Word Structured Training Box */}
+          <div className="bg-white p-5 sm:p-7 rounded-3xl border border-blue-200 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Plus className="w-5 h-5 text-blue-900" />
+                  <span>১,০০০ শব্দের নতুন স্ট্রাকচার্ড ট্রেনিং বক্স (Structured Training Panel)</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  প্রতিটি বক্সে ১,০০০ শব্দ পর্যন্ত প্রাতিষ্ঠানিক সিলেবাস, নিয়মাবলী ও বিস্তারিত জ্ঞান যুক্ত করুন। একাধিক বক্স মিলে ২০০,০০০+ শব্দ সাপোর্ট করবে।
+                </p>
+              </div>
+              <span className="text-xs font-bold px-3 py-1 bg-blue-100 text-blue-900 rounded-full shrink-0">
+                ক্যাপাসিটি: ১,০০০ শব্দ / বক্স
+              </span>
+            </div>
+
+            <form onSubmit={handleAddTrainingChunk} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    ট্রেনিং বক্সের শিরোনাম (Module / Topic Title) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="যেমন: কম্পিউটার ল্যাব ব্যবহারের নিয়মাবলী ও ব্যবহারিক পাঠ"
+                    value={newChunkTitle}
+                    onChange={(e) => setNewChunkTitle(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    ক্যাটাগরি (Category)
+                  </label>
+                  <select
+                    value={newChunkCategory}
+                    onChange={(e) => setNewChunkCategory(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
+                  >
+                    <option value="প্রতিষ্ঠান ও ভিশন">প্রতিষ্ঠান ও ভিশন</option>
+                    <option value="ভর্তি ও ফি পলিসি">ভর্তি ও ফি পলিসি</option>
+                    <option value="কোর্স তথ্য ও কারিকুলাম">কোর্স তথ্য ও কারিকুলাম</option>
+                    <option value="সহীহ কুরআন শিক্ষা">সহীহ কুরআন শিক্ষা</option>
+                    <option value="কম্পিউটার ল্যাব ও স্কিল">কম্পিউটার ল্যাব ও স্কিল</option>
+                    <option value="এসএসসি ও এইচএসসি সহায়িকা">এসএসসি ও এইচএসসি সহায়িকা</option>
+                    <option value="পরীক্ষা ও সনদ নিয়ম">পরীক্ষা ও সনদ নিয়ম</option>
+                    <option value="সাধারণ জ্ঞান ও নীতি">সাধারণ জ্ঞান ও নীতি</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-slate-700">
+                    ট্রেনিং কন্টেন্ট (১,০০০ শব্দ পর্যন্ত) *
+                  </label>
+                  <span className="text-[11px] font-mono text-slate-500">
+                    শব্দ: <b className="text-blue-900">{toBengaliNum(countWords(newChunkContent))}</b> / ১,০০০
+                  </span>
+                </div>
+                <textarea
+                  rows={8}
+                  required
+                  placeholder="এখানে প্রাতিষ্ঠানিক সিলেবাস, রুলস, নিয়মাবলী বা পাঠ্য বিষয়ের বিস্তারিত তথ্য লিখুন (১,০০০ শব্দ পর্যন্ত)..."
+                  value={newChunkContent}
+                  onChange={(e) => setNewChunkContent(e.target.value)}
+                  className="w-full p-4 rounded-xl border border-slate-300 text-xs sm:text-sm leading-relaxed focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-slate-50 font-sans"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  ট্যাগ / সার্চ কি-ওয়ার্ডসমূহ (কমা দিয়ে আলাদা করুন)
+                </label>
+                <input
+                  type="text"
+                  placeholder="যেমন: কম্পিউটার, প্র্যাকটিক্যাল, টাইপিং, ল্যাব, পরীক্ষা"
+                  value={newChunkTags}
+                  onChange={(e) => setNewChunkTags(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm"
+                />
+              </div>
+
+              <div className="flex justify-end pt-1">
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-colors"
+                >
+                  <Plus className="w-4 h-4 text-amber-300" />
+                  <span>ট্রেনিং বক্স ডাটাবেজে যুক্ত ও সেভ করুন</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* List of 1,000-Word Structured Training Chunks */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-indigo-700" />
+                <span>সংরক্ষিত ১,০০০ শব্দের ট্রেনিং বক্সসমূহ ({toBengaliNum(trainingChunks.length)}টি বক্স)</span>
+              </h3>
+              <span className="text-xs text-slate-500 font-medium">
+                সর্বমোট শব্দ: <b className="text-blue-900">{toBengaliNum(chunksWordCount)}</b> শব্দ
+              </span>
+            </div>
+
+            {trainingChunks.length === 0 ? (
+              <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500 text-xs">
+                এখনো কোনো ১,০০০ শব্দের ট্রেনিং বক্স তৈরি করা হয়নি। উপরের ফর্ম থেকে নতুন ট্রেনিং বক্স যুক্ত করুন।
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {trainingChunks.map((chunk) => (
+                  <div
+                    key={chunk.id}
+                    className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-xs hover:border-blue-400 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-2 border-b pb-2">
+                      <div>
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-900 mb-1">
+                          {chunk.category}
+                        </span>
+                        <h4 className="text-sm font-bold text-slate-900">
+                          {chunk.title}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-bold font-mono">
+                          {toBengaliNum(chunk.wordCount || countWords(chunk.content))} শব্দ
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteTrainingChunk(chunk.id)}
+                          className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="মুছে ফেলুন"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-700 leading-relaxed max-h-36 overflow-y-auto whitespace-pre-line bg-slate-50 p-3 rounded-xl border border-slate-100 font-sans">
+                      {chunk.content}
+                    </p>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100 text-[11px] text-slate-500">
+                      <div className="truncate max-w-[200px]">
+                        ট্যাগ: <b>{chunk.tags?.join(', ') || 'কোনো ট্যাগ নেই'}</b>
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        আপডেট: {chunk.updatedAt}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB 3: SELF-GUIDANCE & CONVERSATION LEARNING (TEACHER-VERIFIED Q&A) ================= */}
+      {activeChatTab === 'qa' && (
+        <div className="space-y-6">
+          {/* Explanation Banner */}
+          <div className="bg-emerald-950 text-white p-5 rounded-3xl border border-emerald-800 shadow-md flex items-start gap-3.5">
+            <Bot className="w-6 h-6 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="text-xs sm:text-sm space-y-1">
+              <h4 className="font-bold text-emerald-300">
+                স্বয়ংক্রিয় এআই শিখন ও শিক্ষক প্রশ্নোত্তর সংরক্ষণ (Self-Learning Q&A Engine)
+              </h4>
+              <p className="text-slate-300 leading-relaxed">
+                শিক্ষার্থী যখন শিক্ষককে প্রশ্ন করে এবং শিক্ষক উত্তর দেন, অথবা অ্যাডমিন এখানে প্রশ্ন-উত্তর যোগ করেন, এআই তা স্মরণে রাখে। পরবর্তীতে অন্য কোনো শিক্ষার্থী একই বা অনুরূপ প্রশ্ন করলে এআই সরাসরি শিক্ষকের পক্ষে উত্তর দেয় এবং নিয়মিত নিজেকে প্রশিক্ষিত করে।
+              </p>
+            </div>
+          </div>
+
+          {/* Add Q&A Form */}
+          <div className="bg-white p-5 sm:p-7 rounded-3xl border border-emerald-200 shadow-sm space-y-4">
+            <h3 className="text-base font-bold text-slate-900 border-b pb-3 flex items-center gap-2">
+              <Plus className="w-5 h-5 text-emerald-700" />
+              <span>নতুন শিক্ষক-যাচাইকৃত প্রশ্নোত্তর (Q&A Pair) যুক্ত করুন</span>
+            </h3>
+
+            <form onSubmit={handleAddQA} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    শিক্ষার্থীর প্রশ্ন (Student Question) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="যেমন: হিসাববিজ্ঞানের রেওয়ামিল কীভাবে সহজে মেলাব?"
+                    value={newQAQuestion}
+                    onChange={(e) => setNewQAQuestion(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-emerald-600 focus:outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    উত্তরদাতা শিক্ষক (Teacher)
+                  </label>
+                  <select
+                    value={newQATeacher}
+                    onChange={(e) => setNewQATeacher(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-emerald-600 focus:outline-hidden bg-white"
+                  >
+                    {mentors.map((m) => (
+                      <option key={m.id} value={m.name}>
+                        {m.name} ({m.designation})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  শিক্ষকের চূড়ান্ত ও নির্ভরযোগ্য উত্তর (Teacher's Verified Answer) *
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  placeholder="শিক্ষকের দেওয়া উত্তরটি এখানে লিখুন যা এআই পরবর্তীতে শিক্ষার্থীদের প্রদান করবে..."
+                  value={newQAAnswer}
+                  onChange={(e) => setNewQAAnswer(e.target.value)}
+                  className="w-full p-3.5 rounded-xl border border-slate-300 text-xs sm:text-sm leading-relaxed focus:ring-2 focus:ring-emerald-600 focus:outline-hidden"
+                />
+              </div>
+
+              <div className="flex justify-end pt-1">
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-colors"
+                >
+                  <Save className="w-4 h-4 text-amber-300" />
+                  <span>প্রশ্নোত্তরটি এআই মেমরিতে সেভ করুন</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* List of Verified Q&A Pairs */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Bot className="w-5 h-5 text-emerald-700" />
+                <span>এআই মেমরিতে সংরক্ষিত প্রশ্নোত্তর ({toBengaliNum(qaList.length)}টি Q&A)</span>
+              </h3>
+            </div>
+
+            <div className="space-y-3">
+              {qaList.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-2.5 hover:border-emerald-400 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900">
+                          যাচাইকৃত শিক্ষক: {item.teacherName || 'বোরহানউদ্দিন মহিম'}
+                        </span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-900 font-semibold">
+                          ব্যবহৃত হয়েছে: {toBengaliNum(item.timesUsed || 0)} বার
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {item.createdAt}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-extrabold text-slate-900">
+                        প্রশ্ন: {item.question}
+                      </h4>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteQA(item.id)}
+                      className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors shrink-0"
+                      title="মুছে ফেলুন"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100 whitespace-pre-line font-sans">
+                    {item.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB 4: MULTIPLE INFO BOXES (MULTI-BOX SYSTEM) ================= */}
       {activeChatTab === 'blocks' && (
         <div className="space-y-6">
           {/* Add New Info Block Form */}
@@ -4126,15 +4701,51 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
           {testResponse && !isSimulating && (
             <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-xs sm:text-sm space-y-2">
-              <div className="font-bold text-blue-900 flex items-center gap-1.5">
-                <Bot className="w-4 h-4 text-amber-500" />
-                <span>চ্যাটবটের উত্তর প্রিভিউ:</span>
+              <div className="font-bold text-blue-900 flex items-center justify-between gap-1.5">
+                <div className="flex items-center gap-1.5">
+                  <Bot className="w-4 h-4 text-amber-500" />
+                  <span>চ্যাটবটের উত্তর প্রিভিউ:</span>
+                </div>
+                {testSource && (
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-200 text-blue-950 font-mono">
+                    উৎস: {testSource}
+                  </span>
+                )}
               </div>
               <p className="whitespace-pre-line text-slate-800 leading-relaxed bg-white p-3.5 rounded-xl border border-blue-100 shadow-2xs font-sans">
                 {testResponse}
               </p>
             </div>
           )}
+
+          {/* Wikipedia Autonomous Retrieval Info & Quick Questions */}
+          <div className="pt-2 border-t border-slate-200 space-y-2 text-xs text-slate-600">
+            <div className="font-bold text-slate-800 flex items-center gap-1.5">
+              <span>🌐 দ্রুত টেস্ট করার কিছু নমুনা প্রশ্ন:</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                'সহীহ কুরআন শিক্ষার ক্লাস কখন হয়?',
+                'কম্পিউটার কোর্সের ফি কত?',
+                'বাংলা কিউআর দিয়ে পেমেন্ট নিয়ম',
+                'আইসিটি (ICT) কি?',
+                'উইকিপিডিয়া কি?',
+                '২৫০ + ৩৫০ কত হয়?',
+                'বোরহানউদ্দিন মহিম স্যারের সাথে হোয়াটসঅ্যাপে কথা বলব'
+              ].map((sample, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    setTestQuestion(sample);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-900 text-[11px] font-medium transition-colors border border-slate-200"
+                >
+                  {sample}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

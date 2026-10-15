@@ -220,10 +220,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
               /* Luxury Official Certificate */
               <div className="space-y-4">
                 <div className="printable-area certificate-border relative bg-radial from-amber-50/40 via-white to-amber-50/30 p-8 sm:p-12 rounded-xl shadow-lg overflow-hidden text-center">
-                  {/* Subtle Center Logo Watermark with Institute Logo */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] select-none">
-                    {settings.logoUrl ? (
-                      <img src={settings.logoUrl} alt="Watermark" className="w-80 h-80 object-contain filter grayscale" />
+                  {/* Subtle Center Logo Watermark with Institute Logo / Watermark */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.09] select-none">
+                    {(settings.watermarkUrl || settings.logoUrl) ? (
+                      <img src={settings.watermarkUrl || settings.logoUrl} alt="Watermark" className="w-80 h-80 object-contain filter grayscale" />
                     ) : (
                       <div className="w-80 h-80 rounded-full border-12 border-dashed border-blue-950 flex flex-col items-center justify-center text-center p-6">
                         <span className="text-5xl font-black text-blue-950">BS ZONE</span>
@@ -307,14 +307,16 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                         alt="অফিশিয়াল সিল"
                         className="w-20 h-20 sm:w-24 sm:h-24 object-contain filter drop-shadow-xs"
                       />
-                      <span className="text-[10px] font-bold text-slate-600 mt-1">অফিশিয়াল সিল</span>
+                      <span className="text-[10px] font-bold text-slate-600 mt-1">প্রাতিষ্ঠানিক সিল</span>
                     </div>
 
-                    <div className="hidden sm:flex flex-col items-center opacity-85">
-                      <div className="w-12 h-12 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-md border-2 border-amber-500">
-                        ★
-                      </div>
-                      <span className="text-[9px] font-bold text-amber-700 mt-1">VERIFIED CERTIFICATE</span>
+                    <div className="flex flex-col items-center">
+                      <img
+                        src={settings.signatureSealUrl}
+                        alt="প্রধান শিক্ষকের সিলমোহর"
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-contain filter drop-shadow-xs"
+                      />
+                      <span className="text-[9px] font-bold text-rose-800 mt-1">প্রধান শিক্ষকের সিলমোহর</span>
                     </div>
 
                     <div className="flex flex-col items-center text-center">
