@@ -50,7 +50,7 @@ export default function App() {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [idCardModalOpen, setIdCardModalOpen] = useState(false);
 
-  // Sync listener to immediately reflect admin changes on the frontend
+  // Sync listener to immediately reflect admin changes on the frontend across tabs/events
   useEffect(() => {
     const handleStorageSync = () => {
       setSettings(storage.getSettings());
@@ -68,7 +68,12 @@ export default function App() {
     handleStorageSync();
 
     window.addEventListener('bs_sync', handleStorageSync);
-    return () => window.removeEventListener('bs_sync', handleStorageSync);
+    window.addEventListener('storage', handleStorageSync);
+    
+    return () => {
+      window.removeEventListener('bs_sync', handleStorageSync);
+      window.removeEventListener('storage', handleStorageSync);
+    };
   }, [isAdminLoggedIn]);
 
   // Universal Navigation & Shortcut Handler
