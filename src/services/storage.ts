@@ -305,7 +305,7 @@ const initialCourses: Course[] = [
     certificateFee: 500,
     certificateFeeSecondTime: 0,
     hasGovtCert: true,
-    paymentDetails: "ভর্তি ১,৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
+    paymentDetails: "ভর্তি ১,১৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
     category: "আইটি ও প্রফেশনাল",
     subjects: ["Computer Fundamentals & OS", "MS Word & Typing Speed", "MS Excel & Financial Formula", "MS PowerPoint & Access", "Internet & Email Communication"],
     exams: ["টাইপিং স্পিড টেস্ট", "এক্সেল প্র্যাকটিক্যাল ল্যাব", "কারিগরি বোর্ড ফাইনাল পরীক্ষা"]
@@ -690,7 +690,7 @@ const initialNotices: NoticeItem[] = [
     id: "not-1",
     title: "২০২৬ শিক্ষাবর্ষে সকল কোর্সে বিশেষ ছাড়ে ভর্তি চলছে!",
     date: "১০ এপ্রিল ২০২৬",
-    content: "BS E-Learning & IT Zone-এ ২০২৬ সেশনের নতুন ব্যাচে সীমিত আসনে অফার মূল্যে ভর্তি চলছে। কম্পিউটার অফিস অ্যাপ্লিকেশন কোর্সে অফার ফি ৩,৫০০৳ (প্রথমে ১,৫০০৳), এসএসসি/এইচএসসি হিসাববিজ্ঞানে অফার ভর্তি ফি ৮০০৳। বিস্তারিত তথ্যের জন্য আমাদের হটলাইনে যোগাযোগ করুন।",
+    content: "BS E-Learning & IT Zone-এ ২০২৬ সেশনের নতুন ব্যাচে সীমিত আসনে অফার মূল্যে ভর্তি চলছে। কম্পিউটার অফিস অ্যাপ্লিকেশন কোর্সে অফার ফি ৩,৫০০৳ (প্রথমে ১, ১৫০৳), এসএসসি/এইচএসসি হিসাববিজ্ঞানে অফার ভর্তি ফি ৮০০৳। বিস্তারিত তথ্যের জন্য আমাদের হটলাইনে যোগাযোগ করুন।",
     images: [
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80"
     ],
@@ -819,7 +819,7 @@ BS E-Learning & IT Zone একটি আধুনিক ও সরকারি �
 ৫. অষ্টম-দশম গণিত একাডেমিক: ভর্তি ফি ৮০০ টাকা, মাসিক ফি ৫০০ টাকা।
 ৬. গণিত ও ইংরেজি স্পেশাল কম্বো: ভর্তি ফি ১,২০০ টাকা, মাসিক ফি ৮০০ টাকা।
 ৭. ১ম থেকে ৭ম শ্রেণি সকল বিষয়: ভর্তি ফি ৮০০ টাকা, মাসিক ফি ৫০০ টাকা।
-৮. কম্পিউটার অফিস অ্যাপ্লিকেশন (৬ মাস): অফার ভর্তি ফি মাত্র ১,৫০০ টাকা (প্রকৃত কোর্স ফি ৩,৫০০৳)। পরীক্ষা দেওয়ার পূর্বে বাকি ফি ও সরকারি সনদ ফি ৫০০ টাকা।
+৮. কম্পিউটার অফিস অ্যাপ্লিকেশন (৬ মাস): অফার ভর্তি ফি মাত্র ১,৫০০ টাকা (প্রকৃত কোর্স ফি ৩, ৫০০৳)। পরীক্ষা দেওয়ার পূর্বে বাকি ফি ও সরকারি সনদ ফি ৫০০ টাকা।
 ৯. Spoken English (৪ মাস): ভর্তি ফি ১,০০০ টাকা, মাসিক ফি ৫০০ টাকা।
 ১০. বেসিক ফাউন্ডেশন কোর্স (বাংলা, গণিত, ইংরেজি - ৩ মাস): ভর্তি ফি ১,০০০ টাকা।
 
@@ -852,7 +852,7 @@ BS E-Learning & IT Zone একটি আধুনিক ও সরকারি �
       id: "info-3",
       title: "এডমিট কার্ড ডাউনলোড ও প্রিন্ট সমস্যা সমাধান",
       category: "এডমিট কার্ড",
-      content: "এডমিট কার্ড ডাউনলোড করতে সমস্যা হলে নিশ্চিত করুন আপনার চলতি মাসের কোনো ফি বকেয়া নেই। ফি ক্লিয়ার থাকা সত্ত্বেও এডমিট ব্লক দেখালে হটলাইনে (01612118307) যোগাযোগ করে অ্যাডমিনকে আনব্লক করার অনুরোধ করুন। আনব্লক হওয়ার সাথে সাথেই আপনি প্রিন্ট করতে পারবেন।",
+      content: "এডমিট কার্ড ডাউনলোড করতে সমস্যা হলে নিশ্চিত করুন আপনার চলতি মাসের কোনো ফি বকেয়া নেই। ফি ক্লিয়ার থাকা সত্ত্বেও এডমিট ব্লক দেখালে হটলাইনে (01612118307) যোগাযোগ করে অ্যাডমিনকে আনব্লক করার অনুরোধ করুন। আনব্লক হওয়ার সাথেই আপনি প্রিন্ট করতে পারবেন।",
       keywords: ["এডমিট", "admit", "ব্লক", "ডাউনলোড", "পরীক্ষা", "রোল"],
       isActive: true
     },
@@ -918,10 +918,18 @@ class StorageService {
     }
   }
 
+  // রিয়েল-টাইম সিঙ্ক নিশ্চিত করার জন্য এখানে ইভেন্ট ট্রিগার আপডেট করা হলো
   private set<T>(key: string, value: T): void {
     try {
-      localStorage.setItem(`bs_${key}`, JSON.stringify(value));
-      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
+      const storageKey = `bs_${key}`;
+      const serializedValue = JSON.stringify(value);
+      
+      localStorage.setItem(storageKey, serializedValue);
+      
+      // একই ট্যাবের সব কম্পোনেন্ট এবং ক্রস-ট্যাব সিঙ্কের জন্য ইভেন্ট ফায়ার করা হচ্ছে
+      window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: storageKey, value: serializedValue } }));
+      window.dispatchEvent(new Event('bs_sync'));
+      
     } catch (e) {
       console.error("Storage error:", e);
     }
@@ -1084,11 +1092,5 @@ class StorageService {
     window.location.reload();
   }
 }
-
-const originalSetItem = localStorage.setItem.bind(localStorage);
-localStorage.setItem = function (key: string, value: string) {
-  originalSetItem(key, value);
-  window.dispatchEvent(new Event('bs_sync'));
-};
 
 export const storage = new StorageService();
