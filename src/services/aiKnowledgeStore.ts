@@ -2,12 +2,6 @@
 // Supports 200,000+ words capacity, structured training chunks (1,000 words each),
 // and autonomous teacher Q&A pair learning.
 
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
-// @ts-ignore
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 export interface QAItem {
   id: string;
