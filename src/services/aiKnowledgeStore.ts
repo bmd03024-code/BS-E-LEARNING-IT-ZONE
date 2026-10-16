@@ -5,8 +5,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
 // @ts-ignore
-//import firebaseConfig from '../firebase-applet-config.json';
-//
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
