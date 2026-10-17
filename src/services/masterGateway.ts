@@ -94,8 +94,11 @@ class MasterGatewayEngine {
     try {
       this.channel = new BroadcastChannel('bs_master_gateway');
       this.channel.onmessage = (event) => {
-        const { key, value, senderId } = event.data || {};
+        const { key, value } = event.data || {};
         if (key) {
+          try {
+            localStorage.setItem(`bs_${key}`, JSON.stringify(value));
+          } catch {}
           this.status.totalReceives++;
           this.status.lastSyncTime = Date.now();
           this.notifyStatus();
@@ -131,6 +134,9 @@ class MasterGatewayEngine {
         try {
           const payload = JSON.parse(event.data);
           if (payload.type === 'SYNC_UPDATE' && payload.key) {
+            try {
+              localStorage.setItem(`bs_${payload.key}`, JSON.stringify(payload.value));
+            } catch {}
             this.status.totalReceives++;
             this.status.lastSyncTime = Date.now();
             this.notifyStatus();
@@ -168,17 +174,34 @@ class MasterGatewayEngine {
           this.status.lastSyncTime = Date.now();
           this.notifyStatus();
 
+          // Immediately hydrate all documents on initial snapshot or subsequent updates
+          snapshot.docs.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data && data.data !== undefined) {
+              try {
+                localStorage.setItem(`bs_${docSnap.id}`, JSON.stringify(data.data));
+              } catch {}
+            }
+          });
+
           snapshot.docChanges().forEach((change) => {
             if (change.type === 'added' || change.type === 'modified') {
               const docData = change.doc.data();
               if (docData && docData.data !== undefined) {
+                try {
+                  localStorage.setItem(`bs_${change.doc.id}`, JSON.stringify(docData.data));
+                } catch {}
                 this.status.totalReceives++;
                 this.dispatchChange(change.doc.id, docData.data, 'firestore');
               }
             }
           });
+
+          // Dispatch universal sync event for React re-rendering
+          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { fromFirestore: true } }));
         },
         (error) => {
+          console.warn('[MasterGateway] Firestore sync error:', error);
           this.status.firestoreConnected = false;
           this.notifyStatus();
           handleFirestoreError(error, OperationType.GET, 'institute_data');

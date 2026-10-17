@@ -2,6 +2,9 @@ import express, { Request, Response } from 'express';
 import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
 import path from 'path';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
+import firebaseConfig from './firebase-applet-config.json';
 
 const app = express();
 const port = 3000;
@@ -22,7 +25,7 @@ if (!fs.existsSync(DATA_DIR)) {
 let database: Record<string, any> = {};
 let dbVersion = 1;
 
-// Load persisted data on startup
+// Load persisted data on startup from disk
 if (fs.existsSync(DB_FILE)) {
   try {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
@@ -33,6 +36,31 @@ if (fs.existsSync(DB_FILE)) {
     database = {};
   }
 }
+
+// Initialize Server-side Firebase Firestore instance
+const firebaseApp = initializeApp(firebaseConfig, 'serverApp');
+const firestoreDb = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
+
+// Hydrate server database from Firestore on startup
+async function initServerFirestoreSync() {
+  try {
+    const colRef = collection(firestoreDb, 'institute_data');
+    const snap = await getDocs(colRef);
+    if (!snap.empty) {
+      snap.forEach(d => {
+        const docData = d.data();
+        if (docData && docData.data !== undefined) {
+          database[d.id] = docData.data;
+        }
+      });
+      persistDatabase();
+      console.log(`[Server] Hydrated ${snap.size} modules directly from Cloud Firestore!`);
+    }
+  } catch (err) {
+    console.warn('[Server] Firestore hydration catch:', err);
+  }
+}
+initServerFirestoreSync();
 
 // Save database to disk asynchronously
 function persistDatabase() {
@@ -112,12 +140,15 @@ app.get('/api/sync/version', (_req: Request, res: Response) => {
 });
 
 // Get all persisted institutional data
-app.get('/api/sync/all', (_req: Request, res: Response) => {
+app.get('/api/sync/all', async (_req: Request, res: Response) => {
+  if (Object.keys(database).length === 0) {
+    await initServerFirestoreSync();
+  }
   res.json({ success: true, version: dbVersion, data: database });
 });
 
 // Update a single key (e.g. settings, mentors, courses, chatbot)
-app.post('/api/sync/update', (req: Request, res: Response) => {
+app.post('/api/sync/update', async (req: Request, res: Response) => {
   const { key, value } = req.body;
   if (!key) {
     return res.status(400).json({ error: 'Key is required' });
@@ -127,11 +158,19 @@ app.post('/api/sync/update', (req: Request, res: Response) => {
   persistDatabase();
   broadcastUpdate('SYNC_UPDATE', key, value);
 
+  // Also push to Cloud Firestore directly from server to guarantee global persistence
+  try {
+    const docRef = doc(firestoreDb, 'institute_data', key);
+    await setDoc(docRef, { key, data: value, updatedAt: new Date().toISOString() }, { merge: true });
+  } catch (e) {
+    console.warn(`[Server] Firestore write error for ${key}:`, e);
+  }
+
   return res.json({ success: true, version: dbVersion });
 });
 
 // Bulk update multiple modules at once (e.g. Admin "এক ক্লিকে সব সেভ")
-app.post('/api/sync/bulk', (req: Request, res: Response) => {
+app.post('/api/sync/bulk', async (req: Request, res: Response) => {
   const { all } = req.body;
   if (!all || typeof all !== 'object') {
     return res.status(400).json({ error: 'Valid object required' });
@@ -140,6 +179,14 @@ app.post('/api/sync/bulk', (req: Request, res: Response) => {
   database = { ...database, ...all };
   persistDatabase();
   broadcastUpdate('SYNC_ALL');
+
+  // Push all keys to Firestore in background
+  for (const [k, v] of Object.entries(all)) {
+    try {
+      const docRef = doc(firestoreDb, 'institute_data', k);
+      await setDoc(docRef, { key: k, data: v, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch {}
+  }
 
   return res.json({ success: true, version: dbVersion });
 });

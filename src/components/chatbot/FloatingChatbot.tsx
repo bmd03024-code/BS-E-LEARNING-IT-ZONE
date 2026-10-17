@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { storage } from '../../services/storage';
+import { aiKnowledgeStore } from '../../services/aiKnowledgeStore';
 import { MessageSquare, X, Send, Sparkles, Bot, User, Calculator, Globe, BookOpen, ExternalLink, Phone, MessageCircle, HelpCircle } from 'lucide-react';
 import { toBengaliNum } from '../home/CoursesSection';
 

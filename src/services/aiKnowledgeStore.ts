@@ -1,7 +1,5 @@
-// AI Knowledge Store & Self-Learning Engine for BS E-Learning & IT Zone
-// Supports 200,000+ words capacity, structured training chunks (1,000 words each),
-// and autonomous teacher Q&A pair learning.
-
+import { db } from '../firebase/config';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 
 export interface QAItem {
   id: string;

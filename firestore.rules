@@ -13,21 +13,22 @@ service cloud.firestore {
     }
 
     // 1. Institutional Modules Data (Settings, Courses, Mentors, Notices, Students, etc.)
-    // Anyone worldwide can read public institutional data in real time
+    // Anyone worldwide can read and sync public institutional data in real time
     match /institute_data/{moduleKey} {
-      allow read: if isValidId(moduleKey);
-      allow create, update: if isValidId(moduleKey);
-      allow delete: if isValidId(moduleKey);
+      allow read, write: if true;
     }
 
     // 2. Student Online Admission Applications
     match /applications/{applicationId} {
-      allow read: if isValidId(applicationId);
-      allow create, update: if isValidId(applicationId);
-      allow delete: if isValidId(applicationId);
+      allow read, write: if true;
     }
 
-    // 3. Test Connection Document for Readiness Checks
+    // 3. AI Knowledge Base & Q&A
+    match /ai_kb/{docId} {
+      allow read, write: if true;
+    }
+
+    // 4. Test Connection Document for Readiness Checks
     match /test/{docId} {
       allow read, write: if true;
     }
