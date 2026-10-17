@@ -5760,8 +5760,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </p>
             </div>
 
-            {/* Channel Metrics Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            {/* Channel Metrics Grid - 4 Pillars of Lifetime Sync */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-950/80 to-slate-900 border border-indigo-700/60 shadow-md">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-indigo-300 font-bold">Socket.io (Render)</span>
+                  <span className={`w-2.5 h-2.5 rounded-full ${gatewayStatus.socketConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                </div>
+                <div className="text-sm font-bold text-white flex items-center gap-1.5">
+                  <Activity className="w-4 h-4 text-emerald-400" />
+                  <span>লাইভ WebSocket</span>
+                </div>
+                <div className="text-[11px] text-emerald-400 mt-1 font-mono">
+                  {gatewayStatus.socketConnected ? `${gatewayStatus.activeSocketsCount || 1} টি ব্রাউজার সংযুক্ত (${gatewayStatus.pingMs}ms)` : 'রিকানেক্ট হচ্ছে...'}
+                </div>
+              </div>
+
               <div className="p-4 rounded-2xl bg-slate-800/70 border border-slate-700/60">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-slate-400 font-medium">ক্লাউড ডাটাবেজ</span>
@@ -5782,7 +5796,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
                 <div className="text-sm font-bold text-white flex items-center gap-1.5">
-                  <Activity className="w-4 h-4 text-emerald-400" />
+                  <Globe className="w-4 h-4 text-emerald-400" />
                   <span>Live SSE Stream</span>
                 </div>
                 <div className="text-[11px] text-emerald-400 mt-1 font-mono">

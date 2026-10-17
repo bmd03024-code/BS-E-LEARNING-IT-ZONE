@@ -1,5 +1,5 @@
-import { db } from '../firebase/config';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { db, isFirestoreQuotaExhausted, safeFirestoreSet, handleFirestoreError, OperationType } from '../firebase/config';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 export interface QAItem {
   id: string;
@@ -138,21 +138,28 @@ class AIKnowledgeStoreService {
 
   // Real-time Firestore synchronization listener
   private initRealtimeSync() {
+    if (isFirestoreQuotaExhausted()) return;
     try {
-      onSnapshot(doc(db, 'ai_kb', 'main_data'), (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          const remoteData = docSnapshot.data() as { qa?: QAItem[]; chunks?: TrainingChunk[] };
-          if (remoteData.qa && Array.isArray(remoteData.qa)) {
-            this.qaCache = remoteData.qa;
-            localStorage.setItem('bs_ai_qa_kb', JSON.stringify(this.qaCache));
+      onSnapshot(
+        doc(db, 'ai_kb', 'main_data'),
+        (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            const remoteData = docSnapshot.data() as { qa?: QAItem[]; chunks?: TrainingChunk[] };
+            if (remoteData.qa && Array.isArray(remoteData.qa)) {
+              this.qaCache = remoteData.qa;
+              localStorage.setItem('bs_ai_qa_kb', JSON.stringify(this.qaCache));
+            }
+            if (remoteData.chunks && Array.isArray(remoteData.chunks)) {
+              this.chunksCache = remoteData.chunks;
+              localStorage.setItem('bs_ai_training_chunks', JSON.stringify(this.chunksCache));
+            }
+            window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'ai_realtime_synced' } }));
           }
-          if (remoteData.chunks && Array.isArray(remoteData.chunks)) {
-            this.chunksCache = remoteData.chunks;
-            localStorage.setItem('bs_ai_training_chunks', JSON.stringify(this.chunksCache));
-          }
-          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'ai_realtime_synced' } }));
+        },
+        (error) => {
+          handleFirestoreError(error, OperationType.GET, 'ai_kb/main_data');
         }
-      });
+      );
     } catch (e) {
       console.warn('Realtime sync listener error:', e);
     }
@@ -182,12 +189,13 @@ class AIKnowledgeStoreService {
 
   // Sync current state to Firestore
   private async syncToFirestore() {
+    if (isFirestoreQuotaExhausted()) return;
     try {
-      await setDoc(doc(db, 'ai_kb', 'main_data'), {
+      await safeFirestoreSet('ai_kb', 'main_data', {
         qa: this.qaCache,
         chunks: this.chunksCache,
         updatedAt: new Date().toISOString()
-      }, { merge: true });
+      });
     } catch (e) {
       console.warn('Firestore sync error:', e);
     }

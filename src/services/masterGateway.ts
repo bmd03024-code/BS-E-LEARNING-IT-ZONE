@@ -16,43 +16,66 @@
 
 import { db, handleFirestoreError, OperationType, isFirestoreQuotaExhausted, safeFirestoreSet } from '../firebase/config';
 import { collection, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { io, Socket } from 'socket.io-client';
 
 export interface GatewayStatus {
   isOnline: boolean;
+  socketConnected: boolean;
   firestoreConnected: boolean;
   sseConnected: boolean;
   broadcastChannelReady: boolean;
   lastSyncTime: number | null;
   totalPushes: number;
   totalReceives: number;
-  activeChannel: 'cloud' | 'server' | 'hybrid' | 'local';
+  activeChannel: 'socket.io' | 'cloud' | 'server' | 'hybrid' | 'local';
   pingMs: number;
+  activeSocketsCount: number;
+}
+
+export interface LiveBroadcastMessage {
+  id: string;
+  sender: string;
+  text: string;
+  role: string;
+  timestamp: number;
+}
+
+export interface LiveReaction {
+  id: string;
+  emoji: string;
+  timestamp: number;
 }
 
 export type GatewaySyncCallback = (key: string, value: any, source: 'firestore' | 'sse' | 'broadcast' | 'local') => void;
 
 class MasterGatewayEngine {
   private static instance: MasterGatewayEngine;
+  private socket: Socket | null = null;
   private channel: BroadcastChannel | null = null;
   private sse: EventSource | null = null;
   private firestoreUnsubscribe: Unsubscribe | null = null;
   private listeners: Set<GatewaySyncCallback> = new Set();
   private statusListeners: Set<(status: GatewayStatus) => void> = new Set();
+  private messageListeners: Set<(msg: LiveBroadcastMessage) => void> = new Set();
+  private reactionListeners: Set<(rx: LiveReaction) => void> = new Set();
 
   private status: GatewayStatus = {
     isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+    socketConnected: false,
     firestoreConnected: false,
     sseConnected: false,
     broadcastChannelReady: false,
     lastSyncTime: Date.now(),
     totalPushes: 0,
     totalReceives: 0,
-    activeChannel: 'hybrid',
-    pingMs: 12
+    activeChannel: 'socket.io',
+    pingMs: 12,
+    activeSocketsCount: 1
   };
 
   private constructor() {
     this.setupNetworkMonitor();
+    this.setupSocketIO();
     this.setupBroadcastChannel();
     this.setupSSE();
     this.setupFirestoreListener();
@@ -79,8 +102,124 @@ class MasterGatewayEngine {
 
     window.addEventListener('offline', () => {
       this.status.isOnline = false;
+      this.status.socketConnected = false;
       this.status.sseConnected = false;
       this.status.firestoreConnected = false;
+      this.notifyStatus();
+    });
+  }
+
+  /**
+   * Socket.io WebSockets for unlimited lifetime bi-directional real-time sync (Render Ready)
+   */
+  private setupSocketIO() {
+    if (typeof window === 'undefined') return;
+
+    try {
+      this.socket = io(window.location.origin, {
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionAttempts: Infinity,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000
+      });
+
+      this.socket.on('connect', () => {
+        this.status.socketConnected = true;
+        this.status.activeChannel = 'socket.io';
+        this.measureSocketPing();
+        this.notifyStatus();
+      });
+
+      this.socket.on('disconnect', () => {
+        this.status.socketConnected = false;
+        this.status.activeChannel = this.status.sseConnected ? 'hybrid' : 'local';
+        this.notifyStatus();
+      });
+
+      // Presence awareness: number of live connected devices worldwide
+      this.socket.on('presence:update', (data: { onlineUsers: number }) => {
+        if (data && typeof data.onlineUsers === 'number') {
+          this.status.activeSocketsCount = data.onlineUsers;
+          this.notifyStatus();
+        }
+      });
+
+      // Real-time delta updates from other browsers or server
+      this.socket.on('sync:update', (payload: { key: string; value: any; version?: number }) => {
+        if (payload?.key) {
+          try {
+            localStorage.setItem(`bs_${payload.key}`, JSON.stringify(payload.value));
+          } catch {}
+          this.status.totalReceives++;
+          this.status.lastSyncTime = Date.now();
+          this.notifyStatus();
+          this.dispatchChange(payload.key, payload.value, 'sse');
+          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: payload.key, value: payload.value, fromSocket: true } }));
+        }
+      });
+
+      // Full bulk synchronization from other browsers or server
+      this.socket.on('sync:all', (payload: { data: Record<string, any>; version?: number }) => {
+        if (payload?.data && typeof payload.data === 'object') {
+          for (const [k, v] of Object.entries(payload.data)) {
+            try {
+              localStorage.setItem(`bs_${k}`, JSON.stringify(v));
+            } catch {}
+          }
+          this.status.totalReceives++;
+          this.status.lastSyncTime = Date.now();
+          this.notifyStatus();
+          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { fromSocketAll: true } }));
+        }
+      });
+
+      // Initial state sync upon connection (reconciliation)
+      this.socket.on('sync:init', (payload: { data: Record<string, any>; version?: number }) => {
+        if (payload?.data && typeof payload.data === 'object') {
+          let updated = false;
+          for (const [k, v] of Object.entries(payload.data)) {
+            const localTime = parseInt(localStorage.getItem(`bs_${k}_time`) || '0', 10);
+            if (Date.now() - localTime > 15000) {
+              try {
+                localStorage.setItem(`bs_${k}`, JSON.stringify(v));
+                updated = true;
+              } catch {}
+            }
+          }
+          if (updated) {
+            window.dispatchEvent(new CustomEvent('bs_sync', { detail: { fromSocketInit: true } }));
+          }
+        }
+      });
+      // Real-time live peer messages across all connected browsers
+      this.socket.on('broadcast:message', (msg: LiveBroadcastMessage) => {
+        if (msg) {
+          this.messageListeners.forEach((fn) => {
+            try { fn(msg); } catch {}
+          });
+        }
+      });
+
+      // Real-time floating reactions across all connected browsers
+      this.socket.on('broadcast:reaction', (rx: LiveReaction) => {
+        if (rx) {
+          this.reactionListeners.forEach((fn) => {
+            try { fn(rx); } catch {}
+          });
+        }
+      });
+    } catch (e) {
+      console.warn('[MasterGateway] Socket.io client setup error:', e);
+    }
+  }
+
+  private measureSocketPing() {
+    if (!this.socket || !this.socket.connected) return;
+    const start = Date.now();
+    this.socket.emit('ping:client', () => {
+      this.status.pingMs = Math.max(1, Date.now() - start);
       this.notifyStatus();
     });
   }
@@ -263,7 +402,16 @@ class MasterGatewayEngine {
       window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value, fromGateway: true } }));
     }
 
-    // 3. Push to Central Server SSE Hub (/api/sync/update) - Master Persistence
+    // 3. Instant zero-latency push via Socket.io WebSocket to all connected devices worldwide
+    if (this.socket && this.socket.connected) {
+      try {
+        this.socket.emit('sync:push', { key, value, timestamp: Date.now() });
+      } catch (err) {
+        console.warn('[MasterGateway] Socket emit fallback to REST:', err);
+      }
+    }
+
+    // 4. Push to Central Server SSE Hub & Disk (/api/sync/update) - Master Persistence
     try {
       await fetch('/api/sync/update', {
         method: 'POST',
@@ -274,7 +422,7 @@ class MasterGatewayEngine {
       // In offline scenario, local storage and service worker cache handles it
     }
 
-    // 4. Push to Firebase Firestore in background if quota allows
+    // 5. Push to Firebase Firestore in background if quota allows
     if (!isFirestoreQuotaExhausted()) {
       try {
         await safeFirestoreSet('institute_data', key, value);
@@ -298,6 +446,15 @@ class MasterGatewayEngine {
         try {
           localStorage.setItem(`bs_${k}_time`, Date.now().toString());
         } catch {}
+      }
+
+      // Emit bulk push via Socket.io
+      if (this.socket && this.socket.connected) {
+        try {
+          this.socket.emit('sync:bulk_push', { all: fullState });
+        } catch (err) {
+          console.warn('[MasterGateway] Socket bulk emit error:', err);
+        }
       }
 
       // Push to server disk & SSE hub
@@ -357,6 +514,42 @@ class MasterGatewayEngine {
     const copy = this.getStatus();
     this.statusListeners.forEach((fn) => {
       try { fn(copy); } catch {}
+    });
+  }
+
+  public sendBroadcastMessage(text: string, sender: string = 'সহপাঠী / ভিজিটর', role: string = 'লাইভ শিক্ষার্থী'): void {
+    if (this.socket && this.socket.connected) {
+      this.socket.emit('broadcast:message', { text, sender, role });
+    }
+  }
+
+  public sendReaction(emoji: string): void {
+    if (this.socket && this.socket.connected) {
+      this.socket.emit('broadcast:reaction', { emoji });
+    }
+  }
+
+  public onBroadcastMessage(callback: (msg: LiveBroadcastMessage) => void): () => void {
+    this.messageListeners.add(callback);
+    return () => this.messageListeners.delete(callback);
+  }
+
+  public onReaction(callback: (rx: LiveReaction) => void): () => void {
+    this.reactionListeners.add(callback);
+    return () => this.reactionListeners.delete(callback);
+  }
+
+  public async ping(): Promise<number> {
+    if (!this.socket || !this.socket.connected) return 0;
+    const start = Date.now();
+    return new Promise((resolve) => {
+      this.socket?.emit('ping:client', () => {
+        const ms = Math.max(1, Date.now() - start);
+        this.status.pingMs = ms;
+        this.notifyStatus();
+        resolve(ms);
+      });
+      setTimeout(() => resolve(this.status.pingMs), 2000);
     });
   }
 }

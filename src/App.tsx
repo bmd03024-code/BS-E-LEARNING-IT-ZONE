@@ -23,6 +23,7 @@ import { CertificateModal } from './components/modals/CertificateModal';
 import { RoutineModal } from './components/modals/RoutineModal';
 import { ContactModal } from './components/modals/ContactModal';
 import { StudentIdCardModal } from './components/modals/StudentIdCardModal';
+import { RealtimeSyncModal } from './components/modals/RealtimeSyncModal';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 
@@ -50,6 +51,7 @@ export default function App() {
   const [routineModalOpen, setRoutineModalOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [idCardModalOpen, setIdCardModalOpen] = useState(false);
+  const [realtimeModalOpen, setRealtimeModalOpen] = useState(false);
 
   // Robust Real-Time Sync function for all tabs and admin updates
   const refreshAppData = () => {
@@ -160,6 +162,9 @@ export default function App() {
       }
       case 'contact':
         setContactModalOpen(true);
+        break;
+      case 'realtime':
+        setRealtimeModalOpen(true);
         break;
       case 'chatbot':
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -297,6 +302,11 @@ export default function App() {
         isOpen={idCardModalOpen}
         onClose={() => setIdCardModalOpen(false)}
         courses={courses}
+      />
+
+      <RealtimeSyncModal
+        isOpen={realtimeModalOpen}
+        onClose={() => setRealtimeModalOpen(false)}
       />
 
       <AdminLoginModal

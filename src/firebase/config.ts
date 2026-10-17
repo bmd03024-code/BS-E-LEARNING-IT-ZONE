@@ -41,23 +41,40 @@ export interface FirestoreErrorInfo {
 }
 
 // Global Quota Circuit Breaker to prevent write exhaustion & retry loops
-let quotaExhausted = false;
-let quotaResetTimeout: any = null;
+function checkInitialQuota(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const raw = localStorage.getItem('bs_firestore_quota_exhausted');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Quota resets daily; check if flagged within the last 12 hours
+      if (Date.now() - parsed.timestamp < 12 * 60 * 60 * 1000) {
+        return true;
+      } else {
+        localStorage.removeItem('bs_firestore_quota_exhausted');
+      }
+    }
+  } catch {}
+  return false;
+}
+
+let quotaExhausted = checkInitialQuota();
 
 export function isFirestoreQuotaExhausted(): boolean {
   return quotaExhausted;
 }
 
 export function markFirestoreQuotaExhausted() {
-  if (!quotaExhausted) {
-    quotaExhausted = true;
-    console.info('[Firestore] Daily free write quota reached. Seamlessly routing writes to persistent server & local cache.');
+  quotaExhausted = true;
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('bs_firestore_quota_exhausted', JSON.stringify({
+        exhausted: true,
+        timestamp: Date.now()
+      }));
+    } catch {}
   }
-  if (quotaResetTimeout) clearTimeout(quotaResetTimeout);
-  // Auto-reset check after 10 minutes
-  quotaResetTimeout = setTimeout(() => {
-    quotaExhausted = false;
-  }, 10 * 60 * 1000);
+  console.info('[Firestore] Daily free write quota reached. Seamlessly routing writes to persistent server & local cache.');
 }
 
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
@@ -107,6 +124,7 @@ export async function safeFirestoreSet(collectionName: string, docId: string, da
 
 // Readiness connection verification
 export async function testConnection(): Promise<boolean> {
+  if (isFirestoreQuotaExhausted()) return false;
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
     return true;

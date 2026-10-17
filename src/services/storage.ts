@@ -1217,19 +1217,22 @@ class StorageService {
 
   getShortcuts(): ShortcutItem[] {
     const list = this.get<ShortcutItem[]>('shortcuts', initialShortcuts);
-    const hasFounder = list.some(s => s.target === 'founder');
-    const hasIdCard = list.some(s => s.target === 'idcard');
-    if (!hasFounder || !hasIdCard) {
-      const merged = [...list];
-      if (!hasFounder) {
-        merged.push({ id: "sc-13", title: "প্রতিষ্ঠাতা ও ম্যানেজমেন্ট", iconName: "Award", badge: "পরিচালনা পরিষদ", color: "from-violet-600 to-purple-800", target: "founder", enabled: true });
-      }
-      if (!hasIdCard) {
-        merged.push({ id: "sc-14", title: "স্টুডেন্ট আইডি", iconName: "GraduationCap", badge: "আইডি কার্ড", color: "from-blue-700 to-indigo-800", target: "idcard", enabled: true });
-      }
-      return merged;
+    // Remove any 'realtime' shortcut from public quick actions (kept in Admin Panel)
+    const filtered = list.filter(s => s.target !== 'realtime');
+    const hasFounder = filtered.some(s => s.target === 'founder');
+    const hasIdCard = filtered.some(s => s.target === 'idcard');
+    const hasMarksheet = filtered.some(s => s.target === 'marksheet');
+    const merged = [...filtered];
+    if (!hasMarksheet) {
+      merged.push({ id: "sc-8", title: "ফলাফল ও মার্কশিট", iconName: "BarChart3", badge: "অনলাইন রেজাল্ট", color: "from-indigo-600 to-blue-800", target: "marksheet", enabled: true });
     }
-    return list;
+    if (!hasFounder) {
+      merged.push({ id: "sc-13", title: "প্রতিষ্ঠাতা ও ম্যানেজমেন্ট", iconName: "Award", badge: "পরিচালনা পরিষদ", color: "from-violet-600 to-purple-800", target: "founder", enabled: true });
+    }
+    if (!hasIdCard) {
+      merged.push({ id: "sc-14", title: "স্টুডেন্ট আইডি", iconName: "GraduationCap", badge: "আইডি কার্ড", color: "from-blue-700 to-indigo-800", target: "idcard", enabled: true });
+    }
+    return merged;
   }
   saveShortcuts(shortcuts: ShortcutItem[]): void {
     this.set('shortcuts', shortcuts);

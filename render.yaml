@@ -1,0 +1,16 @@
+# Render Blueprint for Lifetime Free Real-Time Socket.io Web Service
+services:
+  - type: web
+    name: bs-elearning-realtime
+    env: node
+    plan: free
+    region: singapore # or oregon / frankfurt
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000

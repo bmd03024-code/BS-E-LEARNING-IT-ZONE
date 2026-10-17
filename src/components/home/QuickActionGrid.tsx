@@ -15,7 +15,8 @@ import {
   Users,
   PhoneCall,
   Sparkles,
-  GraduationCap
+  GraduationCap,
+  Radio
 } from 'lucide-react';
 
 interface QuickActionGridProps {
@@ -38,6 +39,7 @@ const iconMap: Record<string, React.ReactNode> = {
   Users: <Users className="w-6 h-6" />,
   PhoneCall: <PhoneCall className="w-6 h-6" />,
   GraduationCap: <GraduationCap className="w-6 h-6" />,
+  Radio: <Radio className="w-6 h-6" />,
 };
 
 export const QuickActionGrid: React.FC<QuickActionGridProps> = ({ shortcuts, onActionClick }) => {

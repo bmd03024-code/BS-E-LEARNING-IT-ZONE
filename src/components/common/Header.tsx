@@ -93,9 +93,9 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
             <button
               onClick={() => onNavigate('marksheet')}
-              className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5 text-blue-900 font-bold"
             >
-              ফলাফল
+              মার্কশিট / ফলাফল
             </button>
             <button
               onClick={() => onNavigate('certificate')}
@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </nav>
 
-          {/* Right Action: Admin Panel Protected Entry Button */}
+          {/* Right Action: Smart AI & Admin Panel Protected Entry */}
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => onNavigate('chatbot')}
