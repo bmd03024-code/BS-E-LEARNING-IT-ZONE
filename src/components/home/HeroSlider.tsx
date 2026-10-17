@@ -12,6 +12,12 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ slides, onCtaClick }) =>
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
+    if (currentIdx >= activeSlides.length) {
+      setCurrentIdx(0);
+    }
+  }, [activeSlides.length, currentIdx]);
+
+  useEffect(() => {
     if (activeSlides.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % activeSlides.length);

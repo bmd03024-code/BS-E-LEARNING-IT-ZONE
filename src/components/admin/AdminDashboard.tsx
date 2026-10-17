@@ -225,6 +225,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
     const handleSync = (e: any) => {
       setSyncStatus('লাইভ আপডেট হয়েছে');
+      if (e?.detail?.fromFirestore) {
+        // Hydrate from storage to ensure admin has latest cloud data
+        setSlides(storage.getSlides());
+        setSettings(storage.getSettings());
+        setCourses(storage.getCourses());
+        setMentors(storage.getMentors());
+        setNotices(storage.getNotices());
+      }
       setTimeout(() => setSyncStatus('সবকিছু সিঙ্কড'), 2000);
     };
 
@@ -779,15 +787,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   );
 
   /* ---------------- MODULE 2: HERO SLIDER MANAGEMENT ---------------- */
-  const handleSlideImageUpload = (slideId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateSlideHelper = (slideId: string, updates: Partial<HeroSlide>) => {
+    const updated = slides.map(s => s.id === slideId ? { ...s, ...updates } : s);
+    setSlides(updated);
+    storage.saveSlides(updated);
+    masterGateway.publish('slides', updated);
+  };
+
+  const handleSlideImageUpload = async (slideId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const updated = slides.map(s => s.id === slideId ? { ...s, image: reader.result as string } : s);
+      try {
+        triggerSaveNotification('ছবি অপটিমাইজ ও আপলোড হচ্ছে...');
+        const compressed = await compressImage(file, 1400, 0.8);
+        const updated = slides.map(s => s.id === slideId ? { ...s, image: compressed } : s);
         setSlides(updated);
-      };
-      reader.readAsDataURL(file);
+        storage.saveSlides(updated);
+        await masterGateway.publish('slides', updated);
+        triggerSaveNotification('স্লাইডের ছবি সফলভাবে ক্লাউডে সংরক্ষিত হয়েছে!');
+      } catch {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const raw = reader.result as string;
+          const updated = slides.map(s => s.id === slideId ? { ...s, image: raw } : s);
+          setSlides(updated);
+          storage.saveSlides(updated);
+          await masterGateway.publish('slides', updated);
+          triggerSaveNotification('স্লাইডের ছবি সংরক্ষিত হয়েছে!');
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -796,10 +825,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       <div className="flex justify-between items-center">
         <div>
           <h3 className="text-base font-bold text-slate-900">হিরো স্লাইডার ম্যানেজমেন্ট ({slides.length} টি স্লাইড)</h3>
-          <p className="text-xs text-slate-500">হোম পেজের প্রধান স্লাইডারের ছবি আপলোড, শিরোনাম ও বাটন পরিচালনা করুন</p>
+          <p className="text-xs text-slate-500">হোম পেজের প্রধান স্লাইডারের ছবি আপলোড, শিরোনাম ও বাটন পরিচালনা করুন (অ্যাডমিন যা পরিবর্তন করবেন তা সরাসরি ক্লাউডে চূড়ান্ত হিসেবে কার্যকর হবে)</p>
         </div>
         <button
-          onClick={() => {
+          onClick={async () => {
             const newSlide: HeroSlide = {
               id: `slide-${Date.now()}`,
               title: 'নতুন কোর্স বা সেমিনারের শিরোনাম',
@@ -809,7 +838,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               ctaAction: 'courses',
               active: true
             };
-            setSlides([...slides, newSlide]);
+            const updated = [...slides, newSlide];
+            setSlides(updated);
+            storage.saveSlides(updated);
+            await masterGateway.publish('slides', updated);
+            triggerSaveNotification('নতুন স্লাইড তৈরি ও ক্লাউডে সিঙ্ক হয়েছে!');
           }}
           className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm"
         >
@@ -831,18 +864,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <input
                     type="checkbox"
                     checked={slide.active}
-                    onChange={(e) => {
-                      const updated = slides.map(s => s.id === slide.id ? { ...s, active: e.target.checked } : s);
-                      setSlides(updated);
-                    }}
+                    onChange={(e) => updateSlideHelper(slide.id, { active: e.target.checked })}
                     className="rounded text-blue-900"
                   />
                   <span>সক্রিয় (Active)</span>
                 </label>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (confirm('এই স্লাইডটি মুছে ফেলতে চান?')) {
-                      setSlides(slides.filter(s => s.id !== slide.id));
+                      const updated = slides.filter(s => s.id !== slide.id);
+                      setSlides(updated);
+                      storage.saveSlides(updated);
+                      await masterGateway.publish('slides', updated);
+                      triggerSaveNotification('স্লাইডটি মুছে ফেলা হয়েছে ও ক্লাউডে সিঙ্ক হয়েছে!');
                     }
                   }}
                   className="text-red-500 hover:text-red-700 p-1 rounded-lg hover:bg-red-50 transition-colors"
@@ -870,13 +904,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     type="text"
                     placeholder="অথবা সরাসরি ইমেজ URL পেস্ট করুন..."
                     value={slide.image}
-                    onChange={(e) => {
-                      const updated = slides.map(s => s.id === slide.id ? { ...s, image: e.target.value } : s);
-                      setSlides(updated);
-                    }}
+                    onChange={(e) => updateSlideHelper(slide.id, { image: e.target.value })}
                     className="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-mono"
                   />
-                  <p className="text-[10px] text-slate-500">কম্পিউটার বা মোবাইল থেকে ছবি সিলেক্ট করলেই স্লাইড আপডেট হয়ে যাবে</p>
+                  <p className="text-[10px] text-slate-500">কম্পিউটার বা মোবাইল থেকে ছবি সিলেক্ট করলেই স্বয়ংক্রিয়ভাবে কম্প্রেস ও ক্লাউডে সিঙ্ক হয়ে যাবে</p>
                 </div>
               </div>
             </div>
@@ -887,10 +918,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <input
                   type="text"
                   value={slide.title}
-                  onChange={(e) => {
-                    const updated = slides.map(s => s.id === slide.id ? { ...s, title: e.target.value } : s);
-                    setSlides(updated);
-                  }}
+                  onChange={(e) => updateSlideHelper(slide.id, { title: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold"
                 />
               </div>
@@ -901,10 +929,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <input
                     type="text"
                     value={slide.ctaText}
-                    onChange={(e) => {
-                      const updated = slides.map(s => s.id === slide.id ? { ...s, ctaText: e.target.value } : s);
-                      setSlides(updated);
-                    }}
+                    onChange={(e) => updateSlideHelper(slide.id, { ctaText: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-blue-900"
                   />
                 </div>
@@ -912,10 +937,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <label className="block text-xs font-bold text-slate-700 mb-1">বাটন অ্যাকশন</label>
                   <select
                     value={slide.ctaAction}
-                    onChange={(e) => {
-                      const updated = slides.map(s => s.id === slide.id ? { ...s, ctaAction: e.target.value } : s);
-                      setSlides(updated);
-                    }}
+                    onChange={(e) => updateSlideHelper(slide.id, { ctaAction: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white"
                   >
                     <option value="courses">কোর্সসমূহ (Courses)</option>
@@ -933,10 +955,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <textarea
                   rows={2}
                   value={slide.subText}
-                  onChange={(e) => {
-                    const updated = slides.map(s => s.id === slide.id ? { ...s, subText: e.target.value } : s);
-                    setSlides(updated);
-                  }}
+                  onChange={(e) => updateSlideHelper(slide.id, { subText: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs leading-relaxed"
                 />
               </div>
@@ -945,16 +964,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         ))}
       </div>
 
-      <button
-        onClick={() => {
-          storage.saveSlides(slides);
-          triggerSaveNotification('হিরো স্লাইডার সফলভাবে আপডেট হয়েছে!');
-        }}
-        className="px-6 py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm shadow-md flex items-center gap-2"
-      >
-        <Save className="w-4 h-4 text-amber-400" />
-        <span>স্লাইডার সংরক্ষণ করুন</span>
-      </button>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={async () => {
+            storage.saveSlides(slides);
+            await masterGateway.publish('slides', slides);
+            triggerSaveNotification('হিরো স্লাইডার সফলভাবে ক্লাউড ও কোডে সংরক্ষিত হয়েছে!');
+            alert('✅ আলহামদুলিল্লাহ! হিরো স্লাইডার সফলভাবে ক্লাউড ডাটাবেজ ও কোডে চূড়ান্ত হিসেবে সংরক্ষিত হয়েছে। এখন বিশ্বের যেকোনো প্রান্ত থেকে ওয়েবসাইট খুললে আপনার সংরক্ষিত স্লাইডগুলোই প্রদর্শিত হবে।');
+          }}
+          className="px-6 py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm shadow-md flex items-center gap-2"
+        >
+          <Save className="w-4 h-4 text-amber-400" />
+          <span>স্লাইডার সংরক্ষণ করুন (Save Slider)</span>
+        </button>
+      </div>
     </div>
   );
 
@@ -4923,11 +4946,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-slate-200">
               <button
-                onClick={() => setActiveModule(null)}
+                onClick={() => {
+                  saveCurrentStateSilently();
+                  setActiveModule(null);
+                }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 transition-colors shadow-xs"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>১৪টি শর্টকাট মেনুতে ফিরে যান</span>
+                <span>১৫টি শর্টকাট মেনুতে ফিরে যান</span>
               </button>
 
               <div className="text-right flex items-center gap-3">
