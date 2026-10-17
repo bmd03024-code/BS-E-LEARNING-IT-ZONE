@@ -19,8 +19,8 @@ import {
   EnrollmentApplication,
   AdminCredentials
 } from '../types';
-import { db, handleFirestoreError, OperationType } from '../firebase/config';
-import { collection, doc, onSnapshot, setDoc, getDocs, Unsubscribe } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType, isFirestoreQuotaExhausted, safeFirestoreSet } from '../firebase/config';
+import { collection, doc, onSnapshot, getDocs, Unsubscribe } from 'firebase/firestore';
 
 // Default SVG assets for seals, signature, logos, and Bangla QR
 export const DEFAULT_ASSETS = {
@@ -982,7 +982,6 @@ class StorageService {
 
   constructor() {
     this.initFirestoreSync();
-    this.seedFirestoreIfEmpty();
     this.initLiveSync();
   }
 
@@ -998,18 +997,28 @@ class StorageService {
           this.isFirestoreReady = true;
           let changedCount = 0;
 
-          // Hydrate all documents on snapshot
+          // Hydrate documents on snapshot only if newer than local admin modifications
           snapshot.docs.forEach((d) => {
             const key = d.id;
             const docData = d.data();
             if (docData && docData.data !== undefined) {
-              this.setLocalSilently(key, docData.data);
-              changedCount++;
+              const localTime = parseInt(localStorage.getItem(`bs_${key}_time`) || '0', 10);
+              const cloudTime = typeof docData.updatedAt === 'number'
+                ? docData.updatedAt
+                : (docData.updatedAt ? new Date(docData.updatedAt).getTime() : 0);
+
+              // If admin just modified this locally within the last 15 seconds, protect local edit
+              const isRecentLocalEdit = (Date.now() - localTime) < 15000;
+              
+              if (!isRecentLocalEdit && (!localTime || cloudTime > localTime)) {
+                this.setLocalSilently(key, docData.data);
+                changedCount++;
+              }
             }
           });
 
           // Immediate notification on changes across application
-          if (changedCount > 0 || !snapshot.empty) {
+          if (changedCount > 0) {
             window.dispatchEvent(
               new CustomEvent('bs_sync', {
                 detail: { fromFirestore: true, count: changedCount }
@@ -1026,60 +1035,20 @@ class StorageService {
     }
   }
 
-  // Push individual document to Firestore Cloud
+  // Push individual document to Firestore Cloud safely with quota protection
   private async pushToFirestore<T>(key: string, value: T): Promise<void> {
+    if (isFirestoreQuotaExhausted()) return;
     try {
-      const docRef = doc(db, 'institute_data', key);
-      await setDoc(
-        docRef,
-        {
-          key,
-          data: value,
-          updatedAt: new Date().toISOString()
-        },
-        { merge: true }
-      );
+      await safeFirestoreSet('institute_data', key, value);
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, `institute_data/${key}`);
     }
   }
 
-  // Auto-seed Firestore on initial launch if empty
+  // Auto-seed Firestore safely without quota exhaustion
   public async seedFirestoreIfEmpty(): Promise<void> {
-    if (typeof window === 'undefined') return;
-    try {
-      const colRef = collection(db, 'institute_data');
-      const snap = await getDocs(colRef);
-      if (snap.empty) {
-        console.log('[Firestore] Seeding default institutional data to cloud...');
-        const initialMap: Record<string, any> = {
-          settings: initialSettings,
-          slides: initialSlides,
-          shortcuts: initialShortcuts,
-          courses: initialCourses,
-          mentors: initialMentors,
-          students: initialStudents,
-          routines: initialRoutines,
-          results: initialResults,
-          admit_cards: initialAdmitCards,
-          certificates: initialCertificates,
-          ledger: initialLedger,
-          notices: initialNotices,
-          notes: initialNotes,
-          demo_classes: initialDemoClasses,
-          gallery: initialGallery,
-          chatbot: initialChatbot,
-          applications: initialApplications,
-          admin_creds: initialCredentials
-        };
-
-        for (const [k, v] of Object.entries(initialMap)) {
-          await this.pushToFirestore(k, v);
-        }
-      }
-    } catch (e) {
-      console.warn('[Firestore] Seed check caught:', e);
-    }
+    // Deprecated to prevent write bursts and quota exhaustion; server provides initial defaults.
+    return;
   }
 
   // Real-time synchronization across all browsers worldwide
@@ -1167,6 +1136,9 @@ class StorageService {
 
   private set<T>(key: string, value: T): void {
     this.setLocalSilently(key, value);
+    try {
+      localStorage.setItem(`bs_${key}_time`, Date.now().toString());
+    } catch {}
     window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
     this.pushToFirestore(key, value);
     this.pushToServer(key, value);

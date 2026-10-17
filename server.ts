@@ -41,8 +41,16 @@ if (fs.existsSync(DB_FILE)) {
 const firebaseApp = initializeApp(firebaseConfig, 'serverApp');
 const firestoreDb = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
 
-// Hydrate server database from Firestore on startup
+// Server Firestore Quota tracking
+let serverFirestoreQuotaExhausted = false;
+
+// Hydrate server database from Firestore on startup only if disk is empty
 async function initServerFirestoreSync() {
+  if (Object.keys(database).length > 0) {
+    console.log(`[Server] Persistent disk database loaded with ${Object.keys(database).length} modules (Master Source of Truth). Skipping Firestore overwrite.`);
+    return;
+  }
+
   try {
     const colRef = collection(firestoreDb, 'institute_data');
     const snap = await getDocs(colRef);
@@ -57,7 +65,7 @@ async function initServerFirestoreSync() {
       console.log(`[Server] Hydrated ${snap.size} modules directly from Cloud Firestore!`);
     }
   } catch (err) {
-    console.warn('[Server] Firestore hydration catch:', err);
+    console.warn('[Server] Firestore hydration catch (using disk cache):', err);
   }
 }
 initServerFirestoreSync();
@@ -158,12 +166,19 @@ app.post('/api/sync/update', async (req: Request, res: Response) => {
   persistDatabase();
   broadcastUpdate('SYNC_UPDATE', key, value);
 
-  // Also push to Cloud Firestore directly from server to guarantee global persistence
-  try {
-    const docRef = doc(firestoreDb, 'institute_data', key);
-    await setDoc(docRef, { key, data: value, updatedAt: new Date().toISOString() }, { merge: true });
-  } catch (e) {
-    console.warn(`[Server] Firestore write error for ${key}:`, e);
+  // Attempt to sync to Cloud Firestore in background if quota allows
+  if (!serverFirestoreQuotaExhausted) {
+    try {
+      const docRef = doc(firestoreDb, 'institute_data', key);
+      await setDoc(docRef, { key, data: value, updatedAt: new Date().toISOString() }, { merge: true });
+    } catch (e: any) {
+      if (e?.code === 'resource-exhausted' || String(e).includes('quota') || String(e).includes('Quota')) {
+        serverFirestoreQuotaExhausted = true;
+        console.warn('[Server] Firestore quota limit reached on write. Routing all future syncs through high-speed disk & SSE.');
+      } else {
+        console.warn(`[Server] Firestore write notice for ${key}:`, e?.message || e);
+      }
+    }
   }
 
   return res.json({ success: true, version: dbVersion });
@@ -180,12 +195,23 @@ app.post('/api/sync/bulk', async (req: Request, res: Response) => {
   persistDatabase();
   broadcastUpdate('SYNC_ALL');
 
-  // Push all keys to Firestore in background
-  for (const [k, v] of Object.entries(all)) {
-    try {
-      const docRef = doc(firestoreDb, 'institute_data', k);
-      await setDoc(docRef, { key: k, data: v, updatedAt: new Date().toISOString() }, { merge: true });
-    } catch {}
+  // Push keys to Firestore in background if quota allows
+  if (!serverFirestoreQuotaExhausted) {
+    (async () => {
+      for (const [k, v] of Object.entries(all)) {
+        if (serverFirestoreQuotaExhausted) break;
+        try {
+          const docRef = doc(firestoreDb, 'institute_data', k);
+          await setDoc(docRef, { key: k, data: v, updatedAt: new Date().toISOString() }, { merge: true });
+        } catch (e: any) {
+          if (e?.code === 'resource-exhausted' || String(e).includes('quota') || String(e).includes('Quota')) {
+            serverFirestoreQuotaExhausted = true;
+            console.warn('[Server] Firestore quota limit reached during bulk write.');
+            break;
+          }
+        }
+      }
+    })();
   }
 
   return res.json({ success: true, version: dbVersion });

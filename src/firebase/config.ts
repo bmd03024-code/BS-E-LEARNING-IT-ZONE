@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { getFirestore, doc, getDocFromServer, setDoc } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase App
@@ -40,9 +40,41 @@ export interface FirestoreErrorInfo {
   };
 }
 
+// Global Quota Circuit Breaker to prevent write exhaustion & retry loops
+let quotaExhausted = false;
+let quotaResetTimeout: any = null;
+
+export function isFirestoreQuotaExhausted(): boolean {
+  return quotaExhausted;
+}
+
+export function markFirestoreQuotaExhausted() {
+  if (!quotaExhausted) {
+    quotaExhausted = true;
+    console.info('[Firestore] Daily free write quota reached. Seamlessly routing writes to persistent server & local cache.');
+  }
+  if (quotaResetTimeout) clearTimeout(quotaResetTimeout);
+  // Auto-reset check after 10 minutes
+  quotaResetTimeout = setTimeout(() => {
+    quotaExhausted = false;
+  }, 10 * 60 * 1000);
+}
+
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errorStr = error instanceof Error ? error.message : String(error);
+
+  if (errorStr.includes('resource-exhausted') || errorStr.includes('Quota limit exceeded') || errorStr.includes('quota')) {
+    markFirestoreQuotaExhausted();
+    return {
+      error: 'Quota limit exceeded. Fallback to resilient server cache.',
+      authInfo: {},
+      operationType,
+      path
+    };
+  }
+
   const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? error.message : String(error),
+    error: errorStr,
     authInfo: {
       userId: auth.currentUser?.uid,
       email: auth.currentUser?.email,
@@ -59,6 +91,18 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   };
   console.warn('Firestore Operation Notice: ', JSON.stringify(errInfo));
   return errInfo;
+}
+
+export async function safeFirestoreSet(collectionName: string, docId: string, data: any): Promise<boolean> {
+  if (isFirestoreQuotaExhausted()) return false;
+  try {
+    const docRef = doc(db, collectionName, docId);
+    await setDoc(docRef, { key: docId, data, updatedAt: Date.now() }, { merge: true });
+    return true;
+  } catch (error: any) {
+    handleFirestoreError(error, OperationType.WRITE, `${collectionName}/${docId}`);
+    return false;
+  }
 }
 
 // Readiness connection verification

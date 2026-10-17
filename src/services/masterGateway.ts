@@ -14,8 +14,8 @@
  *    Ensures 100% availability even on network drops or offline transitions.
  */
 
-import { db, handleFirestoreError, OperationType } from '../firebase/config';
-import { collection, doc, onSnapshot, setDoc, getDocs, Unsubscribe } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType, isFirestoreQuotaExhausted, safeFirestoreSet } from '../firebase/config';
+import { collection, onSnapshot, Unsubscribe } from 'firebase/firestore';
 
 export interface GatewayStatus {
   isOnline: boolean;
@@ -162,6 +162,9 @@ class MasterGatewayEngine {
   /**
    * Firebase Firestore real-time onSnapshot listener
    */
+  /**
+   * Firebase Firestore real-time onSnapshot listener
+   */
   private setupFirestoreListener() {
     if (typeof window === 'undefined') return;
 
@@ -174,13 +177,23 @@ class MasterGatewayEngine {
           this.status.lastSyncTime = Date.now();
           this.notifyStatus();
 
-          // Immediately hydrate all documents on initial snapshot or subsequent updates
+          let changed = false;
+          // Hydrate documents on snapshot only if newer than local admin modifications
           snapshot.docs.forEach((docSnap) => {
             const data = docSnap.data();
             if (data && data.data !== undefined) {
-              try {
-                localStorage.setItem(`bs_${docSnap.id}`, JSON.stringify(data.data));
-              } catch {}
+              const localTime = parseInt(localStorage.getItem(`bs_${docSnap.id}_time`) || '0', 10);
+              const cloudTime = typeof data.updatedAt === 'number'
+                ? data.updatedAt
+                : (data.updatedAt ? new Date(data.updatedAt).getTime() : 0);
+
+              const isRecentLocalEdit = (Date.now() - localTime) < 15000;
+              if (!isRecentLocalEdit && (!localTime || cloudTime > localTime)) {
+                try {
+                  localStorage.setItem(`bs_${docSnap.id}`, JSON.stringify(data.data));
+                  changed = true;
+                } catch {}
+              }
             }
           });
 
@@ -188,20 +201,30 @@ class MasterGatewayEngine {
             if (change.type === 'added' || change.type === 'modified') {
               const docData = change.doc.data();
               if (docData && docData.data !== undefined) {
-                try {
-                  localStorage.setItem(`bs_${change.doc.id}`, JSON.stringify(docData.data));
-                } catch {}
-                this.status.totalReceives++;
-                this.dispatchChange(change.doc.id, docData.data, 'firestore');
+                const localTime = parseInt(localStorage.getItem(`bs_${change.doc.id}_time`) || '0', 10);
+                const cloudTime = typeof docData.updatedAt === 'number'
+                  ? docData.updatedAt
+                  : (docData.updatedAt ? new Date(docData.updatedAt).getTime() : 0);
+
+                const isRecentLocalEdit = (Date.now() - localTime) < 15000;
+                if (!isRecentLocalEdit && (!localTime || cloudTime > localTime)) {
+                  try {
+                    localStorage.setItem(`bs_${change.doc.id}`, JSON.stringify(docData.data));
+                  } catch {}
+                  this.status.totalReceives++;
+                  this.dispatchChange(change.doc.id, docData.data, 'firestore');
+                  changed = true;
+                }
               }
             }
           });
 
-          // Dispatch universal sync event for React re-rendering
-          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { fromFirestore: true } }));
+          // Dispatch universal sync event for React re-rendering if data changed
+          if (changed) {
+            window.dispatchEvent(new CustomEvent('bs_sync', { detail: { fromFirestore: true } }));
+          }
         },
         (error) => {
-          console.warn('[MasterGateway] Firestore sync error:', error);
           this.status.firestoreConnected = false;
           this.notifyStatus();
           handleFirestoreError(error, OperationType.GET, 'institute_data');
@@ -220,6 +243,12 @@ class MasterGatewayEngine {
     this.status.lastSyncTime = Date.now();
     this.notifyStatus();
 
+    // 0. Update local storage timestamp so admin edit is always authoritative
+    try {
+      localStorage.setItem(`bs_${key}`, JSON.stringify(value));
+      localStorage.setItem(`bs_${key}_time`, Date.now().toString());
+    } catch {}
+
     // 1. Instant local BroadcastChannel notification (0ms)
     if (this.channel) {
       try {
@@ -234,23 +263,7 @@ class MasterGatewayEngine {
       window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value, fromGateway: true } }));
     }
 
-    // 3. Push to Firebase Firestore (Global Cloud Real-Time)
-    try {
-      const docRef = doc(db, 'institute_data', key);
-      await setDoc(
-        docRef,
-        {
-          key,
-          data: value,
-          updatedAt: new Date().toISOString()
-        },
-        { merge: true }
-      );
-    } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `institute_data/${key}`);
-    }
-
-    // 4. Push to Central Server SSE Hub (/api/sync/update)
+    // 3. Push to Central Server SSE Hub (/api/sync/update) - Master Persistence
     try {
       await fetch('/api/sync/update', {
         method: 'POST',
@@ -258,7 +271,16 @@ class MasterGatewayEngine {
         body: JSON.stringify({ key, value })
       });
     } catch {
-      // In offline scenario, Firestore offline persistence handles it
+      // In offline scenario, local storage and service worker cache handles it
+    }
+
+    // 4. Push to Firebase Firestore in background if quota allows
+    if (!isFirestoreQuotaExhausted()) {
+      try {
+        await safeFirestoreSet('institute_data', key, value);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `institute_data/${key}`);
+      }
     }
   }
 
@@ -271,22 +293,27 @@ class MasterGatewayEngine {
       this.status.lastSyncTime = Date.now();
       this.notifyStatus();
 
-      // Push all to Firestore
-      for (const [k, v] of Object.entries(fullState)) {
+      // Timestamp local records
+      for (const k of Object.keys(fullState)) {
         try {
-          const docRef = doc(db, 'institute_data', k);
-          await setDoc(docRef, { key: k, data: v, updatedAt: new Date().toISOString() }, { merge: true });
-        } catch (e) {
-          console.warn(`[MasterGateway] Bulk item write catch for ${k}:`, e);
-        }
+          localStorage.setItem(`bs_${k}_time`, Date.now().toString());
+        } catch {}
       }
 
-      // Push to server
+      // Push to server disk & SSE hub
       await fetch('/api/sync/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ all: fullState })
       });
+
+      // Push to Firestore if quota allows
+      if (!isFirestoreQuotaExhausted()) {
+        for (const [k, v] of Object.entries(fullState)) {
+          if (isFirestoreQuotaExhausted()) break;
+          await safeFirestoreSet('institute_data', k, v);
+        }
+      }
 
       return true;
     } catch (e) {
