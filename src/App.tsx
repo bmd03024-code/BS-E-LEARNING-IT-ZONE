@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { storage } from './services/storage';
+import { masterGateway } from './services/masterGateway';
 import { Course } from './types';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
@@ -67,6 +68,11 @@ export default function App() {
     // Immediate initial sync on mount
     refreshAppData();
 
+    // Subscribe to Master Gateway real-time updates (Firestore + SSE + Broadcast)
+    const unsubGateway = masterGateway.subscribe(() => {
+      refreshAppData();
+    });
+
     // Listen to custom sync events triggered from admin panel or storage service
     const handleCustomSync = () => {
       refreshAppData();
@@ -81,11 +87,10 @@ export default function App() {
 
     window.addEventListener('bs_sync', handleCustomSync);
     window.addEventListener('storage', handleStorageChange);
-    
-    // Also poll slightly or listen to focus event to catch instant updates if needed
     window.addEventListener('focus', handleCustomSync);
 
     return () => {
+      unsubGateway();
       window.removeEventListener('bs_sync', handleCustomSync);
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('focus', handleCustomSync);

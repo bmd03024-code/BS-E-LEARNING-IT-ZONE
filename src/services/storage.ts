@@ -1170,6 +1170,13 @@ class StorageService {
     window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
     this.pushToFirestore(key, value);
     this.pushToServer(key, value);
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        const bc = new BroadcastChannel('bs_master_gateway');
+        bc.postMessage({ key, value, timestamp: Date.now() });
+        bc.close();
+      }
+    } catch {}
   }
 
   private async pushToServer(key: string, value: any) {
@@ -1372,6 +1379,22 @@ class StorageService {
   }
   saveAdminCredentials(creds: AdminCredentials): void {
     this.set('admin_creds', creds);
+  }
+
+  getItem<T>(key: string, fallback: T): T {
+    return this.get<T>(key, fallback);
+  }
+
+  setItem<T>(key: string, value: T): void {
+    this.set<T>(key, value);
+  }
+
+  getChatMemory(): any[] {
+    return this.get<any[]>('chat_memory', []);
+  }
+
+  saveChatMemory(memory: any[]): void {
+    this.set('chat_memory', memory);
   }
 
   resetAll(): void {

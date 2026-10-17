@@ -6,9 +6,9 @@ class LocalChatbot {
   memory: QAPair[] = [];
   index: Map<string, number[]> = new Map(); // very small in-memory index for tokens
   constructor() { this.load(); }
-  async load() {
-    const s = await storage.get('chat_memory', []);
-    this.memory = s as QAPair[];
+  load() {
+    const s = storage.getItem<QAPair[]>('chat_memory', []);
+    this.memory = s || [];
     this.reindex();
   }
   reindex() {
@@ -18,7 +18,7 @@ class LocalChatbot {
   async appendQAPair(q: string, a: string, source = 'chat') {
     const p: QAPair = { id: `qa-${Date.now()}`, q, a, ts: Date.now(), source };
     this.memory.unshift(p);
-    await storage.saveChatMemory(this.memory);
+    storage.saveChatMemory(this.memory);
     this.reindex();
   }
   async retrieve(question: string, top = 6) {
