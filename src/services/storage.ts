@@ -85,7 +85,7 @@ const initialSettings: InstituteSettings = {
   footerNotice: "ভর্তি ও পরীক্ষার সকল কার্যক্রম সরাসরি প্রধান শিক্ষক কর্তৃক অনুমোদিত।",
   githubRepo: "bmd03024-code/BS-E-LEARNING-IT-ZONE",
   githubBranch: "main",
-  githubToken: "ghp_pIXZV7TX3MvTATEBAddiNkqQ2FbhYK199i0b",
+  githubToken: "",
   githubAutoPushEnabled: true
 };
 
@@ -1143,8 +1143,9 @@ class StorageService {
     try {
       localStorage.setItem(`bs_${key}_time`, Date.now().toString());
     } catch {}
-    window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key, value } }));
-    this.pushToFirestore(key, value);
+    if (!isFirestoreQuotaExhausted()) {
+      this.pushToFirestore(key, value);
+    }
     this.pushToServer(key, value);
     try {
       if (typeof BroadcastChannel !== 'undefined') {

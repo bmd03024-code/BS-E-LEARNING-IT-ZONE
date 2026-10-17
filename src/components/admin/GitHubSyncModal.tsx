@@ -32,7 +32,7 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
   triggerNotification
 }) => {
   const [token, setToken] = useState(
-    settings.githubToken || 'ghp_pIXZV7TX3MvTATEBAddiNkqQ2FbhYK199i0b'
+    settings.githubToken || ''
   );
   const [repo, setRepo] = useState(
     settings.githubRepo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE'

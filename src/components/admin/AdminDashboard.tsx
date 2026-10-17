@@ -2140,164 +2140,637 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   );
 
   /* ---------------- MODULE 7: CERTIFICATE GENERATOR & FEE CONTROL ---------------- */
-  const [certRollInput, setCertRollInput] = useState('');
+  const [certYearInput, setCertYearInput] = useState('2026');
   const [certCourseInput, setCertCourseInput] = useState(courses[0]?.id || '');
-  const [certFeeInput, setCertFeeInput] = useState('0');
+  const [certRollInput, setCertRollInput] = useState('');
   const [certIsFree, setCertIsFree] = useState(true);
+  const [certFeeInput, setCertFeeInput] = useState('0');
+  const [certHasGovtCert, setCertHasGovtCert] = useState(true);
 
-  const handleGenerateCertificate = (e: React.FormEvent) => {
-    e.preventDefault();
-    const match = students.find(s => s.roll === certRollInput.trim());
-    if (!match) {
-      alert(`রোল ${certRollInput} দিয়ে কোনো শিক্ষার্থী পাওয়া যায়নি।`);
+  // Auto-populated and editable certificate text fields
+  const [certStudentName, setCertStudentName] = useState('');
+  const [certFatherName, setCertFatherName] = useState('');
+  const [certMotherName, setCertMotherName] = useState('');
+  const [certAddress, setCertAddress] = useState('ঢাকা, বাংলাদেশ');
+  const [certCourseTitle, setCertCourseTitle] = useState('');
+  const [certDuration, setCertDuration] = useState('৬ মাস (২৪ সপ্তাহ)');
+  const [certGrade, setCertGrade] = useState('A+ (প্রথম শ্রেণি)');
+  const [certNo, setCertNo] = useState('');
+  const [certIssueDate, setCertIssueDate] = useState(new Date().toISOString().split('T')[0]);
+  const [certTitle, setCertTitle] = useState('কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
+  const [certBodyText, setCertBodyText] = useState('');
+  const [certFounderName, setCertFounderName] = useState(settings.founderName || 'বোরহানউদ্দিন মহিম');
+  const [certFounderTitle, setCertFounderTitle] = useState(settings.founderTitle || 'প্রতিষ্ঠাতা ও প্রধান প্রশিক্ষক');
+  const [editingCertId, setEditingCertId] = useState<string | null>(null);
+
+  // Function to auto-fetch student and course details into editable text boxes
+  const handleAutoFetchCertificateData = (rollVal: string, courseVal: string, yearVal: string) => {
+    const trimmedRoll = rollVal.trim();
+    const courseObj = courses.find(c => c.id === courseVal) || courses[0];
+    const isFreeByDefault = courseObj?.certificateFee === 0 || courseVal === 'course-quran';
+    const feeAmt = isFreeByDefault ? 0 : (courseObj?.certificateFee || 200);
+
+    // 1. Check existing published certificate first
+    const existing = certificates.find(
+      c => c.roll === trimmedRoll && c.courseId === courseVal && c.academicYear === yearVal
+    );
+
+    if (existing) {
+      setEditingCertId(existing.id);
+      setCertStudentName(existing.studentName || '');
+      setCertFatherName(existing.fatherName || '');
+      setCertMotherName(existing.motherName || '');
+      setCertAddress(existing.address || 'ঢাকা, বাংলাদেশ');
+      setCertCourseTitle(existing.courseTitle || courseObj?.title || '');
+      setCertDuration(existing.duration || courseObj?.duration || '৬ মাস');
+      setCertGrade(existing.grade || 'A+ (প্রথম শ্রেণি)');
+      setCertNo(existing.certificateNo || `BS-ZONE-${yearVal}-${trimmedRoll.padStart(4, '0')}`);
+      setCertIssueDate(existing.issueDate || new Date().toISOString().split('T')[0]);
+      setCertTitle(existing.certificateTitle || 'কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
+      setCertBodyText(
+        existing.bodyText ||
+        `সফলতার সাথে আমাদের প্রতিষ্ঠানে ${existing.courseTitle || courseObj?.title} কোর্সটি (${existing.duration || courseObj?.duration || '৬ মাস'}) কৃতিত্বের সাথে সম্পন্ন করেছেন এবং চূড়ান্ত মূল্যায়ন পরীক্ষায় "${existing.grade || 'A+ (প্রথম শ্রেণি)'}" অর্জন করেছেন। আমরা তার ভবিষ্যৎ জীবনের সর্বাঙ্গীন সাফল্য ও উন্নতি কামনা করি।`
+      );
+      setCertIsFree(existing.isFree);
+      setCertFeeInput(existing.feeAmount.toString());
+      setCertHasGovtCert(existing.hasGovtCert);
+      setCertFounderName(existing.founderName || settings.founderName);
+      setCertFounderTitle(existing.founderTitle || settings.founderTitle);
       return;
     }
 
+    setEditingCertId(null);
+
+    // 2. Search student registry
+    const match = students.find(
+      s => s.roll === trimmedRoll && (s.academicYear === yearVal || !s.academicYear) && (s.courseId === courseVal || !courseVal)
+    );
+
+    if (match) {
+      setCertStudentName(match.name);
+      setCertFatherName(match.fatherName || '');
+      setCertMotherName(match.motherName || '');
+      setCertAddress(match.address || 'ঢাকা, বাংলাদেশ');
+      setCertCourseTitle(courseObj?.title || match.courseId);
+      setCertDuration(courseObj?.duration || '৬ মাস (২৪ সপ্তাহ)');
+      setCertGrade('A+ (প্রথম শ্রেণি)');
+      setCertNo(`BS-ZONE-${yearVal}-${match.roll.padStart(4, '0')}`);
+      setCertIssueDate(new Date().toISOString().split('T')[0]);
+      setCertTitle('কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
+      setCertBodyText(
+        `সফলতার সাথে আমাদের প্রতিষ্ঠানে ${courseObj?.title || ''} কোর্সটি (${courseObj?.duration || '৬ মাস'}) কৃতিত্বের সাথে সম্পন্ন করেছেন এবং চূড়ান্ত মূল্যায়ন পরীক্ষায় "A+ (প্রথম শ্রেণি)" অর্জন করেছেন। আমরা তার ভবিষ্যৎ জীবনের সর্বাঙ্গীন সাফল্য ও উন্নতি কামনা করি।`
+      );
+      setCertIsFree(isFreeByDefault);
+      setCertFeeInput(feeAmt.toString());
+      setCertHasGovtCert(!!courseObj?.hasGovtCert);
+      setCertFounderName(settings.founderName);
+      setCertFounderTitle(settings.founderTitle);
+    } else if (trimmedRoll) {
+      // Direct new roll fallback
+      setCertCourseTitle(courseObj?.title || '');
+      setCertDuration(courseObj?.duration || '৬ মাস (২৪ সপ্তাহ)');
+      setCertGrade('A+ (প্রথম শ্রেণি)');
+      setCertNo(`BS-ZONE-${yearVal}-${trimmedRoll.padStart(4, '0')}`);
+      setCertIssueDate(new Date().toISOString().split('T')[0]);
+      setCertTitle('কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
+      setCertBodyText(
+        `সফলতার সাথে আমাদের প্রতিষ্ঠানে ${courseObj?.title || ''} কোর্সটি (${courseObj?.duration || '৬ মাস'}) কৃতিত্বের সাথে সম্পন্ন করেছেন এবং চূড়ান্ত মূল্যায়ন পরীক্ষায় "A+ (প্রথম শ্রেণি)" অর্জন করেছেন। আমরা তার ভবিষ্যৎ জীবনের সর্বাঙ্গীন সাফল্য ও উন্নতি কামনা করি।`
+      );
+      setCertIsFree(isFreeByDefault);
+      setCertFeeInput(feeAmt.toString());
+      setCertHasGovtCert(!!courseObj?.hasGovtCert);
+      setCertFounderName(settings.founderName);
+      setCertFounderTitle(settings.founderTitle);
+    }
+  };
+
+  const handleGenerateCertificate = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedRoll = certRollInput.trim();
+    if (!trimmedRoll) {
+      alert('অনুগ্রহ করে শিক্ষার্থীর রোল নম্বর দিন।');
+      return;
+    }
+
+    const courseObj = courses.find(c => c.id === certCourseInput) || courses[0];
+
     const newCert: CertificateRecord = {
-      id: `cert-${Date.now()}`,
-      academicYear: match.academicYear,
+      id: editingCertId || `cert-${Date.now()}`,
+      academicYear: certYearInput,
       courseId: certCourseInput,
-      roll: match.roll,
-      studentName: match.name,
-      fatherName: match.fatherName,
-      motherName: match.motherName,
-      address: match.address || 'ঢাকা, বাংলাদেশ',
-      issueDate: new Date().toISOString().split('T')[0],
-      certificateNo: `BS-ZONE-${match.academicYear}-${match.roll.padStart(4, '0')}`,
-      grade: 'A+ (প্রথম শ্রেণি)',
+      roll: trimmedRoll,
+      studentName: certStudentName.trim() || 'শিক্ষার্থীর নাম',
+      fatherName: certFatherName.trim(),
+      motherName: certMotherName.trim(),
+      address: certAddress.trim() || 'ঢাকা, বাংলাদেশ',
+      issueDate: certIssueDate || new Date().toISOString().split('T')[0],
+      certificateNo: certNo.trim() || `BS-ZONE-${certYearInput}-${trimmedRoll.padStart(4, '0')}`,
+      grade: certGrade.trim() || 'A+ (প্রথম শ্রেণি)',
       isFirstIssue: true,
       feePaid: certIsFree,
       isFree: certIsFree,
-      feeAmount: certIsFree ? 0 : Number(certFeeInput),
+      feeAmount: certIsFree ? 0 : (Number(certFeeInput) || 0),
       hasEverPaid: certIsFree,
-      hasGovtCert: !!courses.find(c => c.id === certCourseInput)?.hasGovtCert
+      hasGovtCert: certHasGovtCert,
+      certificateTitle: certTitle,
+      bodyText: certBodyText,
+      duration: certDuration || courseObj?.duration,
+      courseTitle: certCourseTitle || courseObj?.title,
+      institutionName: settings.name,
+      institutionSubName: settings.subName,
+      founderName: certFounderName || settings.founderName,
+      founderTitle: certFounderTitle || settings.founderTitle,
+      published: true
     };
 
-    const updated = [newCert, ...certificates.filter(c => c.roll !== match.roll)];
+    const updated = [
+      newCert,
+      ...certificates.filter(c => !(c.roll === newCert.roll && c.courseId === newCert.courseId && c.academicYear === newCert.academicYear))
+    ];
     setCertificates(updated);
     storage.saveCertificates(updated);
-    triggerSaveNotification('সার্টিফিকেট তৈরি ও কনফিগার সফল!');
-    alert(`রোল ${match.roll} (${match.name})-এর সনদপত্র সফলভাবে তৈরি করা হয়েছে।`);
+    masterGateway.publish('certificates', updated);
+    triggerSaveNotification('সনদপত্র সফলভাবে এডিট, সাবমিট ও পাবলিশ করা হয়েছে!');
+    alert(`রোল ${newCert.roll} (${newCert.studentName})-এর সনদপত্র সফলভাবে সেভ ও পাবলিশ করা হয়েছে।`);
   };
 
-  const renderModule7 = () => (
-    <div className="space-y-6">
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-        <h3 className="text-base font-bold text-slate-900 border-b pb-2">
-          সার্টিফিকেট জেনারেটর ও ফি নির্ধারণ
-        </h3>
-        <p className="text-xs text-slate-600">
-          রোল দিলে নাম-ঠিকানা অটো-ফেচ হবে। ফি নির্ধারণ করলে শিক্ষার্থী ফি দিয়ে কিনবে; ফ্রি রাখলে ফ্রিতে পাবে। একবার পেমেন্ট করলে আজীবন ফ্রি রি-ডাউনলোড পাবে।
-        </p>
+  const handleLoadCertForEdit = (cert: CertificateRecord) => {
+    setEditingCertId(cert.id);
+    setCertYearInput(cert.academicYear || '2026');
+    setCertCourseInput(cert.courseId);
+    setCertRollInput(cert.roll);
+    setCertStudentName(cert.studentName);
+    setCertFatherName(cert.fatherName || '');
+    setCertMotherName(cert.motherName || '');
+    setCertAddress(cert.address || 'ঢাকা, বাংলাদেশ');
+    setCertCourseTitle(cert.courseTitle || courses.find(c => c.id === cert.courseId)?.title || '');
+    setCertDuration(cert.duration || courses.find(c => c.id === cert.courseId)?.duration || '৬ মাস');
+    setCertGrade(cert.grade || 'A+ (প্রথম শ্রেণি)');
+    setCertNo(cert.certificateNo);
+    setCertIssueDate(cert.issueDate || new Date().toISOString().split('T')[0]);
+    setCertTitle(cert.certificateTitle || 'কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
+    setCertBodyText(
+      cert.bodyText ||
+      `সফলতার সাথে আমাদের প্রতিষ্ঠানে ${cert.courseTitle || courses.find(c => c.id === cert.courseId)?.title} কোর্সটি (${cert.duration || '৬ মাস'}) কৃতিত্বের সাথে সম্পন্ন করেছেন এবং চূড়ান্ত মূল্যায়ন পরীক্ষায় "${cert.grade}" অর্জন করেছেন। আমরা তার ভবিষ্যৎ জীবনের সর্বাঙ্গীন সাফল্য ও উন্নতি কামনা করি।`
+    );
+    setCertIsFree(cert.isFree);
+    setCertFeeInput(cert.feeAmount.toString());
+    setCertHasGovtCert(cert.hasGovtCert);
+    setCertFounderName(cert.founderName || settings.founderName);
+    setCertFounderTitle(cert.founderTitle || settings.founderTitle);
 
-        <form onSubmit={handleGenerateCertificate} className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">কোর্স নির্বাচন</label>
-            <select
-              value={certCourseInput}
-              onChange={(e) => setCertCourseInput(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white"
-            >
-              {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-            </select>
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  };
+
+  const renderModule7 = () => {
+    const matchingStudents = students.filter(
+      s => (!certCourseInput || s.courseId === certCourseInput) && (!certYearInput || s.academicYear === certYearInput)
+    );
+
+    return (
+      <div className="space-y-6">
+        {/* Certificate Generator & Editor Card */}
+        <div className="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+          <div className="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                <Award className="w-5 h-5 text-amber-600" />
+                <span>সার্টিফিকেট জেনারেটর, এডিটর ও ফি নির্ধারণ</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                শিক্ষাবর্ষ, কোর্স ও রোল নির্বাচন করলে তথ্য অটো-ফেচ হবে। টেক্সট এডিট করে সাবমিট ও পাবলিশ করুন।
+              </p>
+            </div>
+
+            {editingCertId && (
+              <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold border border-amber-300">
+                ✏️ বিদ্যমান সনদ এডিট মোড (ID: {editingCertId})
+              </span>
+            )}
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">শিক্ষার্থীর রোল *</label>
-            <input
-              type="text"
-              required
-              placeholder="যেমন: 101"
-              value={certRollInput}
-              onChange={(e) => setCertRollInput(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold font-mono text-blue-900"
-            />
-          </div>
+          <form onSubmit={handleGenerateCertificate} className="space-y-4">
+            {/* Top Selection Row: Academic Year, Course, and Roll */}
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+              <span className="text-xs font-bold text-slate-700 block">
+                ১. শিক্ষাবর্ষ, কোর্স ও শিক্ষার্থী নির্বাচন (অটো-ফেচ)
+              </span>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">সনদ ফি অপশন</label>
-            <div className="flex items-center gap-2">
-              <label className="text-xs flex items-center gap-1 font-semibold">
-                <input
-                  type="checkbox"
-                  checked={certIsFree}
-                  onChange={(e) => setCertIsFree(e.target.checked)}
-                  className="rounded text-blue-900"
-                />
-                <span>সম্পূর্ণ ফ্রি</span>
-              </label>
-              {!certIsFree && (
-                <input
-                  type="number"
-                  placeholder="টাকা"
-                  value={certFeeInput}
-                  onChange={(e) => setCertFeeInput(e.target.value)}
-                  className="w-24 px-2 py-1.5 border rounded-lg text-xs font-bold"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                {/* Academic Year */}
+                <div className="sm:col-span-3">
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">শিক্ষাবর্ষ *</label>
+                  <select
+                    value={certYearInput}
+                    onChange={(e) => {
+                      const newYear = e.target.value;
+                      setCertYearInput(newYear);
+                      handleAutoFetchCertificateData(certRollInput, certCourseInput, newYear);
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white text-slate-900"
+                  >
+                    <option value="2026">২০২৬ সেশন</option>
+                    <option value="2025">২০২৫ সেশন</option>
+                    <option value="2027">২০২৭ সেশন</option>
+                  </select>
+                </div>
+
+                {/* Course Selection */}
+                <div className="sm:col-span-5">
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্স নির্বাচন *</label>
+                  <select
+                    value={certCourseInput}
+                    onChange={(e) => {
+                      const newCourse = e.target.value;
+                      setCertCourseInput(newCourse);
+                      handleAutoFetchCertificateData(certRollInput, newCourse, certYearInput);
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-900"
+                  >
+                    {courses.map(c => (
+                      <option key={c.id} value={c.id}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Roll Input */}
+                <div className="sm:col-span-4">
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">শিক্ষার্থীর রোল *</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      placeholder="যেমন: 101 বা 102"
+                      value={certRollInput}
+                      onChange={(e) => {
+                        const newRoll = e.target.value;
+                        setCertRollInput(newRoll);
+                        handleAutoFetchCertificateData(newRoll, certCourseInput, certYearInput);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold font-mono text-blue-900 bg-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleAutoFetchCertificateData(certRollInput, certCourseInput, certYearInput)}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg"
+                    >
+                      ফেচ করুন
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Matching Students Chips */}
+              {matchingStudents.length > 0 && (
+                <div className="pt-1 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[10px] text-slate-500 font-bold">কোর্সের শিক্ষার্থীরা:</span>
+                  {matchingStudents.slice(0, 8).map(s => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => {
+                        setCertRollInput(s.roll);
+                        handleAutoFetchCertificateData(s.roll, certCourseInput, certYearInput);
+                      }}
+                      className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold transition-all ${
+                        certRollInput === s.roll
+                          ? 'bg-blue-900 text-white shadow-xs'
+                          : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {s.roll} - {s.name}
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              className="w-full py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm"
-            >
-              <Award className="w-4 h-4" />
-              <span>সনদপত্র ক্রিয়েট করুন</span>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Generated list */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-        <div className="p-4 border-b">
-          <span className="font-bold text-sm text-slate-800">তৈরিকৃত সনদপত্রের তালিকা ({certificates.length} টি)</span>
-        </div>
-        <div className="divide-y divide-slate-200 text-xs">
-          {certificates.map((c) => (
-            <div key={c.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Fee & Free Option Box */}
+            <div className="p-4 bg-amber-50/70 rounded-2xl border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-blue-900 bg-amber-100 px-2 py-0.5 rounded-md">রোল {c.roll}</span>
-                  <span className="font-bold text-slate-900 text-sm">{c.studentName}</span>
-                  <span className="text-slate-500">সনদ নং: {c.certificateNo}</span>
+                <span className="text-xs font-bold text-amber-950 block">২. সনদপত্র ফি নির্ধারণ (Free / Paid)</span>
+                <p className="text-[11px] text-slate-600">
+                  ফ্রি রাখলে শিক্ষার্থী সরাসরি ডাউনলোড করতে পারবে; পেইড রাখলে কিউআর কোডে ফি প্রদান করে TrxID দিয়ে আনলক করবে।
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="text-xs flex items-center gap-1.5 font-bold text-slate-800 cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-amber-300">
+                  <input
+                    type="radio"
+                    name="certFeeType"
+                    checked={certIsFree}
+                    onChange={() => {
+                      setCertIsFree(true);
+                      setCertFeeInput('0');
+                    }}
+                    className="text-amber-600"
+                  />
+                  <span>সম্পূর্ণ ফ্রি (Free)</span>
+                </label>
+
+                <label className="text-xs flex items-center gap-1.5 font-bold text-slate-800 cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-amber-300">
+                  <input
+                    type="radio"
+                    name="certFeeType"
+                    checked={!certIsFree}
+                    onChange={() => {
+                      setCertIsFree(false);
+                      if (certFeeInput === '0') setCertFeeInput('200');
+                    }}
+                    className="text-amber-600"
+                  />
+                  <span>পেইড সনদ (Paid Fee)</span>
+                </label>
+
+                {!certIsFree && (
+                  <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-xl border border-amber-300">
+                    <span className="text-xs font-bold text-slate-600">ফি:</span>
+                    <input
+                      type="number"
+                      required
+                      placeholder="টাকা"
+                      value={certFeeInput}
+                      onChange={(e) => setCertFeeInput(e.target.value)}
+                      className="w-20 px-2 py-0.5 border rounded-lg text-xs font-bold font-mono text-emerald-800"
+                    />
+                    <span className="text-xs font-bold text-slate-700">৳</span>
+                  </div>
+                )}
+
+                <label className="text-xs flex items-center gap-1 font-semibold text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={certHasGovtCert}
+                    onChange={(e) => setCertHasGovtCert(e.target.checked)}
+                    className="rounded text-emerald-700"
+                  />
+                  <span>সরকারি সনদ অন্তর্ভুক্ত</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Editable Certificate Text Fields Form */}
+            <div className="space-y-3 pt-1">
+              <span className="text-xs font-bold text-slate-800 block">
+                ৩. সার্টিফিকেটের টেক্সটসমূহ (বক্সে অটো আসার পর প্রয়োজনমতো এডিট করুন)
+              </span>
+
+              {/* Title & Certificate No */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">সনদের মূল শিরোনাম</label>
+                  <input
+                    type="text"
+                    value={certTitle}
+                    onChange={(e) => setCertTitle(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white"
+                  />
                 </div>
-                <div className="text-[11px] text-slate-600 mt-1">
-                  কোর্স: <b>{courses.find(item => item.id === c.courseId)?.title || c.courseId}</b> • গ্রেড: <b>{c.grade}</b> • 
-                  ফি: <b>{c.isFree ? 'সম্পূর্ণ ফ্রি' : `${c.feeAmount}৳ (পরিশোধিত: ${c.hasEverPaid ? 'হ্যাঁ' : 'না'})`}</b>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">অফিশিয়াল সনদ নম্বর</label>
+                  <input
+                    type="text"
+                    value={certNo}
+                    onChange={(e) => setCertNo(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold text-blue-900 bg-white"
+                  />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => setSelectedCertForPrint(c)}
-                  className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-sm"
-                  title="সনদপত্র প্রিভিউ এবং সরাসরি ডাউনলোড ও প্রিন্ট করুন"
-                >
-                  <Award className="w-3.5 h-3.5 text-white" />
-                  <span>সনদ প্রিভিউ ও প্রিন্ট/ডাউনলোড</span>
-                </button>
+              {/* Student Name, Father Name, Mother Name */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">শিক্ষার্থীর নাম *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="শিক্ষার্থীর নাম"
+                    value={certStudentName}
+                    onChange={(e) => setCertStudentName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-900 bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">পিতার নাম</label>
+                  <input
+                    type="text"
+                    placeholder="পিতার নাম"
+                    value={certFatherName}
+                    onChange={(e) => setCertFatherName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-800"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">মাতার নাম</label>
+                  <input
+                    type="text"
+                    placeholder="মাতার নাম"
+                    value={certMotherName}
+                    onChange={(e) => setCertMotherName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-800"
+                  />
+                </div>
+              </div>
 
+              {/* Course Title, Duration, Grade */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্সের নাম</label>
+                  <input
+                    type="text"
+                    value={certCourseTitle}
+                    onChange={(e) => setCertCourseTitle(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্সের মেয়াদ</label>
+                  <input
+                    type="text"
+                    value={certDuration}
+                    onChange={(e) => setCertDuration(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">গ্রেড / ফলাফল</label>
+                  <input
+                    type="text"
+                    value={certGrade}
+                    onChange={(e) => setCertGrade(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-emerald-800 bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Issue Date & Address */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">সনদ ইস্যুর তারিখ</label>
+                  <input
+                    type="text"
+                    value={certIssueDate}
+                    onChange={(e) => setCertIssueDate(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">শিক্ষার্থীর ঠিকানা</label>
+                  <input
+                    type="text"
+                    value={certAddress}
+                    onChange={(e) => setCertAddress(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Full Body Text / Statement */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                  সনদের মূল বক্তব্য (সম্পূর্ণ টেক্সট বক্সে এডিটযোগ্য)
+                </label>
+                <textarea
+                  rows={3}
+                  value={certBodyText}
+                  onChange={(e) => setCertBodyText(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs leading-relaxed bg-white text-slate-900 focus:ring-2 focus:ring-amber-500 font-medium"
+                />
+              </div>
+
+              {/* Signatory Name & Title */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">স্বাক্ষরকারী / প্রধান শিক্ষক</label>
+                  <input
+                    type="text"
+                    value={certFounderName}
+                    onChange={(e) => setCertFounderName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">স্বাক্ষরকারীর পদবী</label>
+                  <input
+                    type="text"
+                    value={certFounderTitle}
+                    onChange={(e) => setCertFounderTitle(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Submit & Publish Action Bar */}
+            <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingCertId(null);
+                  setCertRollInput('');
+                  setCertStudentName('');
+                  setCertFatherName('');
+                  setCertMotherName('');
+                  setCertAddress('ঢাকা, বাংলাদেশ');
+                }}
+                className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 text-xs font-bold"
+              >
+                রিসেট / নতুন সনদ তৈরি
+              </button>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                 <button
-                  onClick={() => {
-                    if (confirm(`রোল ${c.roll} (${c.studentName})-এর সনদপত্র মুছে ফেলবেন?`)) {
-                      const updated = certificates.filter(item => item.id !== c.id);
-                      setCertificates(updated);
-                      storage.saveCertificates(updated);
-                      triggerSaveNotification('সনদপত্র মুছে ফেলা হয়েছে');
-                    }
-                  }}
-                  className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                  type="submit"
+                  className="w-full sm:w-auto py-2.5 px-6 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 active:scale-98 transition-all"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Award className="w-4 h-4 text-amber-200" />
+                  <span>সনদপত্র সাবমিট ও পাবলিশ করুন</span>
                 </button>
               </div>
             </div>
-          ))}
+          </form>
         </div>
-      </div>
+
+        {/* Generated / Published List */}
+        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
+          <div className="p-4 sm:p-5 border-b flex items-center justify-between">
+            <span className="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>তৈরিকৃত ও পাবলিশড সনদপত্রের তালিকা ({certificates.length} টি)</span>
+            </span>
+            <span className="text-xs text-slate-500">অনলাইনে শিক্ষার্থী সরাসরি রোল দিয়ে দেখতে পাবে</span>
+          </div>
+
+          <div className="divide-y divide-slate-200 text-xs">
+            {certificates.length === 0 ? (
+              <div className="p-8 text-center text-slate-400">
+                এখনো কোনো সনদপত্র তৈরি করা হয়নি। উপরের ফরম থেকে রোল ইনপুট দিয়ে সনদ ক্রিয়েট করুন।
+              </div>
+            ) : (
+              certificates.map((c) => (
+                <div key={c.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-blue-900 bg-amber-100 px-2 py-0.5 rounded-md">
+                        সেশন {c.academicYear || '২০২৬'} • রোল {c.roll}
+                      </span>
+                      <span className="font-bold text-slate-900 text-sm">{c.studentName}</span>
+                      <span className="text-slate-500 font-mono text-[11px]">({c.certificateNo})</span>
+                    </div>
+                    <div className="text-[11px] text-slate-600 mt-1">
+                      কোর্স: <b>{courses.find(item => item.id === c.courseId)?.title || c.courseTitle || c.courseId}</b> • গ্রেড: <b>{c.grade}</b> • 
+                      ফি স্ট্যাটাস: <b className={c.isFree ? 'text-emerald-700' : 'text-amber-800'}>
+                        {c.isFree ? 'সম্পূর্ণ ফ্রি' : `${c.feeAmount}৳ (পরিশোধিত: ${c.hasEverPaid ? 'হ্যাঁ' : 'না'})`}
+                      </b>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleLoadCertForEdit(c)}
+                      className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-950 font-bold text-xs flex items-center gap-1 border border-blue-200 transition-colors"
+                      title="এই সনদের তথ্য এডিট বক্সে লোড করুন"
+                    >
+                      <Edit className="w-3.5 h-3.5 text-blue-700" />
+                      <span>এডিট</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCertForPrint(c)}
+                      className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-sm"
+                      title="সনদপত্র প্রিভিউ এবং সরাসরি ডাউনলোড ও প্রিন্ট করুন"
+                    >
+                      <Award className="w-3.5 h-3.5 text-white" />
+                      <span>প্রিভিউ ও প্রিন্ট</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (confirm(`রোল ${c.roll} (${c.studentName})-এর সনদপত্র মুছে ফেলবেন?`)) {
+                          const updated = certificates.filter(item => item.id !== c.id);
+                          setCertificates(updated);
+                          storage.saveCertificates(updated);
+                          masterGateway.publish('certificates', updated);
+                          triggerSaveNotification('সনদপত্র মুছে ফেলা হয়েছে');
+                        }
+                      }}
+                      className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                      title="মুছে ফেলুন"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
 
       {/* Module 7 Save Button */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
@@ -2318,7 +2791,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         </button>
       </div>
     </div>
-  );
+    );
+  };
 
   /* ---------------- MODULE 8: COURSE MANAGEMENT & LOGO ---------------- */
   const handleCourseLogoUpload = (courseId: string, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -5406,14 +5880,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <span>•</span>
                   <span>সনদ নং: {selectedCertForPrint.certificateNo}</span>
                 </div>
-                <p className="text-xs text-slate-700 leading-relaxed max-w-lg mx-auto pt-2">
-                  has successfully completed the comprehensive training course on{' '}
-                  <span className="font-extrabold text-blue-950 text-sm">
-                    {courses.find(c => c.id === selectedCertForPrint.courseId)?.title || selectedCertForPrint.courseId}
-                  </span>{' '}
-                  and achieved the outstanding grade of{' '}
-                  <span className="font-black text-emerald-800 text-sm">{selectedCertForPrint.grade}</span>.
-                </p>
+                <div className="text-xs text-slate-700 leading-relaxed max-w-lg mx-auto pt-2">
+                  {selectedCertForPrint.bodyText ? (
+                    <p className="p-3 bg-amber-50/60 rounded-xl border border-amber-200/60 text-slate-800 font-medium">
+                      {selectedCertForPrint.bodyText}
+                    </p>
+                  ) : (
+                    <p>
+                      has successfully completed the comprehensive training course on{' '}
+                      <span className="font-extrabold text-blue-950 text-sm">
+                        {courses.find(c => c.id === selectedCertForPrint.courseId)?.title || selectedCertForPrint.courseId}
+                      </span>{' '}
+                      and achieved the outstanding grade of{' '}
+                      <span className="font-black text-emerald-800 text-sm">{selectedCertForPrint.grade}</span>.
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Seal & Signatures */}

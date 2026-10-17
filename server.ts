@@ -78,7 +78,7 @@ let serverFirestoreQuotaExhausted = false;
 if (fs.existsSync(QUOTA_FILE)) {
   try {
     const qData = JSON.parse(fs.readFileSync(QUOTA_FILE, 'utf-8'));
-    if (Date.now() - qData.timestamp < 12 * 60 * 60 * 1000) {
+    if (qData.exhausted && (Date.now() - qData.timestamp < 24 * 60 * 60 * 1000)) {
       serverFirestoreQuotaExhausted = true;
       console.log('[Server] Daily Firestore free write quota exhausted. Seamlessly routing all writes through persistent disk and Socket.io.');
     }
@@ -89,11 +89,20 @@ function flagServerQuotaExhausted() {
   if (!serverFirestoreQuotaExhausted) {
     serverFirestoreQuotaExhausted = true;
     try {
-      fs.writeFileSync(QUOTA_FILE, JSON.stringify({ exhausted: true, timestamp: Date.now() }), 'utf-8');
+      fs.writeFileSync(QUOTA_FILE, JSON.stringify({ exhausted: true, timestamp: Date.now(), reason: 'Daily write limit reached' }), 'utf-8');
     } catch {}
     console.warn('[Server] Firestore quota limit reached on write. Routing all future syncs through high-speed disk & Socket.io.');
   }
 }
+
+// Endpoint to inform clients about Firestore quota state
+app.get('/api/quota-state', (_req: Request, res: Response) => {
+  res.json({
+    exhausted: serverFirestoreQuotaExhausted,
+    firestoreQuotaExhausted: serverFirestoreQuotaExhausted,
+    timestamp: Date.now()
+  });
+});
 
 // Hydrate server database from Firestore on startup only if disk is empty
 async function initServerFirestoreSync() {
@@ -572,7 +581,7 @@ app.get('/api/wiki', async (req: Request, res: Response) => {
 
 // GitHub Auto-Push & Vercel Sync REST API Endpoints
 app.get('/api/github/status', async (req: Request, res: Response) => {
-  const token = (req.query.token as string) || process.env.GITHUB_TOKEN || 'ghp_pIXZV7TX3MvTATEBAddiNkqQ2FbhYK199i0b';
+  const token = (req.query.token as string) || process.env.GITHUB_TOKEN || '';
   const repo = (req.query.repo as string) || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
 
   try {
@@ -613,7 +622,7 @@ app.get('/api/github/status', async (req: Request, res: Response) => {
 });
 
 app.post('/api/github/push', async (req: Request, res: Response) => {
-  const token = req.body.token || process.env.GITHUB_TOKEN || 'ghp_pIXZV7TX3MvTATEBAddiNkqQ2FbhYK199i0b';
+  const token = req.body.token || process.env.GITHUB_TOKEN || '';
   const repo = req.body.repo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
   const branch = req.body.branch || 'main';
   const filePath = req.body.path || 'data/institute_db.json';

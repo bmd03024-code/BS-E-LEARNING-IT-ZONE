@@ -14,6 +14,7 @@ import { NoticeSection } from './components/home/NoticeSection';
 import { GallerySection } from './components/home/GallerySection';
 import { FreeResourcesSection } from './components/home/FreeResourcesSection';
 import { FloatingChatbot } from './components/chatbot/FloatingChatbot';
+import { FloatingToolsSuite } from './components/tools/FloatingToolsSuite';
 
 // Modals
 import { EnrollModal } from './components/modals/EnrollModal';
@@ -257,6 +258,7 @@ export default function App() {
       />
 
       <FloatingChatbot />
+      <FloatingToolsSuite />
 
       {/* Modals */}
       <EnrollModal

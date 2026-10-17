@@ -323,6 +323,15 @@ export interface CertificateRecord {
   feeAmount: number; // Admin determined fee
   hasEverPaid: boolean; // Once paid, re-downloads are free unlimited times
   hasGovtCert: boolean;
+  certificateTitle?: string;
+  bodyText?: string;
+  institutionName?: string;
+  institutionSubName?: string;
+  founderName?: string;
+  founderTitle?: string;
+  duration?: string;
+  courseTitle?: string;
+  published?: boolean;
 }
 
 export interface AdminCredentials {

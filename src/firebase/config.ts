@@ -42,23 +42,46 @@ export interface FirestoreErrorInfo {
 
 // Global Quota Circuit Breaker to prevent write exhaustion & retry loops
 function checkInitialQuota(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') return true;
   try {
     const raw = localStorage.getItem('bs_firestore_quota_exhausted');
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Quota resets daily; check if flagged within the last 12 hours
-      if (Date.now() - parsed.timestamp < 12 * 60 * 60 * 1000) {
+      if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
         return true;
-      } else {
-        localStorage.removeItem('bs_firestore_quota_exhausted');
       }
     }
   } catch {}
-  return false;
+  // Default to true to prevent initial write spikes; verified via /api/quota-state
+  return true;
 }
 
 let quotaExhausted = checkInitialQuota();
+
+// Fetch live server quota status immediately on boot
+if (typeof window !== 'undefined') {
+  try {
+    localStorage.setItem('bs_firestore_quota_exhausted', JSON.stringify({
+      exhausted: true,
+      timestamp: Date.now()
+    }));
+  } catch {}
+
+  fetch('/api/quota-state')
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.exhausted === false) {
+        quotaExhausted = false;
+        try { localStorage.removeItem('bs_firestore_quota_exhausted'); } catch {}
+      } else {
+        quotaExhausted = true;
+      }
+    })
+    .catch(() => {
+      // Default to safe quota protection on offline / network error
+      quotaExhausted = true;
+    });
+}
 
 export function isFirestoreQuotaExhausted(): boolean {
   return quotaExhausted;
@@ -74,16 +97,15 @@ export function markFirestoreQuotaExhausted() {
       }));
     } catch {}
   }
-  console.info('[Firestore] Daily free write quota reached. Seamlessly routing writes to persistent server & local cache.');
 }
 
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
   const errorStr = error instanceof Error ? error.message : String(error);
 
-  if (errorStr.includes('resource-exhausted') || errorStr.includes('Quota limit exceeded') || errorStr.includes('quota')) {
+  if (errorStr.includes('resource-exhausted') || errorStr.includes('Quota limit exceeded') || errorStr.includes('quota') || errorStr.includes('Quota')) {
     markFirestoreQuotaExhausted();
     return {
-      error: 'Quota limit exceeded. Fallback to resilient server cache.',
+      error: 'Daily free Firestore quota limit reached. Routing all writes through high-speed disk and Socket.io.',
       authInfo: {},
       operationType,
       path
@@ -106,11 +128,11 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     operationType,
     path
   };
-  console.warn('Firestore Operation Notice: ', JSON.stringify(errInfo));
   return errInfo;
 }
 
 export async function safeFirestoreSet(collectionName: string, docId: string, data: any): Promise<boolean> {
+  // Prevent any setDoc call if quota is exhausted to avoid SDK retry backoff loops
   if (isFirestoreQuotaExhausted()) return false;
   try {
     const docRef = doc(db, collectionName, docId);
@@ -136,7 +158,3 @@ export async function testConnection(): Promise<boolean> {
   }
 }
 
-// Auto-run connection check in background
-if (typeof window !== 'undefined') {
-  testConnection();
-}
