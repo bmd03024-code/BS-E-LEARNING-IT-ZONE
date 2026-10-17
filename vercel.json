@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "^/institute_db\\.json$",
+      "dest": "/institute_db.json",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Content-Type": "application/json; charset=utf-8"
+      }
+    },
+    {
+      "src": "^/data/institute_db\\.json$",
+      "dest": "/data/institute_db.json",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Content-Type": "application/json; charset=utf-8"
+      }
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/.*",
+      "dest": "/index.html"
+    }
+  ]
+}

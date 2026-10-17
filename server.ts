@@ -104,9 +104,28 @@ app.get('/api/quota-state', (_req: Request, res: Response) => {
   });
 });
 
-// Hydrate server database from Firestore on startup only if disk is empty
+// Explicit route for institute_db.json with proper JSON headers to prevent HTML fallback
+app.get(['/institute_db.json', '/data/institute_db.json', '/api/institute_db.json'], (_req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  if (database && Object.keys(database).length > 0) {
+    return res.json(database);
+  }
+  if (fs.existsSync(DB_FILE)) {
+    try {
+      const raw = fs.readFileSync(DB_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      database = parsed;
+      return res.json(parsed);
+    } catch {}
+  }
+  return res.json({});
+});
+
+// Hydrate server database from Firestore on startup only if disk is empty and quota allows
 async function initServerFirestoreSync() {
-  if (!firestoreDb) return;
+  if (!firestoreDb || serverFirestoreQuotaExhausted) return;
   if (Object.keys(database).length > 0) {
     console.log(`[Server] Persistent disk database loaded with ${Object.keys(database).length} modules (Master Source of Truth). Skipping Firestore overwrite.`);
     return;
@@ -125,18 +144,40 @@ async function initServerFirestoreSync() {
       persistDatabase();
       console.log(`[Server] Hydrated ${snap.size} modules directly from Cloud Firestore!`);
     }
-  } catch (err) {
-    console.warn('[Server] Firestore hydration catch (using disk cache):', err);
+  } catch (err: any) {
+    if (err?.code === 'resource-exhausted' || String(err).includes('quota') || String(err).includes('Quota')) {
+      flagServerQuotaExhausted();
+    }
+    console.warn('[Server] Firestore hydration catch (using disk cache):', err?.message || err);
   }
 }
 initServerFirestoreSync();
 
-// Save database to disk asynchronously
+// Save database to disk and public static paths for 100% reliable Vercel/Express sync
 function persistDatabase() {
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(database, null, 2), 'utf-8');
+    const jsonStr = JSON.stringify(database, null, 2);
+    // 1. Save to persistent data directory
+    fs.writeFileSync(DB_FILE, jsonStr, 'utf-8');
+
+    // 2. Save to public directory for static asset delivery on Vite / Vercel
+    const publicPath = path.resolve(process.cwd(), 'public', 'institute_db.json');
+    fs.writeFileSync(publicPath, jsonStr, 'utf-8');
+
+    const publicDataDir = path.resolve(process.cwd(), 'public', 'data');
+    if (!fs.existsSync(publicDataDir)) fs.mkdirSync(publicDataDir, { recursive: true });
+    fs.writeFileSync(path.join(publicDataDir, 'institute_db.json'), jsonStr, 'utf-8');
+
+    // 3. If dist exists, keep dist in sync as well
+    const distPath = path.resolve(process.cwd(), 'dist');
+    if (fs.existsSync(distPath)) {
+      fs.writeFileSync(path.join(distPath, 'institute_db.json'), jsonStr, 'utf-8');
+      const distDataDir = path.join(distPath, 'data');
+      if (!fs.existsSync(distDataDir)) fs.mkdirSync(distDataDir, { recursive: true });
+      fs.writeFileSync(path.join(distDataDir, 'institute_db.json'), jsonStr, 'utf-8');
+    }
   } catch (err) {
-    console.error('[Database] Error saving to disk:', err);
+    console.error('[Database] Error saving to disk & public:', err);
   }
 }
 
