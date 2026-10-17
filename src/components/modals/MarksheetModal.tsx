@@ -207,6 +207,13 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     <span className="w-32 text-slate-500 font-semibold shrink-0">পরীক্ষার ধরণ:</span>
                     <span className="font-semibold text-slate-800">{foundResult.examType}</span>
                   </div>
+
+                  {foundResult.address && (
+                    <div className="flex sm:col-span-2">
+                      <span className="w-32 text-slate-500 font-semibold shrink-0">ঠিকানা:</span>
+                      <span className="font-semibold text-slate-800">{foundResult.address}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Subject Marks Table */}

@@ -396,25 +396,31 @@ class AIKnowledgeStoreService {
         highestChunkScore = score;
         bestChunk = chunk;
 
-        const sentences = chunk.content.split(/[।.\n]+/).map(s => s.trim()).filter(Boolean);
-        let bestSentence = sentences[0] || chunk.content;
-        let bestSentScore = 0;
-
-        for (const sent of sentences) {
+        const sentences = chunk.content.split(/(?<=[।.\n])\s*/).map(s => s.trim()).filter(Boolean);
+        const scoredSentences = sentences.map(sent => {
           const lowerS = sent.toLowerCase();
-          const sentMatches = queryTerms.filter(t => lowerS.includes(t)).length;
-          if (sentMatches > bestSentScore) {
-            bestSentScore = sentMatches;
-            bestSentence = sent;
+          let sentScore = 0;
+          for (const term of queryTerms) {
+            if (lowerS.includes(term)) sentScore += 10;
           }
+          return { text: sent, score: sentScore };
+        });
+
+        const matched = scoredSentences.filter(s => s.score > 0);
+        if (matched.length > 0) {
+          const topScoring = [...matched].sort((a, b) => b.score - a.score).slice(0, 3);
+          const orderedTexts = sentences.filter(s => topScoring.some(ts => ts.text === s));
+          matchedSnippet = orderedTexts.join(' ');
+        } else {
+          matchedSnippet = sentences.slice(0, 2).join(' ');
         }
-        matchedSnippet = bestSentence;
       }
     }
 
     if (bestChunk && highestChunkScore >= 20) {
+      const finalExcerpt = matchedSnippet || bestChunk.content.slice(0, 300) + '...';
       return {
-        answer: `📌 [${bestChunk.title}]\n\n${bestChunk.content}`,
+        answer: `📌 [${bestChunk.title}]\n\n${finalExcerpt}`,
         confidence: Math.min(95, highestChunkScore),
         source: `প্রতিষ্ঠানের ডাটাবেজ মডিউল (${bestChunk.category})`
       };

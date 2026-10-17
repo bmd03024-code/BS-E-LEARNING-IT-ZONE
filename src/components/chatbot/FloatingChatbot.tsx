@@ -24,7 +24,195 @@ interface ChatMessage {
   whatsappButtons?: WhatsAppButtonInfo[];
 }
 
-// Built-in arithmetic solver for BS Learning AI
+// Built-in comprehensive dictionary database for academic & technical terms
+interface DictItem {
+  terms: string[];
+  title: string;
+  category: string;
+  definition: string;
+  example?: string;
+}
+
+const DICTIONARY_RECORDS: DictItem[] = [
+  {
+    terms: ['কম্পিউটার', 'computer'],
+    title: 'কম্পিউটার (Computer)',
+    category: 'কম্পিউটার ও আইসিটি',
+    definition: 'কম্পিউটার হলো একটি অত্যন্ত দ্রুতগতির ইলেকট্রনিক গণনাকারী যন্ত্র, যা ব্যবহারকারীর থেকে ডাটা বা ইনপুট গ্রহণ করে, সেন্ট্রাল প্রসেসিং ইউনিটের (CPU) মাধ্যমে তা বিশ্লেষণ ও প্রক্রিয়াজাত করে এবং নির্ভুল ফলাফল বা আউটপুট প্রদান করে।'
+  },
+  {
+    terms: ['আইসিটি', 'ict', 'তথ্যপ্রযুক্তি'],
+    title: 'আইসিটি (ICT - Information & Communication Technology)',
+    category: 'তথ্য ও যোগাযোগ প্রযুক্তি',
+    definition: 'যেকোনো প্রকার তথ্য তৈরি, সংগ্রহ, প্রক্রিয়াকরণ, সংরক্ষণ, রূপান্তর এবং ইন্টারনেট বা টেলিকমিউনিকেশনের মাধ্যমে নিরাপদে দ্রুত প্রেরণের সামগ্রিক ইলেকট্রনিক প্রযুক্তিকে আইসিটি বা তথ্যপ্রযুক্তি বলে।'
+  },
+  {
+    terms: ['র‍্যাম', 'ram'],
+    title: 'র‍্যাম (RAM - Random Access Memory)',
+    category: 'কম্পিউটার হার্ডওয়্যার',
+    definition: 'র‍্যাম হলো কম্পিউটারের একটি অস্থায়ী প্রধান মেমোরি (Volatile Memory)। কম্পিউটার চালু থাকা অবস্থায় বর্তমানে ব্যবহৃত সব অ্যাপ্লিকেশন ও ডেটা এতে সংরক্ষিত থাকে। কম্পিউটার বন্ধ করলে এর সমস্ত তথ্য মুছে যায়।'
+  },
+  {
+    terms: ['রম', 'rom'],
+    title: 'রম (ROM - Read Only Memory)',
+    category: 'কম্পিউটার হার্ডওয়্যার',
+    definition: 'রম হলো একটি স্থায়ী অপরিবর্তনশীল মেমোরি (Non-volatile Memory)। কম্পিউটার প্রস্তুতকারী কোম্পানি এতে বুট-আপ প্রোগ্রাম ও বায়োস (BIOS) সংক্রান্ত মৌলিক নির্দেশনাবলী স্থায়ীভাবে সংরক্ষণ করে।'
+  },
+  {
+    terms: ['সিপিইউ', 'cpu', 'প্রসেসর'],
+    title: 'সিপিইউ (CPU - Central Processing Unit)',
+    category: 'কম্পিউটার হার্ডওয়্যার',
+    definition: 'সিপিইউ হলো কম্পিউটারের মস্তিষ্ক বা প্রধান নিয়ন্ত্রণ কেন্দ্র। এটি গাণিতিক-যৌক্তিক ইউনিট (ALU) এবং নিয়ন্ত্রণ ইউনিট (CU) দ্বারা নির্দেশাবলী বিশ্লেষণ ও নির্বাহ করে সমস্ত যন্ত্রাংশের কাজ সমন্বয় করে।'
+  },
+  {
+    terms: ['সফটওয়্যার', 'software'],
+    title: 'সফটওয়্যার (Software)',
+    category: 'কম্পিউটার বিজ্ঞান',
+    definition: 'কম্পিউটারকে পরিচালনার জন্য লিখিত কতগুলো প্রোগ্রাম, নির্দেশাবলী ও ডেটার সুশৃঙ্খল সমষ্টিকে সফটওয়্যার বলে। এটি প্রধানত দুই প্রকার: সিস্টেম সফটওয়্যার (যেমন: Windows) এবং অ্যাপ্লিকেশন সফটওয়্যার (যেমন: MS Word, Excel)।'
+  },
+  {
+    terms: ['হার্ডওয়্যার', 'hardware'],
+    title: 'হার্ডওয়্যার (Hardware)',
+    category: 'কম্পিউটার বিজ্ঞান',
+    definition: 'কম্পিউটারের যেসব ভৌত ও স্পর্শযোগ্য যন্ত্রাংশ চোখে দেখা যায় এবং হাতে স্পর্শ করা যায়, সেগুলোকে হার্ডওয়্যার বলে। যেমন: মাদারবোর্ড, কিবোর্ড, মাউস, প্রসেসর ও মনিটর।'
+  },
+  {
+    terms: ['হিসাববিজ্ঞান', 'accounting', 'একাউন্টিং'],
+    title: 'হিসাববিজ্ঞান (Accounting)',
+    category: 'ব্যবসায় শিক্ষা',
+    definition: 'হিসাববিজ্ঞান হলো এমন একটি বিশেষায়িত আর্থিক তথ্য ব্যবস্থা যার মাধ্যমে কোনো ব্যক্তি বা প্রতিষ্ঠানের আর্থিক লেনদেনসমূহ সনাক্তকরণ, লিপিবদ্ধকরণ, শ্রেণিবদ্ধকরণ এবং বিবরণী প্রস্তুত করে সংশ্লিষ্ট সিদ্ধান্ত গ্রহণকারীদের নিকট পরিবেশন করা হয়। একে ব্যবসায়ের ভাষা বলা হয়।'
+  },
+  {
+    terms: ['জাবেদা', 'journal'],
+    title: 'জাবেদা (Journal)',
+    category: 'হিসাববিজ্ঞান',
+    definition: 'জাবেদা হলো হিসাবের প্রাথমিক বই, যেখানে আর্থিক লেনদেন সংঘটিত হওয়ার পর তারিখের ক্রমানুসারে ডেবিট ও ক্রেডিট বিশ্লেষণ করে সংক্ষিপ্ত ব্যাখ্যাসহ প্রাথমিকভাবে লিপিবদ্ধ করা হয়।'
+  },
+  {
+    terms: ['খতিয়ান', 'ledger'],
+    title: 'খতিয়ান (Ledger)',
+    category: 'হিসাববিজ্ঞান',
+    definition: 'খতিয়ান হলো হিসাবের পাকা বা চূড়ান্ত বই (King of all books)। এতে বিভিন্ন শ্রেণির হিসাবের লেনদেনসমূহকে স্থায়ী শিরোনামের অধীনে সুনির্দিষ্ট ছকে শ্রেণিবদ্ধ ও সংক্ষিপ্ত আকারে সংরক্ষণ করে উদ্বৃত্ত বা জের নির্ণয় করা হয়।'
+  },
+  {
+    terms: ['রেওয়ামিল', 'trial balance'],
+    title: 'রেওয়ামিল (Trial Balance)',
+    category: 'হিসাববিজ্ঞান',
+    definition: 'খতিয়ানের হিসাবগুলোর গাণিতিক নির্ভুলতা যাচাইয়ের জন্য নির্দিষ্ট তারিখে ডেবিট ও ক্রেডিট উদ্বৃত্তসমূহ নিয়ে যে বিবরণী প্রস্তুত করা হয়, তাকে রেওয়ামিল বলে। দুই দিকের যোগফল সমান হলে ধরে নেওয়া হয় খতিয়ানে কোনো গাণিতিক ভুল নেই।'
+  },
+  {
+    terms: ['ডেবিট', 'debit'],
+    title: 'ডেবিট (Debit)',
+    category: 'হিসাববিজ্ঞান',
+    definition: 'হিসাববিজ্ঞানের ভাষায় ডেবিট অর্থ কোনো হিসাব খাতের বাম দিক। আধুনিক নিয়মে সম্পদ ও ব্যয় বৃদ্ধি পেলে ডেবিট হয় এবং আয়, দায় ও মূলধন হ্রাস পেলে ডেবিট হয়।'
+  },
+  {
+    terms: ['ক্রেডিট', 'credit'],
+    title: 'ক্রেডিট (Credit)',
+    category: 'হিসাববিজ্ঞান',
+    definition: 'হিসাববিজ্ঞানের ভাষায় ক্রেডিট অর্থ কোনো হিসাব খাতের ডান দিক। আধুনিক নিয়মে আয়, দায় ও মূলধন বৃদ্ধি পেলে ক্রেডিট হয় এবং সম্পদ ও ব্যয় হ্রাস পেলে ক্রেডিট হয়।'
+  },
+  {
+    terms: ['বাংলা কিউআর', 'bangla qr'],
+    title: 'বাংলা কিউআর (Bangla QR)',
+    category: 'ডিজিটাল ব্যাংকিং ও পেমেন্ট',
+    definition: 'বাংলা কিউআর হলো বাংলাদেশ ব্যাংক কর্তৃক প্রবর্তিত একটি সর্বজনীন ইন্টারঅপারেবল কিউআর কোড স্ট্যান্ডার্ড। এর মাধ্যমে দেশের যেকোনো ব্যাংকিং অ্যাপ (Citytouch, Cellfin, NexusPay ইত্যাদি) বা এমএফএস ওয়ালেট (বিকাশ, নগদ, রকেট, উপায়) দিয়ে একই কিউআর স্ক্যান করে মুহূর্তেই ক্যাশলেস ফি পরিশোধ করা যায়।'
+  },
+  {
+    terms: ['তাজবীদ', 'tajweed'],
+    title: 'তাজবীদ (علم التجويد)',
+    category: 'সহীহ কুরআন শিক্ষা',
+    definition: 'তাজবীদ অর্থ সুন্দর ও নিখুঁত করা। ইসলামি পরিভাষায় পবিত্র আল-কুরআনের প্রতিটি আরবি হরফকে তার নিজস্ব মাখরাজ ও সিফাত বজায় রেখে সহীহ-শুদ্ধভাবে তিলাওয়াত করার নিয়ম-কানুন ও বিজ্ঞানকে তাজবীদ বলে।'
+  },
+  {
+    terms: ['মাখরাজ', 'makhraj'],
+    title: 'মাখরাজ (مخرج)',
+    category: 'সহীহ কুরআন শিক্ষা',
+    definition: 'মুখের যে নির্দিষ্ট স্থান থেকে আরবি হরফ উচ্চারিত ও নিঃসৃত হয় তাকে মাখরাজ বলে। আরবি ২৯টি হরফ সঠিকভাবে উচ্চারণের জন্য মুখে মোট ১৭টি প্রধান মাখরাজ রয়েছে।'
+  },
+  {
+    terms: ['ভার্ব', 'verb', 'ক্রিয়া'],
+    title: 'Verb (ক্রিয়া)',
+    category: 'English Grammar',
+    definition: 'যে Part of Speech দ্বারা কোনো কিছু করা, হওয়া, খাওয়া, যাওয়া, থাকা বা কোন অবস্থা প্রকাশ পায় তাকে Verb বলে। Verb ছাড়া কোনো ইংরেজি বাক্য গঠিত হতে পারে না।'
+  },
+  {
+    terms: ['টেন্স', 'tense', 'কাল'],
+    title: 'Tense (ক্রিয়ার কাল)',
+    category: 'English Grammar',
+    definition: 'কোনো কাজ সম্পাদনের সুনির্দিষ্ট সময়কে Tense বলে। এটি প্রধানত তিন প্রকার: Present Tense (বর্তমান কাল), Past Tense (অতীত কাল) এবং Future Tense (ভবিষ্যৎ কাল)। প্রতিটি Tense আবার ৪টি করে ভাগে বিভক্ত।'
+  },
+  {
+    terms: ['জিপিএ', 'gpa'],
+    title: 'GPA (Grade Point Average)',
+    category: 'একাডেমিক গ্রেডিং',
+    definition: 'GPA হলো পরীক্ষায় প্রাপ্ত সকল বিষয়ের গ্রেড পয়েন্টের গাণিতিক গড় মান। বাংলাদেশে এসএসসি ও এইচএসসি পর্যায়ে সর্বোচ্চ জিপিএ ৫.০০ স্কেলে ফলাফল প্রকাশিত হয়।'
+  },
+  {
+    terms: ['অ্যালগরিদম', 'algorithm'],
+    title: 'অ্যালগরিদম (Algorithm)',
+    category: 'কম্পিউটার প্রোগ্রামিং',
+    definition: 'কোনো সুনির্দিষ্ট সমস্যা সমাধানের জন্য ধাপে ধাপে যুক্তিযুক্ত ও পর্যায়ক্রমিক নির্দেশনাবলীর লিখিত বিবরণকে অ্যালগরিদম বলা হয়।'
+  }
+];
+
+// Autonomous Dictionary Lookup Helper
+const evaluateDictionaryQuery = (query: string): string | null => {
+  const cleanQ = query.toLowerCase().trim();
+  const isDictQuery =
+    cleanQ.includes('অর্থ কি') ||
+    cleanQ.includes('অর্থ কী') ||
+    cleanQ.includes('মানে কি') ||
+    cleanQ.includes('মানে কী') ||
+    cleanQ.includes('কাকে বলে') ||
+    cleanQ.includes('বলতে কি বোঝায়') ||
+    cleanQ.includes('বলতে কি বুঝায়') ||
+    cleanQ.includes('সংজ্ঞা') ||
+    cleanQ.includes('শব্দার্থ') ||
+    cleanQ.includes('meaning of') ||
+    cleanQ.includes('what is') ||
+    cleanQ.includes('definition of') ||
+    cleanQ.includes('কাকে বলে?');
+
+  for (const item of DICTIONARY_RECORDS) {
+    const matchedTerm = item.terms.some(t => cleanQ.includes(t.toLowerCase()));
+    if (matchedTerm && (isDictQuery || cleanQ.length <= 25)) {
+      return `📖 [ডিকশনারি ও শব্দার্থ: ${item.title}]\n\n• বিভাগ: ${item.category}\n• সংজ্ঞা ও অর্থ: ${item.definition}`;
+    }
+  }
+
+  return null;
+};
+
+// Extract word or term being queried for dictionary definition
+const extractDictionaryTerm = (query: string): string | null => {
+  const cleanQ = query.trim();
+  const lowerQ = cleanQ.toLowerCase();
+  const isDictQuery =
+    lowerQ.includes('অর্থ কি') ||
+    lowerQ.includes('অর্থ কী') ||
+    lowerQ.includes('মানে কি') ||
+    lowerQ.includes('মানে কী') ||
+    lowerQ.includes('কাকে বলে') ||
+    lowerQ.includes('বলতে কি বোঝায়') ||
+    lowerQ.includes('বলতে কি বুঝায়') ||
+    lowerQ.includes('সংজ্ঞা') ||
+    lowerQ.includes('শব্দার্থ') ||
+    lowerQ.includes('meaning of') ||
+    lowerQ.includes('what is') ||
+    lowerQ.includes('definition of');
+
+  if (!isDictQuery) return null;
+
+  const term = cleanQ
+    .replace(/(?:এর\s+)?(?:অর্থ\s+(?:কি|কী)|মানে\s+(?:কি|কী)|কাকে\s+বলে\??|বলতে\s+(?:কি|কী)\s+(?:বোঝায়|বুঝায়)\??|এর\s+সংজ্ঞা\??|শব্দার্থ\??|meaning\s+of|what\s+is|definition\s+of)/gi, '')
+    .replace(/[?।!,]+/g, '')
+    .trim();
+
+  return term.length >= 2 ? term : null;
+};
+
+// Built-in Enhanced Arithmetic Calculator for BS Learning AI
 const evaluateMathExpression = (expr: string): string | null => {
   const bnToEnMap: Record<string, string> = {
     '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
@@ -38,31 +226,44 @@ const evaluateMathExpression = (expr: string): string | null => {
     .replace(/গুণ|গুন/g, '*')
     .replace(/ভাগ/g, '/')
     .replace(/বর্গমূল/g, 'sqrt')
+    .replace(/পাওয়ার|ঘাত/g, '^')
     .replace(/এর/g, '*');
 
+  // Square Root calculation (e.g. রুট ২৫, sqrt(144))
   const sqrtMatch = normalized.match(/(?:sqrt|রুট)\s*\(?(\d+(?:\.\d+)?)\)?/i);
   if (sqrtMatch) {
     const val = parseFloat(sqrtMatch[1]);
     const res = Math.sqrt(val);
-    return `√${toBengaliNum(val)} এর বর্গমূল = ${toBengaliNum(res.toFixed(2).replace(/\.00$/, ''))}`;
+    return `গণিত ও ক্যালকুলেটর সমাধান:\n• হিসাব: √${toBengaliNum(val)} এর বর্গমূল\n• ফলাফল: ${toBengaliNum(res.toFixed(2).replace(/\.00$/, ''))}`;
   }
 
+  // Percentage calculation (e.g. ৫০০ এর ১৫%, 20% of 1000)
   const pctMatch = normalized.match(/(\d+(?:\.\d+)?)\s*%\s*(?:of|\*)\s*(\d+(?:\.\d+)?)/i) ||
                    normalized.match(/(\d+(?:\.\d+)?)\s*\*\s*(\d+(?:\.\d+)?)\s*%/i);
   if (pctMatch) {
     const p = parseFloat(pctMatch[1]);
     const total = parseFloat(pctMatch[2]);
     const ans = (p / 100) * total;
-    return `${toBengaliNum(total)} এর ${toBengaliNum(p)}% = ${toBengaliNum(ans)}`;
+    return `গণিত ও ক্যালকুলেটর সমাধান:\n• হিসাব: ${toBengaliNum(total)} এর ${toBengaliNum(p)}%\n• ফলাফল: ${toBengaliNum(ans)}`;
   }
 
+  // Power / Exponent (e.g. 2^5, ৩ এর পাওয়ার ৪)
+  const powMatch = normalized.match(/(\d+(?:\.\d+)?)\s*\^\s*(\d+(?:\.\d+)?)/);
+  if (powMatch) {
+    const base = parseFloat(powMatch[1]);
+    const exp = parseFloat(powMatch[2]);
+    const ans = Math.pow(base, exp);
+    return `গণিত ও ক্যালকুলেটর সমাধান:\n• হিসাব: ${toBengaliNum(base)}^${toBengaliNum(exp)}\n• ফলাফল: ${toBengaliNum(ans)}`;
+  }
+
+  // General arithmetic expressions: +, -, *, /, (), .
   const mathSanitized = normalized.replace(/[^0-9+\-*/().]/g, '');
   if (mathSanitized.length >= 3 && /[+\-*/]/.test(mathSanitized)) {
     try {
       const sanitized = mathSanitized.replace(/[^0-9+\-*/().\s]/g, '');
       const result = new Function(`return (${sanitized})`)();
       if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
-        return `গণিত সমাধান:\n${toBengaliNum(mathSanitized)} = ${toBengaliNum(Number(result.toFixed(4)).toString())}`;
+        return `গণিত ও ক্যালকুলেটর সমাধান:\n• হিসাব: ${toBengaliNum(mathSanitized)}\n• ফলাফল = ${toBengaliNum(Number(result.toFixed(4)).toString())}`;
       }
     } catch {
       return null;
@@ -165,7 +366,77 @@ export const FloatingChatbot: React.FC = () => {
       return;
     }
 
-    // 2. Teacher-Specific WhatsApp Direct Connectivity Check
+    // 2. Autonomous Dictionary & Word Meaning
+    const dictResult = evaluateDictionaryQuery(query);
+    if (dictResult) {
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `b-${Date.now()}`,
+            sender: 'bot',
+            text: dictResult,
+            timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+            sourceBadge: 'স্মার্ট ডিকশনারি'
+          }
+        ]);
+        setLoading(false);
+      }, 250);
+      return;
+    }
+
+    // 2b. Dynamic Word Meaning Lookup (Instant answer for ANY word definition)
+    const dictTerm = extractDictionaryTerm(query);
+    if (dictTerm) {
+      try {
+        const wikiRes = await fetch(`/api/wiki?q=${encodeURIComponent(dictTerm)}`);
+        if (wikiRes.ok) {
+          const wikiData = await wikiRes.json();
+          if (wikiData.success && wikiData.extract) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `b-${Date.now()}`,
+                sender: 'bot',
+                text: `📖 [ডিকশনারি ও শব্দার্থ: ${wikiData.title}]\n\n• অর্থ ও সংক্ষিপ্ত সংজ্ঞা: ${wikiData.extract}`,
+                timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+                sourceBadge: 'স্মার্ট ডিকশনারি',
+                sourceUrl: wikiData.url
+              }
+            ]);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {}
+
+      try {
+        const aiRes = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: `"${dictTerm}" শব্দটির অর্থ ও সুনির্দিষ্ট সংক্ষিপ্ত সংজ্ঞা সহজ বাংলায় বুঝিয়ে বলুন (অনূর্ধ্ব ২ বাক্য)।` })
+        });
+        if (aiRes.ok) {
+          const aiData = await aiRes.json();
+          if (aiData.success && aiData.text) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `b-${Date.now()}`,
+                sender: 'bot',
+                text: `📖 [ডিকশনারি ও শব্দার্থ: ${dictTerm}]\n\n• অর্থ ও সংজ্ঞা:\n${aiData.text}`,
+                timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+                sourceBadge: 'স্মার্ট ডিকশনারি'
+              }
+            ]);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {}
+    }
+
+    // 3. Teacher-Specific WhatsApp Direct Connectivity Check
     const mentors = storage.getMentors();
     const isAskingForTeacher = 
       lowerQuery.includes('whatsapp') ||
@@ -292,9 +563,26 @@ export const FloatingChatbot: React.FC = () => {
         matchedAnswer = `🎓 ${matchedCourse.title}:\n• মেয়াদ: ${matchedCourse.duration}\n• অফার ভর্তি ফি: ${toBengaliNum(matchedCourse.admissionFee)} টাকা\n• নিয়মিত মাসিক ফি: ${toBengaliNum(matchedCourse.monthlyFee)} টাকা\n• কোর্স বিবরণ: ${matchedCourse.description}`;
         sourceBadge = 'কোর্স ক্যাটালগ';
       }
+      // D2. Check Founder / Head Teacher / Institute Info
+      else if (lowerQuery.includes('বোরহানউদ্দিন') || lowerQuery.includes('মহিম') || lowerQuery.includes('প্রতিষ্ঠাতা') || lowerQuery.includes('হেডস্যার') || lowerQuery.includes('প্রধান শিক্ষক') || lowerQuery.includes('প্রতিষ্ঠান') || lowerQuery.includes('ঠিকানা') || lowerQuery.includes('হটলাইন')) {
+        matchedAnswer = `🏛️ ${settings.name}:\n• প্রতিষ্ঠাতা ও প্রধান শিক্ষক: ${settings.founderName || 'বোরহানউদ্দিন মহিম'} (${settings.founderTitle || 'প্রধান শিক্ষক'})\n• ঠিকানা: ${settings.address || 'ঢাকা, বাংলাদেশ'}\n• হটলাইন: ${settings.phone || '01612118307'}\n• ইমেইল: ${settings.email || 'onlinetutionbyborhansir@gmail.com'}`;
+        sourceBadge = 'প্রতিষ্ঠান পরিচিতি';
+      }
+      // D3. Check Academic Results & Marksheets
+      else if (lowerQuery.includes('ফলাফল') || lowerQuery.includes('মার্কশিট') || lowerQuery.includes('গ্রেডশিট') || lowerQuery.includes('জিপিএ') || lowerQuery.includes('result') || lowerQuery.includes('marksheet')) {
+        matchedAnswer = `📊 একাডেমিক ফলাফল ও মার্কশিট:\nহোম পেজের "একাডেমিক ফলাফল ও মার্কশিট" অপশনে গিয়ে শিক্ষাবর্ষ, কোর্স ও আপনার রোল নম্বর নির্বাচন করলেই সাথে সাথে ডিজিটাল সিল ও প্রধান শিক্ষকের স্বাক্ষরযুক্ত অফিশিয়াল মার্কশিট ও গ্রেডশিট দেখতে ও ডাউনলোড/প্রিন্ট করতে পারবেন।`;
+        sourceBadge = 'ফলাফল ও মার্কশিট সিস্টেম';
+      }
+      // D4. Check Class Routine
+      else if (lowerQuery.includes('রুটিন') || lowerQuery.includes('routine') || lowerQuery.includes('ক্লাস টাইম') || lowerQuery.includes('ক্লাসের সময়')) {
+        const routines = storage.getRoutines();
+        const topRoutines = routines.slice(0, 4).map(r => `• ${r.day}: ${r.subject} (${r.time})`).join('\n');
+        matchedAnswer = `📅 লাইভ ক্লাস রুটিন:\n${topRoutines}\n\nসম্পূর্ণ রুটিন দেখতে হোম পেজের "ক্লাস রুটিন" বাটনে চাপুন।`;
+        sourceBadge = 'ক্লাস রুটিন';
+      }
     }
 
-    // E. Check Admin Custom Info Blocks & 50,000 words text
+    // E. Check Admin Custom Info Blocks
     if (!matchedAnswer && chatbotData.infoBlocks && chatbotData.infoBlocks.length > 0) {
       for (const block of chatbotData.infoBlocks) {
         if (!block.isActive) continue;
@@ -303,6 +591,24 @@ export const FloatingChatbot: React.FC = () => {
         if (matchesKeyword || lowerQuery.includes(blockTitle)) {
           matchedAnswer = `📌 [${block.title}]\n\n${block.content}`;
           sourceBadge = 'অ্যাডমিন তথ্য বক্স';
+          break;
+        }
+      }
+    }
+
+    // F. Search Central 500,000-Word Knowledge Base Text (Extract relevant concise paragraph/sentence)
+    if (!matchedAnswer && chatbotData.knowledgeBaseText && chatbotData.knowledgeBaseText.trim()) {
+      const kbParagraphs = chatbotData.knowledgeBaseText.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+      for (const p of kbParagraphs) {
+        const lowerP = p.toLowerCase();
+        const terms = lowerQuery.split(/[\s,?!;।+*()/-]+/).filter(w => w.length > 2);
+        const matchCount = terms.filter(t => lowerP.includes(t)).length;
+        if (matchCount >= 2 || (terms.length === 1 && lowerP.includes(terms[0]))) {
+          // Extract specific relevant sentences (under 60 words) rather than whole text
+          const sents = p.split(/(?<=[।.\n])\s*/).map(s => s.trim()).filter(Boolean);
+          const topSents = sents.filter(s => terms.some(t => s.toLowerCase().includes(t))).slice(0, 3);
+          matchedAnswer = `📌 [সেন্ট্রাল নলেজবেস]\n\n${topSents.length > 0 ? topSents.join(' ') : p.slice(0, 250) + '...'}`;
+          sourceBadge = 'সেন্ট্রাল নলেজবেস';
           break;
         }
       }
@@ -351,7 +657,35 @@ export const FloatingChatbot: React.FC = () => {
       // Wiki offline or error, proceed to fallback
     }
 
-    // 6. Intelligent Fallback with Teacher Direct Routing Option
+    // 6. Server-Side AI Chatbot Query (if Gemini API is configured)
+    try {
+      const aiRes = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: query })
+      });
+      if (aiRes.ok) {
+        const aiData = await aiRes.json();
+        if (aiData.success && aiData.text) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `b-${Date.now()}`,
+              sender: 'bot',
+              text: aiData.text,
+              timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+              sourceBadge: 'স্মার্ট এআই লার্নিং'
+            }
+          ]);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch {
+      // AI endpoint offline or unconfigured, proceed to teacher contact fallback
+    }
+
+    // 7. Intelligent Fallback with Teacher Direct Routing Option
     const borhanMentor = mentors.find(m => m.id === 'mentor-borhan') || mentors[0];
     const defaultWhatsApp = borhanMentor?.whatsappNumber || '01612118307';
     const fallbackWhatsAppUrl = formatWhatsAppLink(

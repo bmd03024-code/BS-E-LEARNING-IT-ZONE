@@ -34,6 +34,11 @@ export interface InstituteSettings {
   footerText?: string;
   footerCopyright?: string;
   footerNotice?: string;
+  // GitHub Auto-Push & Vercel Sync
+  githubRepo?: string;
+  githubBranch?: string;
+  githubToken?: string;
+  githubAutoPushEnabled?: boolean;
 }
 
 export interface HeroSlide {
@@ -181,6 +186,8 @@ export interface ResultRecord {
   studentName: string;
   fatherName: string;
   motherName: string;
+  address?: string;
+  phone?: string;
   examType: string;
   published: boolean;
   date: string;

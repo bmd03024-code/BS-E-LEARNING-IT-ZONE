@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
+import { GoogleGenAI } from '@google/genai';
 let firebaseConfig: any = {};
 try {
   const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
@@ -447,6 +448,43 @@ app.post('/api/ai/sync', (req: Request, res: Response) => {
   res.json({ success: true, version: dbVersion });
 });
 
+// Server-side Gemini AI Chat Assistant Endpoint (Secure proxy, never exposes API key)
+app.post('/api/ai/chat', async (req: Request, res: Response) => {
+  const { prompt } = req.body;
+  if (!prompt || typeof prompt !== 'string') {
+    return res.status(400).json({ error: 'Prompt is required' });
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return res.status(503).json({
+      error: 'GEMINI_API_KEY not configured',
+      available: false
+    });
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction: 'You are the intelligent Bengali-speaking AI assistant for BS E-Learning & IT Zone, founded by Borhanuddin Mohim. Help students, teachers, and learners with questions politely, accurately, and encouragingly in Bengali.'
+      }
+    });
+
+    return res.json({
+      success: true,
+      text: response.text
+    });
+  } catch (error: any) {
+    console.warn('[Gemini API Warning]:', error?.message || error);
+    return res.status(500).json({
+      error: error?.message || 'Gemini generation failed'
+    });
+  }
+});
+
 // Autonomous Wikipedia Free Search & Summary Endpoint
 app.get('/api/wiki', async (req: Request, res: Response) => {
   const query = (req.query.q as string || '').trim();
@@ -528,6 +566,135 @@ app.get('/api/wiki', async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       error: 'Wikipedia fetch failed'
+    });
+  }
+});
+
+// GitHub Auto-Push & Vercel Sync REST API Endpoints
+app.get('/api/github/status', async (req: Request, res: Response) => {
+  const token = (req.query.token as string) || process.env.GITHUB_TOKEN || 'ghp_pIXZV7TX3MvTATEBAddiNkqQ2FbhYK199i0b';
+  const repo = (req.query.repo as string) || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
+
+  try {
+    const ghRes = await fetch(`https://api.github.com/repos/${repo}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'BS-ELearning-Admin'
+      }
+    });
+
+    if (ghRes.ok) {
+      const data: any = await ghRes.json();
+      return res.json({
+        success: true,
+        connected: true,
+        fullName: data.full_name,
+        defaultBranch: data.default_branch,
+        updatedAt: data.updated_at,
+        htmlUrl: data.html_url
+      });
+    } else {
+      const errData: any = await ghRes.json().catch(() => ({}));
+      return res.json({
+        success: false,
+        connected: false,
+        status: ghRes.status,
+        error: errData.message || `GitHub HTTP Error ${ghRes.status}`
+      });
+    }
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      connected: false,
+      error: error?.message || 'Network error connecting to GitHub'
+    });
+  }
+});
+
+app.post('/api/github/push', async (req: Request, res: Response) => {
+  const token = req.body.token || process.env.GITHUB_TOKEN || 'ghp_pIXZV7TX3MvTATEBAddiNkqQ2FbhYK199i0b';
+  const repo = req.body.repo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
+  const branch = req.body.branch || 'main';
+  const filePath = req.body.path || 'data/institute_db.json';
+  const commitMsg = req.body.message || `Admin Auto-Sync: Updates to institute data [${new Date().toISOString()}]`;
+
+  try {
+    let contentStr = '';
+    if (req.body.content) {
+      contentStr = typeof req.body.content === 'string' ? req.body.content : JSON.stringify(req.body.content, null, 2);
+    } else if (fs.existsSync(DB_FILE)) {
+      contentStr = fs.readFileSync(DB_FILE, 'utf-8');
+    } else {
+      contentStr = JSON.stringify(database, null, 2);
+    }
+
+    const contentBase64 = Buffer.from(contentStr, 'utf-8').toString('base64');
+
+    // 1. Check if file already exists in repository to get its current SHA
+    let existingSha: string | undefined;
+    try {
+      const getFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'BS-ELearning-Admin'
+        }
+      });
+
+      if (getFileRes.ok) {
+        const fileData: any = await getFileRes.json();
+        existingSha = fileData.sha;
+      }
+    } catch (e) {
+      console.warn('[GitHub Sync] Could not fetch existing file SHA:', e);
+    }
+
+    // 2. Put file to commit directly to GitHub repository
+    const putPayload: any = {
+      message: commitMsg,
+      content: contentBase64,
+      branch
+    };
+    if (existingSha) {
+      putPayload.sha = existingSha;
+    }
+
+    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'BS-ELearning-Admin'
+      },
+      body: JSON.stringify(putPayload)
+    });
+
+    const putData: any = await putRes.json().catch(() => ({}));
+
+    if (putRes.ok) {
+      console.log(`[GitHub Sync] Successfully committed and pushed ${filePath} to ${repo}@${branch}`);
+      return res.json({
+        success: true,
+        commitSha: putData.commit?.sha,
+        commitUrl: putData.commit?.html_url,
+        message: 'সফলভাবে GitHub রিপোজিটরিতে ডাটা পুশ সম্পন্ন হয়েছে! Vercel স্বয়ংক্রিয়ভাবে লাইভ সাইট রি-ডিপ্লয় ও সিঙ্ক শুরু করেছে।'
+      });
+    } else {
+      console.warn('[GitHub Sync Warning]:', putData);
+      return res.status(putRes.status || 400).json({
+        success: false,
+        error: putData.message || 'GitHub commit failed',
+        status: putRes.status,
+        documentationUrl: putData.documentation_url
+      });
+    }
+  } catch (error: any) {
+    console.error('[GitHub Push Exception]:', error);
+    return res.status(500).json({
+      success: false,
+      error: error?.message || 'Failed to push to GitHub'
     });
   }
 });

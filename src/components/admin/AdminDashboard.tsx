@@ -69,10 +69,13 @@ import {
   Send,
   Globe,
   Activity,
-  Wifi
+  Wifi,
+  Github
 } from 'lucide-react';
 import { masterGateway, GatewayStatus } from '../../services/masterGateway';
 import { toBengaliNum } from '../home/CoursesSection';
+import { ResultGeneratorModule } from './ResultGeneratorModule';
+import { GitHubSyncModal } from './GitHubSyncModal';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -83,6 +86,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [activeModule, setActiveModule] = useState<number | null>(null);
   const [syncStatus, setSyncStatus] = useState<string>('সবকিছু সিঙ্কড');
   const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
+  const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
   const [gatewayStatus, setGatewayStatus] = useState<GatewayStatus>(() => masterGateway.getStatus());
   const [isManualSyncing, setIsManualSyncing] = useState(false);
 
@@ -213,6 +217,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         setTimeout(() => setSyncStatus('সবকিছু সিঙ্কড'), 3000);
         alert('✅ তথ্য স্থানীয় ও সার্ভার ক্যাশে সংরক্ষিত হয়েছে।');
       }
+
+      // Auto-push to GitHub repository for automatic Vercel live sync
+      if (settings.githubAutoPushEnabled !== false) {
+        const ghToken = settings.githubToken || 'ghp_pIXZV7TX3MvTATEBAddiNkqQ2FbhYK199i0b';
+        const ghRepo = settings.githubRepo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
+        const ghBranch = settings.githubBranch || 'main';
+        fetch('/api/github/push', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            token: ghToken,
+            repo: ghRepo,
+            branch: ghBranch,
+            content: fullState,
+            message: `Admin Auto-Sync: Updates to institute data [${new Date().toISOString()}]`
+          })
+        }).then(r => r.json()).then(res => {
+          if (res.success) {
+            console.log('[GitHub Auto-Push] Committed & Pushed to GitHub:', res.commitSha);
+          }
+        }).catch(err => {
+          console.warn('[GitHub Auto-Push Notice]:', err);
+        });
+      }
     } catch {
       setSyncStatus('সংরক্ষিত ✅');
       setTimeout(() => setSyncStatus('সবকিছু সিঙ্কড'), 3000);
@@ -248,7 +276,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     setTimeout(() => setSyncStatus('সবকিছু সিঙ্কড'), 2500);
   };
 
-  // The 14 Modules Catalog with exact user specifications
+  // The 17 Modules Catalog with exact user specifications
   const moduleCatalog = [
     { id: 1, title: 'প্রতিষ্ঠাতা, হেডার, ফুটার ও সিল-স্বাক্ষর', desc: 'লোগো পরিবর্তন, ফন্ট সাইজ, প্রধান শিক্ষকের বাণী/ছবি/স্বাক্ষর, সম্পূর্ণ ফুটার ও বাংলা কিউআর কন্ট্রোল', icon: Settings, color: 'from-blue-600 to-indigo-700' },
     { id: 2, title: 'হিরো স্লাইডার ম্যানেজমেন্ট', desc: 'হোম পেজের ৩টি স্লাইডের ছবি, শিরোনাম ও সাবটেক্সট এডিট এবং নতুন স্লাইড যোগ', icon: Sliders, color: 'from-amber-600 to-orange-700' },
@@ -264,7 +292,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     { id: 12, title: 'নোটিশ ও ফ্রি নোটস ম্যানেজমেন্ট', desc: 'ছবি ও পিডিএফ সহ নোটিশ প্রকাশ এবং ফ্রি হ্যান্ডনোট ও স্টাডি ফাইল আপলোড', icon: FileText, color: 'from-sky-600 to-blue-700' },
     { id: 13, title: 'গ্যালারি ও ফ্রি ডেমো ক্লাস', desc: 'সরাসরি ছবি-ভিডিও আপলোড এবং ইউটিউব ও ফেসবুক ভিডিও এমবেড/লিংক যুক্তকরণ', icon: ImageIcon, color: 'from-pink-600 to-rose-700' },
     { id: 14, title: 'সিকিউরিটি, পাসওয়ার্ড ও মাস্টার পিন (PIN)', desc: 'মাস্কড পাসওয়ার্ড, ইমেলহীন মাস্টার পিন রিকভারি সেটআপ ও সিকিউরিটি লগইন', icon: ShieldAlert, color: 'from-slate-700 to-slate-900' },
-    { id: 15, title: 'চ্যাটবট ও নলেজবেস কন্ট্রোল (৫০,০০০ শব্দ)', desc: 'ওয়েবসাইটের চ্যাটবক্স এডিট, বৃহৎ নলেজবেস টেক্সটবক্স (৫০,০০০ শব্দ পর্যন্ত), একাধিক তথ্য বক্স (Info Blocks) ও সেভ অপশন', icon: Bot, color: 'from-blue-600 via-indigo-600 to-purple-700' },
+    { id: 15, title: 'চ্যাটবট ও নলেজবেস কন্ট্রোল (৫,০০,০০০ শব্দ)', desc: 'ওয়েবসাইটের চ্যাটবক্স এডিট, বিশালাকার নলেজবেস (৫,০০,০০০ শব্দ পর্যন্ত), ১,০০০ শব্দের একাধিক ট্রেনিং বক্স যুক্ত ও এডিট করা, ক্যালকুলেটর ও ডিকশনারি কন্ট্রোল', icon: Bot, color: 'from-blue-600 via-indigo-600 to-purple-700' },
+    { id: 16, title: 'ফলাফল ও মার্কশিট জেনারেটর', desc: 'শিক্ষাবর্ষ, কোর্স ও রোল অনুযায়ী শিক্ষার্থীর অটো ডাটা লোড, বিষয়ভিত্তিক নম্বর এন্ট্রি, অটো জিপিএ ক্যালকুলেশন ও এক ক্লিকে পাবলিশ কন্ট্রোল', icon: BarChart3, color: 'from-emerald-600 via-teal-600 to-cyan-700' },
+    { id: 17, title: 'GitHub অটো পুশ ও লাইভ Vercel সিঙ্ক', desc: 'GitHub Personal Access Token দিয়ে মূল রিপোজিটরি (BS-E-LEARNING-IT-ZONE)-তে ডাটা অটো-পুশ ও Vercel লাইভ সিঙ্ক কন্ট্রোল', icon: Github, color: 'from-slate-900 via-purple-950 to-blue-950' },
   ];
 
   /* ---------------- MODULE 1: GENERAL SETTINGS, LOGO, FOOTER & SEALS ---------------- */
@@ -3706,19 +3736,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     </div>
   );
 
-  /* ---------------- MODULE 15: CHATBOT & 50,000-WORD KNOWLEDGE BASE ---------------- */
+  /* ---------------- MODULE 15: CHATBOT & 500,000-WORD KNOWLEDGE BASE ---------------- */
   const [kbText, setKbText] = useState(chatbot.knowledgeBaseText || '');
   const [infoBlocks, setInfoBlocks] = useState<ChatbotInfoBlock[]>(chatbot.infoBlocks || []);
   const [botName, setBotName] = useState(chatbot.botName || 'BS Learning নিজস্ব AI সহকারী');
   const [welcomeMsg, setWelcomeMsg] = useState(chatbot.welcomeMessage || '');
   const [activeChatTab, setActiveChatTab] = useState<'knowledge' | 'chunks' | 'qa' | 'blocks' | 'settings' | 'test'>('knowledge');
 
-  // 1,000-Word Structured Training Chunks State (Up to 200,000+ Words total)
+  // 1,000-Word Structured Training Chunks State (Up to 500,000+ Words total)
   const [trainingChunks, setTrainingChunks] = useState<TrainingChunk[]>(aiKnowledgeStore.getTrainingChunks());
   const [newChunkTitle, setNewChunkTitle] = useState('');
   const [newChunkCategory, setNewChunkCategory] = useState('কোর্স তথ্য ও কারিকুলাম');
   const [newChunkContent, setNewChunkContent] = useState('');
   const [newChunkTags, setNewChunkTags] = useState('');
+  const [editingChunkId, setEditingChunkId] = useState<string | null>(null);
 
   // Self-Learning Q&A Pairs (Teacher-Verified Dynamic Learning)
   const [qaList, setQaList] = useState<QAItem[]>(aiKnowledgeStore.getKnowledgeBase());
@@ -3739,7 +3770,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [testSource, setTestSource] = useState<string | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
 
-  // Word count calculations across the massive 200,000+ words store
+  // Word count calculations across the massive 500,000+ words store
   const countWords = (text: string) => {
     if (!text) return 0;
     return text.trim().split(/\s+/).filter(Boolean).length;
@@ -3749,7 +3780,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const chunksWordCount = trainingChunks.reduce((acc, c) => acc + countWords(c.title + ' ' + c.content), 0);
   const qaWordCount = qaList.reduce((acc, q) => acc + countWords(q.question + ' ' + q.answer), 0);
   const totalWordCount = kbWordCount + blocksWordCount + chunksWordCount + qaWordCount;
-  const maxWords = 200000;
+  const maxWords = 500000;
   const percentUsed = Math.min(100, Math.round((totalWordCount / maxWords) * 100));
 
   // Master Chatbot Save
@@ -3764,10 +3795,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     setChatbot(updated);
     storage.saveChatbot(updated);
     triggerSaveNotification(customMsg || 'চ্যাটবটের ডাটা সফলভাবে সংরক্ষিত হয়েছে!');
-    alert(customMsg || '✅ আলহামদুলিল্লাহ! ২০০,০০০+ শব্দের নলেজবেস ও সকল ট্রেনিং ডাটা সফলভাবে সংরক্ষিত হয়েছে এবং লাইভ ওয়েবসাইটে সক্রিয়!');
+    alert(customMsg || '✅ আলহামদুলিল্লাহ! ৫,০০,০০০ (পাঁচ লক্ষ) শব্দের নলেজবেস ও সকল ট্রেনিং ডাটা সফলভাবে সংরক্ষিত হয়েছে এবং লাইভ ওয়েবসাইটে সক্রিয়!');
   };
 
-  // Add 1,000-Word Structured Training Chunk
+  // Add or Update 1,000-Word Structured Training Chunk
   const handleAddTrainingChunk = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newChunkTitle.trim() || !newChunkContent.trim()) {
@@ -3775,18 +3806,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       return;
     }
     const tags = newChunkTags.split(',').map(t => t.trim()).filter(Boolean);
-    aiKnowledgeStore.saveTrainingChunk({
-      title: newChunkTitle.trim(),
-      category: newChunkCategory.trim() || 'সাধারণ জ্ঞান ও নীতি',
-      content: newChunkContent.trim(),
-      tags
-    });
-    setTrainingChunks([...aiKnowledgeStore.getTrainingChunks()]);
+    if (editingChunkId) {
+      aiKnowledgeStore.saveTrainingChunk({
+        id: editingChunkId,
+        title: newChunkTitle.trim(),
+        category: newChunkCategory.trim() || 'সাধারণ জ্ঞান ও নীতি',
+        content: newChunkContent.trim(),
+        tags
+      });
+      setTrainingChunks([...aiKnowledgeStore.getTrainingChunks()]);
+      setEditingChunkId(null);
+      setNewChunkTitle('');
+      setNewChunkContent('');
+      setNewChunkTags('');
+      triggerSaveNotification('১,০০০ শব্দের ট্রেনিং বক্স আপডেট ও সেভ হয়েছে!');
+      alert('✅ ১,০০০ শব্দের ট্রেনিং বক্স সফলভাবে আপডেট ও সংরক্ষিত হয়েছে!');
+    } else {
+      aiKnowledgeStore.saveTrainingChunk({
+        title: newChunkTitle.trim(),
+        category: newChunkCategory.trim() || 'সাধারণ জ্ঞান ও নীতি',
+        content: newChunkContent.trim(),
+        tags
+      });
+      setTrainingChunks([...aiKnowledgeStore.getTrainingChunks()]);
+      setNewChunkTitle('');
+      setNewChunkContent('');
+      setNewChunkTags('');
+      triggerSaveNotification('১,০০০ শব্দের ট্রেনিং বক্স ডাটাবেজে যুক্ত হয়েছে!');
+      alert('✅ ১,০০০ শব্দের ট্রেনিং বক্স সফলভাবে সংরক্ষিত হয়েছে!');
+    }
+  };
+
+  const handleEditTrainingChunk = (chunk: TrainingChunk) => {
+    setEditingChunkId(chunk.id);
+    setNewChunkTitle(chunk.title);
+    setNewChunkCategory(chunk.category);
+    setNewChunkContent(chunk.content);
+    setNewChunkTags(chunk.tags ? chunk.tags.join(', ') : '');
+    const element = document.getElementById('training-chunk-form');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleCancelEditChunk = () => {
+    setEditingChunkId(null);
     setNewChunkTitle('');
     setNewChunkContent('');
     setNewChunkTags('');
-    triggerSaveNotification('১,০০০ শব্দের ট্রেনিং বক্স ডাটাবেজে যুক্ত হয়েছে!');
-    alert('✅ ১,০০০ শব্দের ট্রেনিং বক্স সফলভাবে সংরক্ষিত হয়েছে!');
   };
 
   // Delete Training Chunk
@@ -3975,7 +4042,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
   const renderModule15 = () => (
     <div className="space-y-6">
-      {/* Top Banner with 50,000 Words Capacity Badge */}
+      {/* Top Banner with 500,000 Words Capacity Badge */}
       <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-white p-5 sm:p-7 rounded-3xl shadow-xl border border-blue-900/40 relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-8 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
         
@@ -3983,13 +4050,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 mb-2">
               <Bot className="w-4 h-4 text-amber-400" />
-              <span>চ্যাটবট ও ৫০,০০০ শব্দের বৃহৎ নলেজবেস কন্ট্রোল রুম</span>
+              <span>চ্যাটবট ও ৫,০০,০০০ (পাঁচ লক্ষ) শব্দের বিশালাকার নলেজবেস কন্ট্রোল রুম</span>
             </div>
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight">
               চ্যাটবট এডিটর ও মাল্টি-বক্স ডাটাবেজ
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
-              ওয়েবসাইটের চ্যাটবটকে আপনার প্রতিষ্ঠানের যেকোনো তথ্য শেখান। নিচে একটি বিশালাকার বক্সে ৫০,০০০ শব্দ পর্যন্ত তথ্য রাখতে পারেন অথবা বিষয়ভিত্তিক পৃথক পৃথক তথ্য বক্স যুক্ত করে সহজে সংরক্ষণ করতে পারেন।
+              ওয়েবসাইটের চ্যাটবটকে আপনার প্রতিষ্ঠানের যেকোনো তথ্য শেখান। নিচে একটি বিশালাকার বক্সে ৫,০০,০০০ শব্দ পর্যন্ত তথ্য রাখতে পারেন অথবা বিষয়ভিত্তিক পৃথক পৃথক ১,০০০ শব্দের তথ্য বক্স যুক্ত ও পরবর্তীতে এডিট করে সহজে সংরক্ষণ করতে পারেন।
             </p>
           </div>
 
@@ -4000,7 +4067,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 নলেজবেস শব্দ ক্যাপাসিটি
               </div>
               <div className="text-lg sm:text-xl font-black text-white mt-0.5">
-                {toBengaliNum(totalWordCount)} / ৫০,০০০ <span className="text-xs font-medium text-slate-300">শব্দ</span>
+                {toBengaliNum(totalWordCount)} / ৫,০০,০০০ <span className="text-xs font-medium text-slate-300">শব্দ</span>
               </div>
               {/* Progress bar */}
               <div className="w-full bg-slate-800 rounded-full h-2 mt-1.5 overflow-hidden border border-slate-700">
@@ -4101,14 +4168,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         </div>
       </div>
 
-      {/* ================= TAB 1: LARGE 50,000-WORD KNOWLEDGE BASE TEXTAREA ================= */}
+      {/* ================= TAB 1: LARGE 500,000-WORD KNOWLEDGE BASE TEXTAREA ================= */}
       {activeChatTab === 'knowledge' && (
         <div className="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
             <div>
               <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-blue-900" />
-                <span>৫০,০০০ শব্দের বৃহৎ সেন্ট্রাল নলেজবেস বক্স</span>
+                <span>৫,০০,০০০ (পাঁচ লক্ষ) শব্দের বিশালাকার সেন্ট্রাল নলেজবেস বক্স</span>
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 এখানে প্রতিষ্ঠানের সমস্ত সিলেবাস, রুলস, নিয়মাবলী, প্রশ্নোত্তর বা নোটস টাইপ বা পেস্ট করে সেভ করুন।
@@ -4158,7 +4225,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               rows={20}
               value={kbText}
               onChange={(e) => setKbText(e.target.value)}
-              placeholder="এখানে প্রতিষ্ঠানের সমস্ত তথ্য, কোর্স নীতিমালা, সিলেবাস, নোটিশ, ভর্তি ও পেমেন্টের নির্দেশিকা পেস্ট বা টাইপ করুন (৫০,০০০ শব্দ পর্যন্ত গ্রহণ করবে)..."
+              placeholder="এখানে প্রতিষ্ঠানের সমস্ত তথ্য, কোর্স নীতিমালা, সিলেবাস, নোটিশ, ভর্তি ও পেমেন্টের নির্দেশিকা পেস্ট বা টাইপ করুন (৫,০০,০০০ শব্দ পর্যন্ত গ্রহণ করবে)..."
               className="w-full p-4 sm:p-5 rounded-2xl border-2 border-slate-300 focus:border-blue-700 focus:outline-hidden text-xs sm:text-sm font-mono leading-relaxed bg-slate-900 text-emerald-300 placeholder:text-slate-500 shadow-inner resize-y selection:bg-amber-400 selection:text-slate-950"
             />
             <div className="absolute right-4 bottom-4 px-3 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-[11px] text-slate-300 font-mono border border-slate-700 pointer-events-none">
@@ -4170,7 +4237,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>
-                শিক্ষার্থী চ্যাটবটে প্রশ্ন করলেই এই নলেজবেসের সংশ্লিষ্ট অংশ সার্চ করে সঠিক উত্তর প্রদান করা হবে।
+                শিক্ষার্থী চ্যাটবটে প্রশ্ন করলেই এই নলেজবেসের সংশ্লিষ্ট অংশ সার্চ করে সুনির্দিষ্ট সংক্ষিপ্ত উত্তর প্রদান করা হবে।
               </span>
             </div>
             <button
@@ -4184,24 +4251,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         </div>
       )}
 
-      {/* ================= TAB 2: 1,000-WORD STRUCTURED TRAINING PANELS (UP TO 200,000+ WORDS) ================= */}
+      {/* ================= TAB 2: 1,000-WORD STRUCTURED TRAINING PANELS (UP TO 500,000+ WORDS) ================= */}
       {activeChatTab === 'chunks' && (
         <div className="space-y-6">
-          {/* Add 1,000-Word Structured Training Box */}
-          <div className="bg-white p-5 sm:p-7 rounded-3xl border border-blue-200 shadow-sm space-y-4">
+          {/* Add / Edit 1,000-Word Structured Training Box */}
+          <div id="training-chunk-form" className={`bg-white p-5 sm:p-7 rounded-3xl border shadow-sm space-y-4 transition-all ${editingChunkId ? 'border-amber-400 ring-2 ring-amber-300/40' : 'border-blue-200'}`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-blue-900" />
-                  <span>১,০০০ শব্দের নতুন স্ট্রাকচার্ড ট্রেনিং বক্স (Structured Training Panel)</span>
+                  {editingChunkId ? <Edit className="w-5 h-5 text-amber-600" /> : <Plus className="w-5 h-5 text-blue-900" />}
+                  <span>{editingChunkId ? '১,০০০ শব্দের ট্রেনিং বক্স এডিট করুন' : '১,০০০ শব্দের নতুন স্ট্রাকচার্ড ট্রেনিং বক্স (Structured Training Panel)'}</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  প্রতিটি বক্সে ১,০০০ শব্দ পর্যন্ত প্রাতিষ্ঠানিক সিলেবাস, নিয়মাবলী ও বিস্তারিত জ্ঞান যুক্ত করুন। একাধিক বক্স মিলে ২০০,০০০+ শব্দ সাপোর্ট করবে।
+                  প্রতিটি বক্সে ১,০০০ শব্দ পর্যন্ত প্রাতিষ্ঠানিক সিলেবাস, নিয়মাবলী ও বিস্তারিত জ্ঞান যুক্ত বা এডিট করুন। একাধিক বক্স মিলে ৫,০০,০০০ শব্দ সাপোর্ট করবে।
                 </p>
               </div>
-              <span className="text-xs font-bold px-3 py-1 bg-blue-100 text-blue-900 rounded-full shrink-0">
-                ক্যাপাসিটি: ১,০০০ শব্দ / বক্স
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                {editingChunkId && (
+                  <span className="text-xs font-bold px-3 py-1 bg-amber-100 text-amber-900 rounded-full">
+                    এডিট মোড সক্রিয়
+                  </span>
+                )}
+                <span className="text-xs font-bold px-3 py-1 bg-blue-100 text-blue-900 rounded-full">
+                  ক্যাপাসিটি: ১,০০০ শব্দ / বক্স
+                </span>
+              </div>
             </div>
 
             <form onSubmit={handleAddTrainingChunk} className="space-y-4">
@@ -4273,13 +4347,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 />
               </div>
 
-              <div className="flex justify-end pt-1">
+              <div className="flex items-center justify-end gap-2 pt-1">
+                {editingChunkId && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEditChunk}
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-colors"
+                  >
+                    বাতিল করুন
+                  </button>
+                )}
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-colors"
+                  className={`px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-colors text-white ${editingChunkId ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-900 hover:bg-blue-800'}`}
                 >
-                  <Plus className="w-4 h-4 text-amber-300" />
-                  <span>ট্রেনিং বক্স ডাটাবেজে যুক্ত ও সেভ করুন</span>
+                  {editingChunkId ? <Save className="w-4 h-4 text-white" /> : <Plus className="w-4 h-4 text-amber-300" />}
+                  <span>{editingChunkId ? 'ট্রেনিং বক্স আপডেট ও সেভ করুন' : 'ট্রেনিং বক্স ডাটাবেজে যুক্ত ও সেভ করুন'}</span>
                 </button>
               </div>
             </form>
@@ -4318,10 +4401,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                         </h4>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-bold font-mono">
                           {toBengaliNum(chunk.wordCount || countWords(chunk.content))} শব্দ
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => handleEditTrainingChunk(chunk)}
+                          className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="এডিট করুন"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
                         <button
                           type="button"
                           onClick={() => handleDeleteTrainingChunk(chunk.id)}
@@ -4739,7 +4830,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <span>অ্যাডমিন লাইভ চ্যাটবট টেস্ট সিমুলেটর</span>
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              এখানে যেকোনো প্রশ্ন লিখে টেস্ট করুন আপনার সেভ করা ৫০,০০০ শব্দের নলেজবেস ও তথ্য বক্স সঠিকভাবে কাজ করছে কি না।
+              এখানে যেকোনো প্রশ্ন লিখে টেস্ট করুন আপনার সেভ করা ৫,০০,০০০ শব্দের নলেজবেস ও তথ্য বক্স সঠিকভাবে কাজ করছে কি না।
             </p>
           </div>
 
@@ -4821,6 +4912,91 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     </div>
   );
 
+  /* ---------------- MODULE 16: RESULT & MARKSHEET GENERATOR ---------------- */
+  const renderModule16 = () => (
+    <ResultGeneratorModule
+      courses={courses}
+      students={students}
+      results={results}
+      settings={settings}
+      onUpdateResults={(newResults) => {
+        setResults(newResults);
+        storage.saveResults(newResults);
+      }}
+      triggerNotification={triggerSaveNotification}
+    />
+  );
+
+  /* ---------------- MODULE 17: GITHUB AUTO-PUSH & VERCEL SYNC ---------------- */
+  const renderModule17 = () => (
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-slate-950 via-purple-950 to-blue-950 text-white p-6 sm:p-8 rounded-3xl shadow-xl border border-purple-900/40 relative overflow-hidden">
+        <div className="absolute right-0 top-0 translate-x-12 -translate-y-8 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-purple-400/20 text-purple-300 border border-purple-400/30 mb-2">
+              <Github className="w-4 h-4 text-purple-300" />
+              <span>GitHub Auto-Push &amp; Vercel Live Deploy Hub</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black">GitHub অটো পুশ ও লাইভ Vercel সিঙ্ক</h2>
+            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
+              অ্যাডমিন প্যানেলের যেকোনো ডাটা বা সেটিংস পরিবর্তন করলে স্বয়ংক্রিয়ভাবে মূল GitHub রিপোজিটরি (<code className="text-purple-300 font-mono">bmd03024-code/BS-E-LEARNING-IT-ZONE</code>)-তে কমিট ও পুশ হয়ে যায় এবং সংযুক্ত Vercel প্রজেক্টে স্বয়ংক্রিয় লাইভ রি-ডিপ্লয় হয়।
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsGitHubModalOpen(true)}
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg transition-all shrink-0 active:scale-95 cursor-pointer"
+          >
+            <Github className="w-4 h-4" />
+            <span>কনফিগারেশন ও লাইভ পুশ প্যানেল</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+          <div className="flex items-center gap-2 text-purple-900 font-bold text-sm">
+            <Github className="w-4 h-4 text-purple-700" />
+            <span>টার্গেট রিপোজিটরি</span>
+          </div>
+          <div className="text-xs font-mono font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-200 break-all">
+            {settings.githubRepo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE'}
+          </div>
+          <p className="text-[11px] text-slate-500">ডিফল্ট ব্রাঞ্চ: <b>{settings.githubBranch || 'main'}</b></p>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+          <div className="flex items-center gap-2 text-emerald-900 font-bold text-sm">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>অটো-পুশ স্ট্যাটাস</span>
+          </div>
+          <div className="text-xs font-semibold text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>{settings.githubAutoPushEnabled !== false ? 'অটো-পুশ সক্রিয় (Active)' : 'নিষ্ক্রিয়'}</span>
+          </div>
+          <p className="text-[11px] text-slate-500">সেভ বাটনে চাপলেই সরাসরি পুশ কার্যকর হবে</p>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+          <div className="flex items-center gap-2 text-blue-900 font-bold text-sm">
+            <RefreshCw className="w-4 h-4 text-blue-700" />
+            <span>ম্যানুয়াল একশন</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsGitHubModalOpen(true)}
+            className="w-full py-2.5 px-4 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-amber-300" />
+            <span>এখনই পুশ ও সিঙ্ক টেস্ট করুন</span>
+          </button>
+          <p className="text-[11px] text-slate-500 text-center">টোকেন ভেরিফিকেশন ও লাইভ পুশ টেস্ট</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 pb-16">
       {/* Admin Top Bar */}
@@ -4846,6 +5022,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="hidden sm:inline">গেটওয়ে:</span>
               <span className="text-emerald-300 font-bold">{syncStatus}</span>
+            </button>
+
+            <button
+              onClick={() => setIsGitHubModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 hover:border-purple-500/50 transition-all cursor-pointer shadow-xs"
+              title="GitHub অটো-পুশ ও Vercel লাইভ সিঙ্ক উইন্ডো ওপেন করুন"
+            >
+              <Github className="w-3.5 h-3.5 text-purple-400" />
+              <span className="hidden sm:inline">GitHub:</span>
+              <span className="text-purple-300 font-bold">অটো-পুশ</span>
             </button>
 
             <button
@@ -4885,12 +5071,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       {/* Main Admin Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {activeModule === null ? (
-          /* 14 Module Dashboard */
+          /* 17 Module Dashboard */
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
-                  শর্টকাট ড্যাশবোর্ড (১৫টি মডিউল)
+                  শর্টকাট ড্যাশবোর্ড (১৭টি মডিউল)
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-600 mt-1">
                   যেকোনো একটি মডিউলে ক্লিক করে সংশ্লিষ্ট ডাটাবেজ এডিট ও প্রিন্ট করুন
@@ -4953,7 +5139,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 transition-colors shadow-xs"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>১৫টি শর্টকাট মেনুতে ফিরে যান</span>
+                <span>১৭টি শর্টকাট মেনুতে ফিরে যান</span>
               </button>
 
               <div className="text-right flex items-center gap-3">
@@ -4988,6 +5174,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             {activeModule === 13 && renderModule13()}
             {activeModule === 14 && renderModule14()}
             {activeModule === 15 && renderModule15()}
+            {activeModule === 16 && renderModule16()}
+            {activeModule === 17 && renderModule17()}
           </div>
         )}
       </main>
@@ -5874,6 +6062,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           </div>
         </div>
       )}
+
+      {/* GitHub Auto-Push & Vercel Sync Modal */}
+      <GitHubSyncModal
+        isOpen={isGitHubModalOpen}
+        onClose={() => setIsGitHubModalOpen(false)}
+        settings={settings}
+        onUpdateSettings={(newSettings) => {
+          setSettings(newSettings);
+          storage.saveSettings(newSettings);
+        }}
+        triggerNotification={triggerSaveNotification}
+      />
     </div>
   );
 };
