@@ -1021,7 +1021,8 @@ app.post('/api/github/push', async (req: Request, res: Response) => {
       body: JSON.stringify(putPayload)
     });
 
-    const putData: any = await putRes.json().catch(() => ({}));
+    const responseText = await putRes.text();
+const putData = responseText ? JSON.parse(responseText) : {};
 
     if (putRes.ok) {
       console.log(`[GitHub Sync] Successfully committed and pushed ${filePath} to ${repo}@${branch}`);
