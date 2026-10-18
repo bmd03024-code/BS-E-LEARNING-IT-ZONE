@@ -18,7 +18,9 @@ import {
   ChatbotInfoBlock,
   EnrollmentApplication,
   AdminCredentials,
-  CertificateRecord
+  CertificateRecord,
+  AIProviderType,
+  AISettings
 } from '../../types';
 import { storage, DEFAULT_ASSETS, compressImage } from '../../services/storage';
 import { aiKnowledgeStore, QAItem, TrainingChunk } from '../../services/aiKnowledgeStore';
@@ -70,12 +72,17 @@ import {
   Globe,
   Activity,
   Wifi,
-  Github
+  Github,
+  Database,
+  Cpu,
+  Key,
+  Zap
 } from 'lucide-react';
 import { masterGateway, GatewayStatus } from '../../services/masterGateway';
 import { toBengaliNum } from '../home/CoursesSection';
 import { ResultGeneratorModule } from './ResultGeneratorModule';
 import { GitHubSyncModal } from './GitHubSyncModal';
+import { SupabaseSyncModal } from './SupabaseSyncModal';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -87,6 +94,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [syncStatus, setSyncStatus] = useState<string>('সবকিছু সিঙ্কড');
   const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
+  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [gatewayStatus, setGatewayStatus] = useState<GatewayStatus>(() => masterGateway.getStatus());
   const [isManualSyncing, setIsManualSyncing] = useState(false);
 
@@ -4215,7 +4223,86 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [infoBlocks, setInfoBlocks] = useState<ChatbotInfoBlock[]>(chatbot.infoBlocks || []);
   const [botName, setBotName] = useState(chatbot.botName || 'BS Learning নিজস্ব AI সহকারী');
   const [welcomeMsg, setWelcomeMsg] = useState(chatbot.welcomeMessage || '');
-  const [activeChatTab, setActiveChatTab] = useState<'knowledge' | 'chunks' | 'qa' | 'blocks' | 'settings' | 'test'>('knowledge');
+  const [activeChatTab, setActiveChatTab] = useState<'knowledge' | 'chunks' | 'qa' | 'blocks' | 'settings' | 'ai_engine' | 'test'>('knowledge');
+
+  // Dynamic Multi-AI Engine State (Gemini, Groq, OpenRouter)
+  const [activeAIProvider, setActiveAIProvider] = useState<AIProviderType>(
+    chatbot.aiSettings?.activeProvider || 'gemini'
+  );
+  const [geminiApiKey, setGeminiApiKey] = useState(chatbot.aiSettings?.geminiApiKey || '');
+  const [geminiModel, setGeminiModel] = useState(chatbot.aiSettings?.geminiModel || 'gemini-3.8-flash');
+  const [groqApiKey, setGroqApiKey] = useState(chatbot.aiSettings?.groqApiKey || '');
+  const [groqModel, setGroqModel] = useState(chatbot.aiSettings?.groqModel || 'llama-3.3-70b-versatile');
+  const [openrouterApiKey, setOpenrouterApiKey] = useState(chatbot.aiSettings?.openrouterApiKey || '');
+  const [openrouterModel, setOpenrouterModel] = useState(chatbot.aiSettings?.openrouterModel || 'meta-llama/llama-3.2-3b-instruct:free');
+  const [aiFallbackLocal, setAiFallbackLocal] = useState<boolean>(
+    chatbot.aiSettings?.fallbackToLocal !== undefined ? chatbot.aiSettings.fallbackToLocal : true
+  );
+
+  // AI Connection Test state
+  const [isTestingAI, setIsTestingAI] = useState(false);
+  const [aiTestResult, setAiTestResult] = useState<{
+    success: boolean;
+    provider: string;
+    text?: string;
+    error?: string;
+    latencyMs?: number;
+  } | null>(null);
+
+  // Fetch current server AI settings on mount
+  useEffect(() => {
+    fetch('/api/ai/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.activeProvider) setActiveAIProvider(data.activeProvider);
+        if (data.geminiModel) setGeminiModel(data.geminiModel);
+        if (data.groqModel) setGroqModel(data.groqModel);
+        if (data.openrouterModel) setOpenrouterModel(data.openrouterModel);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Test selected AI Provider Connection
+  const handleTestAIConnection = async (providerToTest?: AIProviderType) => {
+    const prov = providerToTest || activeAIProvider;
+    setIsTestingAI(true);
+    setAiTestResult(null);
+
+    let keyToTest = '';
+    let modelToTest = '';
+    if (prov === 'gemini') {
+      keyToTest = geminiApiKey.trim();
+      modelToTest = geminiModel.trim();
+    } else if (prov === 'groq') {
+      keyToTest = groqApiKey.trim();
+      modelToTest = groqModel.trim();
+    } else if (prov === 'openrouter') {
+      keyToTest = openrouterApiKey.trim();
+      modelToTest = openrouterModel.trim();
+    }
+
+    try {
+      const res = await fetch('/api/ai/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: prov,
+          apiKey: keyToTest,
+          model: modelToTest
+        })
+      });
+      const data = await res.json();
+      setAiTestResult(data);
+    } catch (err: any) {
+      setAiTestResult({
+        success: false,
+        provider: prov,
+        error: err?.message || 'সার্ভারের সাথে সংযোগ স্থাপন করা যায়নি।'
+      });
+    } finally {
+      setIsTestingAI(false);
+    }
+  };
 
   // 1,000-Word Structured Training Chunks State (Up to 500,000+ Words total)
   const [trainingChunks, setTrainingChunks] = useState<TrainingChunk[]>(aiKnowledgeStore.getTrainingChunks());
@@ -4258,18 +4345,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const percentUsed = Math.min(100, Math.round((totalWordCount / maxWords) * 100));
 
   // Master Chatbot Save
-  const handleSaveChatbotAll = (customMsg?: string) => {
+  const handleSaveChatbotAll = async (customMsg?: string) => {
+    const aiConfig: AISettings = {
+      activeProvider: activeAIProvider,
+      geminiApiKey: geminiApiKey.trim(),
+      geminiModel: geminiModel.trim(),
+      groqApiKey: groqApiKey.trim(),
+      groqModel: groqModel.trim(),
+      openrouterApiKey: openrouterApiKey.trim(),
+      openrouterModel: openrouterModel.trim(),
+      fallbackToLocal: aiFallbackLocal
+    };
+
     const updated: ChatbotSettings = {
       ...chatbot,
       botName: botName.trim(),
       welcomeMessage: welcomeMsg.trim(),
       knowledgeBaseText: kbText.trim(),
       infoBlocks: infoBlocks,
+      aiSettings: aiConfig
     };
     setChatbot(updated);
     storage.saveChatbot(updated);
-    triggerSaveNotification(customMsg || 'চ্যাটবটের ডাটা সফলভাবে সংরক্ষিত হয়েছে!');
-    alert(customMsg || '✅ আলহামদুলিল্লাহ! ৫,০০,০০০ (পাঁচ লক্ষ) শব্দের নলেজবেস ও সকল ট্রেনিং ডাটা সফলভাবে সংরক্ষিত হয়েছে এবং লাইভ ওয়েবসাইটে সক্রিয়!');
+
+    // Also push AI settings to backend server so backend immediately switches provider
+    try {
+      await fetch('/api/ai/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(aiConfig)
+      });
+    } catch (e) {
+      console.warn('Could not sync AI settings to server:', e);
+    }
+
+    triggerSaveNotification(customMsg || 'চ্যাটবটের ডাটা ও AI ইঞ্জিন সেটিংস সফলভাবে সংরক্ষিত হয়েছে!');
+    alert(customMsg || '✅ আলহামদুলিল্লাহ! ৫,০০,০০০ শব্দের নলেজবেস ও মাল্টি-এআই (Gemini / Groq / OpenRouter) সেটিংস সফলভাবে সংরক্ষিত ও ব্যাকএন্ডে সক্রিয়!');
   };
 
   // Add or Update 1,000-Word Structured Training Chunk
@@ -4629,6 +4740,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           </button>
 
           <button
+            onClick={() => setActiveChatTab('ai_engine')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+              activeChatTab === 'ai_engine'
+                ? 'bg-amber-400 text-slate-950 shadow-md font-extrabold'
+                : 'bg-white/10 text-white hover:bg-white/20'
+            }`}
+          >
+            <Cpu className="w-3.5 h-3.5" />
+            <span>৭. মাল্টি-AI সুইচিং (Gemini, Groq, OpenRouter)</span>
+          </button>
+
+          <button
             onClick={() => setActiveChatTab('test')}
             className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
               activeChatTab === 'test'
@@ -4637,7 +4760,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             }`}
           >
             <Send className="w-3.5 h-3.5" />
-            <span>৬. লাইভ চ্যাট টেস্ট ও উইকিপিডিয়া</span>
+            <span>৮. লাইভ চ্যাট টেস্ট ও সিমুলেটর</span>
           </button>
         </div>
       </div>
@@ -5295,6 +5418,417 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         </div>
       )}
 
+      {/* ================= TAB 7: DYNAMIC MULTI-AI ENGINE SETTINGS (Gemini, Groq, OpenRouter) ================= */}
+      {activeChatTab === 'ai_engine' && (
+        <div className="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-6">
+          <div className="border-b pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 mb-1">
+                <Cpu className="w-3.5 h-3.5" />
+                <span>ডাইনামিক মাল্টি-AI এপিআই সুইচিং ইঞ্জিন</span>
+              </div>
+              <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                AI প্রোভাইডার সেটিংস (Gemini, Groq, OpenRouter)
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                এডমিন প্যানেল থেকে পছন্দমতো যেকোনো ফ্রি এআই প্রোভাইডার নির্বাচন করুন এবং নিজ নিজ API Key দিয়ে এক ক্লিকে সেভ করুন।
+              </p>
+            </div>
+
+            <button
+              onClick={() => handleSaveChatbotAll('এআই প্রোভাইডার ও API Key সফলভাবে সংরক্ষিত হয়েছে!')}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 shrink-0"
+            >
+              <Save className="w-4 h-4 text-amber-200" />
+              <span>AI সেটিংস সংরক্ষণ করুন</span>
+            </button>
+          </div>
+
+          {/* 1. Active Provider Dropdown & Radio Cards */}
+          <div className="space-y-3">
+            <label className="block text-xs font-black uppercase text-slate-700 tracking-wider">
+              ১. বর্তমানে সক্রিয় AI প্রোভাইডার নির্বাচন করুন:
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              
+              {/* Google Gemini Card */}
+              <div
+                onClick={() => setActiveAIProvider('gemini')}
+                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                  activeAIProvider === 'gemini'
+                    ? 'border-blue-600 bg-blue-50/70 shadow-md ring-2 ring-blue-600/20'
+                    : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-black text-blue-900 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-blue-600" /> Google Gemini
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-200 text-blue-950">
+                    রেকমেন্ডেড
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  গুগলের শক্তিশালী ফ্ল্যাশ মডেল। চমৎকার বাংলা বোঝে ও অতি দ্রুত প্রাতিষ্ঠানিক তথ্য বুঝিয়ে বলে।
+                </p>
+                <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-blue-700">
+                  <span>মডেল: {geminiModel}</span>
+                  {activeAIProvider === 'gemini' && <Check className="w-4 h-4 text-blue-600" />}
+                </div>
+              </div>
+
+              {/* Groq Card */}
+              <div
+                onClick={() => setActiveAIProvider('groq')}
+                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                  activeAIProvider === 'groq'
+                    ? 'border-orange-500 bg-orange-50/70 shadow-md ring-2 ring-orange-500/20'
+                    : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-black text-orange-950 flex items-center gap-1.5">
+                    <Zap className="w-4 h-4 text-orange-500" /> Groq Cloud
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-200 text-orange-950">
+                    আল্ট্রা ফাস্ট
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  বিশ্বের দ্রুততম LPU ইনফারেন্স ইঞ্জিন। LLaMA 3.3 70B ও 8B মডেল দিয়ে চোখের পলকে উত্তর দেয়।
+                </p>
+                <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-orange-800">
+                  <span>মডেল: {groqModel}</span>
+                  {activeAIProvider === 'groq' && <Check className="w-4 h-4 text-orange-600" />}
+                </div>
+              </div>
+
+              {/* OpenRouter Card */}
+              <div
+                onClick={() => setActiveAIProvider('openrouter')}
+                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                  activeAIProvider === 'openrouter'
+                    ? 'border-purple-600 bg-purple-50/70 shadow-md ring-2 ring-purple-600/20'
+                    : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-black text-purple-950 flex items-center gap-1.5">
+                    <Globe className="w-4 h-4 text-purple-600" /> OpenRouter
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-200 text-purple-950">
+                    ফ্রি গেটওয়ে
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  ইউনিভার্সাল এআই হাব। LLaMA 3.2, DeepSeek ও শত শত ফ্রি ওপেন-সোর্স এআই মডেল অ্যাক্সেস করুন।
+                </p>
+                <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-purple-800">
+                  <span className="truncate max-w-[130px]">মডেল: {openrouterModel}</span>
+                  {activeAIProvider === 'openrouter' && <Check className="w-4 h-4 text-purple-600" />}
+                </div>
+              </div>
+
+              {/* Local Only Card */}
+              <div
+                onClick={() => setActiveAIProvider('local_only')}
+                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                  activeAIProvider === 'local_only'
+                    ? 'border-emerald-600 bg-emerald-50/70 shadow-md ring-2 ring-emerald-600/20'
+                    : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-black text-emerald-950 flex items-center gap-1.5">
+                    <Database className="w-4 h-4 text-emerald-600" /> লোকাল নলেজবেস
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-200 text-emerald-950">
+                    ১০০% অফলাইন
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  কোনো ক্লাউড এপিআই ছাড়াই শুধু এডমিন প্যানেলের ৫ লক্ষ শব্দের স্টোর ও শিক্ষক প্রশ্নোত্তর দিয়ে চলবে।
+                </p>
+                <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-emerald-800">
+                  <span>জিরো এপিআই খরচ</span>
+                  {activeAIProvider === 'local_only' && <Check className="w-4 h-4 text-emerald-600" />}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* 2. Provider API Credentials & Configuration Accordions */}
+          <div className="space-y-4 pt-2">
+            
+            {/* Google Gemini Config Box */}
+            <div className={`p-5 rounded-2xl border transition-all ${
+              activeAIProvider === 'gemini' ? 'bg-blue-50/40 border-blue-200 ring-1 ring-blue-300/40' : 'bg-slate-50/60 border-slate-200'
+            }`}>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                    G
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">Google Gemini API কনফিগারেশন</h4>
+                    <p className="text-[11px] text-slate-500">গুগল এআই স্টুডিও থেকে সম্পূর্ণ ফ্রি এপিআই কি সংগ্রহ করা যায়</p>
+                  </div>
+                </div>
+                <a
+                  href="https://aistudio.google.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 hover:text-blue-900 underline"
+                >
+                  <span>ফ্রি API Key নিন</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Gemini API Key
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      placeholder="AIzaSy..."
+                      value={geminiApiKey}
+                      onChange={(e) => setGeminiApiKey(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-mono focus:outline-hidden focus:ring-2 focus:ring-blue-600 bg-white"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1">কোডের ভেতর কোনো কি হার্ডকোড থাকবে না; এটি সুরক্ষিতভাবে সংরক্ষিত হবে।</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Gemini মডেল নির্বাচন
+                  </label>
+                  <select
+                    value={geminiModel}
+                    onChange={(e) => setGeminiModel(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
+                  >
+                    <option value="gemini-3.8-flash">gemini-3.8-flash (সর্বাধুনিক, নির্ভুল ও দ্রুততম - রেকমেন্ডেড)</option>
+                    <option value="gemini-2.5-flash">gemini-2.5-flash (ফ্ল্যাশ)</option>
+                    <option value="gemini-1.5-flash">gemini-1.5-flash (হালকা)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Groq Config Box */}
+            <div className={`p-5 rounded-2xl border transition-all ${
+              activeAIProvider === 'groq' ? 'bg-orange-50/40 border-orange-200 ring-1 ring-orange-300/40' : 'bg-slate-50/60 border-slate-200'
+            }`}>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-orange-600 text-white flex items-center justify-center font-bold text-xs">
+                    Q
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">Groq Cloud API কনফিগারেশন</h4>
+                    <p className="text-[11px] text-slate-500">Groq Console থেকে ফ্রি হাই-স্পিড LPU এপিআই কি সংগ্রহ করুন</p>
+                  </div>
+                </div>
+                <a
+                  href="https://console.groq.com/keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-700 hover:text-orange-900 underline"
+                >
+                  <span>Groq API Key নিন</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Groq API Key
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="gsk_..."
+                    value={groqApiKey}
+                    onChange={(e) => setGroqApiKey(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-mono focus:outline-hidden focus:ring-2 focus:ring-orange-500 bg-white"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Groq সম্পূর্ণ বিনামূল্যে দৈনিক হাজার হাজার টোকেন প্রদান করে।</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Groq মডেল নির্বাচন
+                  </label>
+                  <select
+                    value={groqModel}
+                    onChange={(e) => setGroqModel(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium bg-white focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (সেরা পারফরম্যান্স ও গভীর জ্ঞান)</option>
+                    <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (তাত্ক্ষণিক ও হালকা)</option>
+                    <option value="mixtral-8x7b-32768">mixtral-8x7b-32768 (বিশাল কনটেক্সট উইন্ডো)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* OpenRouter Config Box */}
+            <div className={`p-5 rounded-2xl border transition-all ${
+              activeAIProvider === 'openrouter' ? 'bg-purple-50/40 border-purple-200 ring-1 ring-purple-300/40' : 'bg-slate-50/60 border-slate-200'
+            }`}>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center font-bold text-xs">
+                    R
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">OpenRouter API কনফিগারেশন</h4>
+                    <p className="text-[11px] text-slate-500">ওপেনরাউটার থেকে ফ্রি টায়ার মডেলের যেকোনো এপিআই কি ব্যবহার করুন</p>
+                  </div>
+                </div>
+                <a
+                  href="https://openrouter.ai/keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 hover:text-purple-900 underline"
+                >
+                  <span>OpenRouter Key নিন</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    OpenRouter API Key
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="sk-or-v1-..."
+                    value={openrouterApiKey}
+                    onChange={(e) => setOpenrouterApiKey(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-mono focus:outline-hidden focus:ring-2 focus:ring-purple-500 bg-white"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">নাম্বার ও ইমেইল দিয়ে ফ্রি একাউন্ট খুলেই সাথে সাথে কি পাওয়া যায়।</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    OpenRouter মডেল নির্বাচন (Free Models)
+                  </label>
+                  <select
+                    value={openrouterModel}
+                    onChange={(e) => setOpenrouterModel(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-medium bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="meta-llama/llama-3.2-3b-instruct:free">meta-llama/llama-3.2-3b-instruct:free (ফ্রি)</option>
+                    <option value="google/gemini-2.0-flash-exp:free">google/gemini-2.0-flash-exp:free (ফ্রি)</option>
+                    <option value="deepseek/deepseek-r1:free">deepseek/deepseek-r1:free (গভীর যুক্তি ও ফ্রি)</option>
+                    <option value="qwen/qwen-2.5-72b-instruct:free">qwen/qwen-2.5-72b-instruct:free (ফ্রি)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* 3. Safe Error Handling & Fallback Option */}
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={aiFallbackLocal}
+                onChange={(e) => setAiFallbackLocal(e.target.checked)}
+                className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+              />
+              <div>
+                <span className="text-xs font-bold text-amber-950 block">
+                  নিরাপদ এরর হ্যান্ডলিং ও লোকাল ফলব্যাক লজিক সক্রিয় রাখুন (Auto Fallback)
+                </span>
+                <span className="text-[11px] text-slate-600 leading-relaxed block mt-0.5">
+                  যদি ক্লাউড এআই এর কি ভুল হয়, ইন্টারনেট ব্যাহত হয় অথবা কোটা লিমিট শেষ হয়ে যায়, তবে চ্যাটবট কোনো অবস্থাতেই ক্র্যাশ করবে না; স্বয়ংক্রিয়ভাবে প্রতিষ্ঠানের ৫ লক্ষ শব্দের লোকাল নলেজবেস ও শিক্ষক ভেরিফায়েড ডাটাবেজ থেকে তথ্য সরবরাহ করবে।
+                </span>
+              </div>
+            </label>
+          </div>
+
+          {/* 4. Live Connection & Latency Test Button & Results */}
+          <div className="p-5 rounded-2xl bg-slate-900 text-white space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-emerald-400" />
+                  <span>লাইভ AI সংযোগ ও লেটেন্সি টেস্ট</span>
+                </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  বর্তমান নির্বাচিত প্রোভাইডারের ({activeAIProvider.toUpperCase()}) সাথে লাইভ পিং পাঠিয়ে রেসপন্স টেস্ট করুন।
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={isTestingAI}
+                  onClick={() => handleTestAIConnection()}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all"
+                >
+                  {isTestingAI ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Zap className="w-3.5 h-3.5" />
+                  )}
+                  <span>{isTestingAI ? 'টেস্ট চলছে...' : 'সংযোগ পরীক্ষা করুন'}</span>
+                </button>
+              </div>
+            </div>
+
+            {aiTestResult && (
+              <div className={`p-4 rounded-xl border text-xs space-y-1.5 animate-in fade-in duration-150 ${
+                aiTestResult.success ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-200' : 'bg-rose-950/60 border-rose-500/50 text-rose-200'
+              }`}>
+                <div className="flex items-center justify-between font-bold">
+                  <span className="flex items-center gap-1.5">
+                    {aiTestResult.success ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <XCircle className="w-4 h-4 text-rose-400" />}
+                    <span>{aiTestResult.success ? 'সংযোগ সফল ও সক্রিয়!' : 'সংযোগ ব্যর্থ হয়েছে'}</span>
+                  </span>
+                  {aiTestResult.latencyMs && (
+                    <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-black/40">
+                      লেটেন্সি: {aiTestResult.latencyMs} ms
+                    </span>
+                  )}
+                </div>
+                {aiTestResult.text && (
+                  <p className="text-white text-xs bg-black/30 p-2.5 rounded-lg border border-white/10 font-sans">
+                    {aiTestResult.text}
+                  </p>
+                )}
+                {aiTestResult.error && (
+                  <p className="text-rose-300 text-xs font-mono bg-black/30 p-2.5 rounded-lg border border-rose-500/20">
+                    এরর: {aiTestResult.error}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Master Bottom Save Button */}
+          <div className="flex justify-end pt-2">
+            <button
+              onClick={() => handleSaveChatbotAll('এআই প্রোভাইডার সেটিংস সফলভাবে সেভ হয়েছে!')}
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition-all active:scale-95"
+            >
+              <Save className="w-4 h-4 text-amber-200" />
+              <span>এক ক্লিকে AI সেটিংস সংরক্ষণ ও ব্যাকএন্ডে প্রয়োগ করুন</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ================= TAB 4: LIVE SIMULATOR / TEST BOX ================= */}
       {activeChatTab === 'test' && (
         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5 max-w-2xl">
@@ -5428,7 +5962,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
           <div className="flex items-center gap-2 text-purple-900 font-bold text-sm">
             <Github className="w-4 h-4 text-purple-700" />
@@ -5455,7 +5989,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
           <div className="flex items-center gap-2 text-blue-900 font-bold text-sm">
             <RefreshCw className="w-4 h-4 text-blue-700" />
-            <span>ম্যানুয়াল একশন</span>
+            <span>GitHub সিঙ্ক একশন</span>
           </div>
           <button
             type="button"
@@ -5466,6 +6000,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             <span>এখনই পুশ ও সিঙ্ক টেস্ট করুন</span>
           </button>
           <p className="text-[11px] text-slate-500 text-center">টোকেন ভেরিফিকেশন ও লাইভ পুশ টেস্ট</p>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-emerald-200 bg-gradient-to-b from-white to-emerald-50/30 shadow-xs space-y-2">
+          <div className="flex items-center gap-2 text-emerald-950 font-bold text-sm">
+            <Database className="w-4 h-4 text-emerald-600" />
+            <span>সুপারবেস ক্লাউড ডেটাবেজ</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsSupabaseModalOpen(true)}
+            className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-800 to-teal-800 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+          >
+            <Database className="w-3.5 h-3.5 text-emerald-300" />
+            <span>সুপারবেস প্যানেল ও লাইভ সিঙ্ক</span>
+          </button>
+          <p className="text-[11px] text-slate-500 text-center font-medium">
+            {gatewayStatus.supabaseConnected ? 'সংযুক্ত ও সক্রিয় ✅' : 'URL ও Key দিয়ে কানেক্ট করুন'}
+          </p>
         </div>
       </div>
     </div>
@@ -5506,6 +6058,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <Github className="w-3.5 h-3.5 text-purple-400" />
               <span className="hidden sm:inline">GitHub:</span>
               <span className="text-purple-300 font-bold">অটো-পুশ</span>
+            </button>
+
+            <button
+              onClick={() => setIsSupabaseModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 hover:border-emerald-500/50 transition-all cursor-pointer shadow-xs"
+              title="সুপারবেস ডেটাবেজ ও রিয়েল-টাইম লাইভ সিঙ্ক প্যানেল খুলুন"
+            >
+              <Database className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">সুপারবেস:</span>
+              <span className="text-emerald-300 font-bold">
+                {gatewayStatus.supabaseConnected ? 'সংযুক্ত ✅' : 'সেটিংস'}
+              </span>
             </button>
 
             <button
@@ -6549,6 +7113,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       <GitHubSyncModal
         isOpen={isGitHubModalOpen}
         onClose={() => setIsGitHubModalOpen(false)}
+        settings={settings}
+        onUpdateSettings={(newSettings) => {
+          setSettings(newSettings);
+          storage.saveSettings(newSettings);
+        }}
+        triggerNotification={triggerSaveNotification}
+      />
+
+      {/* Supabase Database & Realtime Sync Modal */}
+      <SupabaseSyncModal
+        isOpen={isSupabaseModalOpen}
+        onClose={() => setIsSupabaseModalOpen(false)}
         settings={settings}
         onUpdateSettings={(newSettings) => {
           setSettings(newSettings);

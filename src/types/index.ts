@@ -39,6 +39,11 @@ export interface InstituteSettings {
   githubBranch?: string;
   githubToken?: string;
   githubAutoPushEnabled?: boolean;
+  // Supabase Database & Realtime Sync
+  supabaseUrl?: string;
+  supabaseAnonKey?: string;
+  supabaseTableName?: string;
+  supabaseAutoSyncEnabled?: boolean;
 }
 
 export interface HeroSlide {
@@ -292,6 +297,20 @@ export interface ChatbotFAQ {
   keywords: string[];
 }
 
+export type AIProviderType = 'gemini' | 'groq' | 'openrouter' | 'local_only';
+
+export interface AISettings {
+  activeProvider: AIProviderType;
+  geminiApiKey?: string;
+  geminiModel?: string; // e.g. 'gemini-2.5-flash'
+  groqApiKey?: string;
+  groqModel?: string; // e.g. 'llama-3.3-70b-versatile', 'llama-3.1-8b-instant'
+  openrouterApiKey?: string;
+  openrouterModel?: string; // e.g. 'meta-llama/llama-3.2-3b-instruct:free', 'google/gemini-2.0-flash-exp:free'
+  systemPrompt?: string;
+  fallbackToLocal?: boolean;
+}
+
 export interface ChatbotSettings {
   botName?: string;
   welcomeMessage?: string;
@@ -302,6 +321,8 @@ export interface ChatbotSettings {
   infoBlocks?: ChatbotInfoBlock[];
   faqs: ChatbotFAQ[];
   quickChips?: string[];
+  // Dynamic Multi-AI API switching settings (Gemini, Groq, OpenRouter)
+  aiSettings?: AISettings;
 }
 
 export interface CertificateRecord {

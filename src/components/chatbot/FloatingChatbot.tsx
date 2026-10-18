@@ -657,32 +657,38 @@ export const FloatingChatbot: React.FC = () => {
       // Wiki offline or error, proceed to fallback
     }
 
-    // 6. Server-Side AI Chatbot Query (if Gemini API is configured)
+    // 6. Server-Side Dynamic Multi-AI Query (Gemini, Groq, OpenRouter)
     try {
-      const aiRes = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: query })
-      });
-      if (aiRes.ok) {
-        const aiData = await aiRes.json();
-        if (aiData.success && aiData.text) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `b-${Date.now()}`,
-              sender: 'bot',
-              text: aiData.text,
-              timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
-              sourceBadge: 'স্মার্ট এআই লার্নিং'
-            }
-          ]);
-          setLoading(false);
-          return;
+      const activeProvider = chatbotSettings.aiSettings?.activeProvider || 'gemini';
+      if (activeProvider !== 'local_only') {
+        const aiRes = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            prompt: query,
+            requestedProvider: activeProvider
+          })
+        });
+        if (aiRes.ok) {
+          const aiData = await aiRes.json();
+          if (aiData.success && aiData.text) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `b-${Date.now()}`,
+                sender: 'bot',
+                text: aiData.text,
+                timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+                sourceBadge: aiData.providerUsed ? `✨ ${aiData.providerUsed}` : 'স্মার্ট এআই লার্নিং'
+              }
+            ]);
+            setLoading(false);
+            return;
+          }
         }
       }
     } catch {
-      // AI endpoint offline or unconfigured, proceed to teacher contact fallback
+      // AI endpoint offline or unconfigured, proceed safely to teacher contact fallback
     }
 
     // 7. Intelligent Fallback with Teacher Direct Routing Option

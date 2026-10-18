@@ -21,6 +21,7 @@ import {
 } from '../types';
 import { db, handleFirestoreError, OperationType, isFirestoreQuotaExhausted, safeFirestoreSet } from '../firebase/config';
 import { collection, doc, onSnapshot, getDocs, Unsubscribe } from 'firebase/firestore';
+import { supabaseService } from './supabaseClient';
 
 // Default SVG assets for seals, signature, logos, and Bangla QR
 export const DEFAULT_ASSETS = {
@@ -86,7 +87,11 @@ const initialSettings: InstituteSettings = {
   githubRepo: "bmd03024-code/BS-E-LEARNING-IT-ZONE",
   githubBranch: "main",
   githubToken: "",
-  githubAutoPushEnabled: true
+  githubAutoPushEnabled: true,
+  supabaseUrl: "",
+  supabaseAnonKey: "",
+  supabaseTableName: "institute_data",
+  supabaseAutoSyncEnabled: true
 };
 
 // Initial 3 Hero Slides
@@ -909,7 +914,17 @@ BS E-Learning & IT Zone একটি আধুনিক ও সরকারি �
     "সহীহ কুরআন শিক্ষার ক্লাস সময়",
     "√৬২৫ এর বর্গমূল কত?",
     "নতুন কোনো নোটিস আছে?"
-  ]
+  ],
+  aiSettings: {
+    activeProvider: 'gemini',
+    geminiModel: 'gemini-3.8-flash',
+    geminiApiKey: '',
+    groqModel: 'llama-3.3-70b-versatile',
+    groqApiKey: '',
+    openrouterModel: 'meta-llama/llama-3.2-3b-instruct:free',
+    openrouterApiKey: '',
+    fallbackToLocal: true
+  }
 };
 
 // Initial Credentials with Master PIN (6 to 11 digits)
@@ -992,6 +1007,10 @@ class StorageService {
   // 1. Firebase Firestore Real-Time Global Synchronization
   public initFirestoreSync() {
     if (typeof window === 'undefined') return;
+    if (isFirestoreQuotaExhausted()) {
+      this.isFirestoreReady = false;
+      return;
+    }
 
     try {
       const colRef = collection(db, 'institute_data');
@@ -1031,6 +1050,12 @@ class StorageService {
           }
         },
         (error) => {
+          this.isFirestoreReady = false;
+          // Unsubscribe immediately to prevent Firebase SDK backoff retry loop
+          if (this.unsubscribeFirestore) {
+            try { this.unsubscribeFirestore(); } catch {}
+            this.unsubscribeFirestore = null;
+          }
           handleFirestoreError(error, OperationType.GET, 'institute_data');
         }
       );
@@ -1105,16 +1130,58 @@ class StorageService {
 
   private async hydrateFromServer() {
     try {
-      const res = await fetch('/api/sync/all');
-      if (res.ok) {
-        const json = await res.json();
-        if (json.data && typeof json.data === 'object') {
-          for (const key of Object.keys(json.data)) {
-            this.setLocalSilently(key, json.data[key]);
+      let data: Record<string, any> | null = null;
+      let version = 0;
+
+      // 1. Try server REST API endpoint
+      try {
+        const res = await fetch('/api/sync/all');
+        const cType = res.headers.get('content-type') || '';
+        if (res.ok && cType.includes('application/json')) {
+          const json = await res.json();
+          if (json && json.data && typeof json.data === 'object') {
+            data = json.data;
+            if (json.version) version = json.version;
           }
-          if (json.version) this.currentDbVersion = json.version;
-          window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'all', fromServer: true } }));
         }
+      } catch {}
+
+      // 2. Fallback to static institute_db.json (Vercel / GitHub / static host)
+      if (!data) {
+        for (const url of ['/institute_db.json', '/data/institute_db.json']) {
+          try {
+            const res = await fetch(url);
+            const cType = res.headers.get('content-type') || '';
+            // Critical: Only parse if valid application/json to avoid HTML error pages
+            if (res.ok && cType.includes('application/json')) {
+              const parsed = await res.json();
+              if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+                data = parsed;
+                break;
+              }
+            }
+          } catch {}
+        }
+      }
+
+      // 3. Fallback to Supabase cloud storage if configured
+      if (!data && supabaseService.isConfigured()) {
+        try {
+          const supa = await supabaseService.pullAllFromSupabase();
+          if (supa.success && supa.data) {
+            data = supa.data;
+          }
+        } catch (e) {
+          console.warn('[Storage] Supabase hydration notice:', e);
+        }
+      }
+
+      if (data && typeof data === 'object') {
+        for (const key of Object.keys(data)) {
+          this.setLocalSilently(key, data[key]);
+        }
+        if (version) this.currentDbVersion = version;
+        window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'all', fromServer: true } }));
       }
     } catch {
       // Offline fallback
@@ -1191,9 +1258,12 @@ class StorageService {
         admin_creds: this.getAdminCredentials()
       };
 
-      // Push all records to Cloud Firestore
-      for (const [k, v] of Object.entries(fullDb)) {
-        this.pushToFirestore(k, v);
+      // Push all records to Cloud Firestore only if quota permits
+      if (!isFirestoreQuotaExhausted()) {
+        for (const [k, v] of Object.entries(fullDb)) {
+          if (isFirestoreQuotaExhausted()) break;
+          this.pushToFirestore(k, v);
+        }
       }
 
       await fetch('/api/sync/bulk', {
@@ -1343,6 +1413,7 @@ class StorageService {
       infoBlocks: data.infoBlocks && Array.isArray(data.infoBlocks) && data.infoBlocks.length > 0 ? data.infoBlocks : (initialChatbot.infoBlocks || []),
       faqs: data.faqs && Array.isArray(data.faqs) && data.faqs.length > 0 ? data.faqs : (initialChatbot.faqs || []),
       quickChips: data.quickChips && Array.isArray(data.quickChips) ? data.quickChips : initialChatbot.quickChips,
+      aiSettings: data.aiSettings ? { ...initialChatbot.aiSettings, ...data.aiSettings } : initialChatbot.aiSettings,
     };
   }
   saveChatbot(settings: ChatbotSettings): void {

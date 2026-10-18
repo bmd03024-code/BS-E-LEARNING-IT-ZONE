@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { type Request, type Response } from 'express';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer as createViteServer } from 'vite';
@@ -18,8 +18,8 @@ try {
 }
 
 const app = express();
-// Dynamic port support for Render / Railway / Heroku / Cloud Run / AI Studio (defaults to 3000)
-const port = Number(process.env.PORT) || 3000;
+// Default to 3000 for AI Studio environment and iframe preview, avoiding port 8080 collision with internal proxy
+const port = (Number(process.env.PORT) === 8080 || !process.env.PORT) ? 3000 : Number(process.env.PORT);
 const server = http.createServer(app);
 
 // Initialize Socket.io Server attached to same HTTP server (No extra ports needed!)
@@ -498,39 +498,339 @@ app.post('/api/ai/sync', (req: Request, res: Response) => {
   res.json({ success: true, version: dbVersion });
 });
 
-// Server-side Gemini AI Chat Assistant Endpoint (Secure proxy, never exposes API key)
+// ============================================================================
+// DYNAMIC MULTI-AI ENGINE (Gemini, Groq, OpenRouter)
+// Automatic Provider Detection, Live Testing & Safe Fallback
+// ============================================================================
+
+interface ServerAISettings {
+  activeProvider: 'gemini' | 'groq' | 'openrouter' | 'local_only';
+  geminiApiKey: string;
+  geminiModel: string;
+  groqApiKey: string;
+  groqModel: string;
+  openrouterApiKey: string;
+  openrouterModel: string;
+  fallbackToLocal: boolean;
+}
+
+const AI_SETTINGS_FILE = path.join(DATA_DIR, 'ai_settings.json');
+
+// Default initial AI settings (reads env vars if present, but never hardcodes keys)
+let serverAISettings: ServerAISettings = {
+  activeProvider: (process.env.DEFAULT_AI_PROVIDER as any) || 'gemini',
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
+  geminiModel: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+  groqApiKey: process.env.GROQ_API_KEY || '',
+  groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+  openrouterApiKey: process.env.OPENROUTER_API_KEY || '',
+  openrouterModel: process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.2-3b-instruct:free',
+  fallbackToLocal: true
+};
+
+// Load persisted settings from disk
+if (fs.existsSync(AI_SETTINGS_FILE)) {
+  try {
+    const raw = fs.readFileSync(AI_SETTINGS_FILE, 'utf-8');
+    const parsed = JSON.parse(raw);
+    serverAISettings = { ...serverAISettings, ...parsed };
+    if (!serverAISettings.geminiModel || serverAISettings.geminiModel.includes('2.5')) {
+      serverAISettings.geminiModel = 'gemini-3.8-flash';
+    }
+    console.log(`[AI Engine] Loaded persisted AI settings (Active Provider: ${serverAISettings.activeProvider})`);
+  } catch (err) {
+    console.warn('[AI Engine] Failed to load ai_settings.json:', err);
+  }
+}
+
+function persistAISettings() {
+  try {
+    fs.writeFileSync(AI_SETTINGS_FILE, JSON.stringify(serverAISettings, null, 2), 'utf-8');
+    console.log(`[AI Engine] Settings saved to disk. Active provider: ${serverAISettings.activeProvider}`);
+  } catch (err) {
+    console.error('[AI Engine] Failed to write ai_settings.json:', err);
+  }
+}
+
+const SYSTEM_AI_INSTRUCTION = `You are the polite, intelligent, and highly knowledgeable Bengali-speaking AI assistant for "BS E-Learning & IT Zone", founded and directed by Borhanuddin Mohim. 
+Institution Details:
+- Founder & Head Teacher: Borhanuddin Mohim (বোরহানউদ্দিন মহিম).
+- Key Courses: Quran Education with Tajweed (সহীহ কুরআন শিক্ষা), Computer Office Application 6-month Govt Approved (কম্পিউটার অফিস অ্যাপ্লিকেশন), Spoken English, SSC & HSC Accounting (হিসাববিজ্ঞান), Academic Math & English.
+- Payment System: Interoperable Bangla QR (বাংলা কিউআর) via bKash, Nagad, Rocket, Upay, or any banking app.
+- Answer clearly, helpfully, encouragingly, and respectfully in Bengali (বাংলা). If a question is in English, reply in helpful English or bilingual Bengali-English. Keep answers crisp and educational.`;
+
+// Call Google Gemini
+async function runGeminiChat(prompt: string, apiKey: string, model: string): Promise<string> {
+  const finalKey = apiKey || process.env.GEMINI_API_KEY;
+  if (!finalKey) throw new Error('Gemini API Key is not configured');
+  const finalModel = model || 'gemini-3.8-flash';
+  const ai = new GoogleGenAI({ apiKey: finalKey });
+  const response = await ai.models.generateContent({
+    model: finalModel,
+    contents: prompt,
+    config: {
+      systemInstruction: SYSTEM_AI_INSTRUCTION
+    }
+  });
+  if (!response.text) throw new Error('Empty response from Gemini');
+  return response.text;
+}
+
+// Call Groq (Ultra-fast LPU inference)
+async function runGroqChat(prompt: string, apiKey: string, model: string): Promise<string> {
+  const finalKey = apiKey || process.env.GROQ_API_KEY;
+  if (!finalKey) throw new Error('Groq API Key is not configured');
+  const finalModel = model || 'llama-3.3-70b-versatile';
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${finalKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: finalModel,
+      messages: [
+        { role: 'system', content: SYSTEM_AI_INSTRUCTION },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.6,
+      max_tokens: 1024
+    }),
+    signal: AbortSignal.timeout(15000)
+  });
+
+  if (!res.ok) {
+    const errData: any = await res.json().catch(() => ({}));
+    throw new Error(errData?.error?.message || `Groq API returned HTTP ${res.status}`);
+  }
+
+  const data: any = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from Groq');
+  return text;
+}
+
+// Call OpenRouter (Universal AI Gateway)
+async function runOpenRouterChat(prompt: string, apiKey: string, model: string): Promise<string> {
+  const finalKey = apiKey || process.env.OPENROUTER_API_KEY;
+  if (!finalKey) throw new Error('OpenRouter API Key is not configured');
+  const finalModel = model || 'meta-llama/llama-3.2-3b-instruct:free';
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${finalKey}`,
+      'HTTP-Referer': 'https://bs-elearning.local',
+      'X-Title': 'BS E-Learning IT Zone AI Assistant',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: finalModel,
+      messages: [
+        { role: 'system', content: SYSTEM_AI_INSTRUCTION },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.6,
+      max_tokens: 1024
+    }),
+    signal: AbortSignal.timeout(18000)
+  });
+
+  if (!res.ok) {
+    const errData: any = await res.json().catch(() => ({}));
+    throw new Error(errData?.error?.message || `OpenRouter API returned HTTP ${res.status}`);
+  }
+
+  const data: any = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from OpenRouter');
+  return text;
+}
+
+// GET /api/ai/settings - Retrieve current configuration
+app.get('/api/ai/settings', (_req: Request, res: Response) => {
+  res.json({
+    activeProvider: serverAISettings.activeProvider,
+    geminiModel: serverAISettings.geminiModel,
+    groqModel: serverAISettings.groqModel,
+    openrouterModel: serverAISettings.openrouterModel,
+    hasGeminiKey: Boolean(serverAISettings.geminiApiKey || process.env.GEMINI_API_KEY),
+    hasGroqKey: Boolean(serverAISettings.groqApiKey || process.env.GROQ_API_KEY),
+    hasOpenrouterKey: Boolean(serverAISettings.openrouterApiKey || process.env.OPENROUTER_API_KEY),
+    // Masked keys for display in admin inputs
+    geminiApiKeyMasked: serverAISettings.geminiApiKey ? `${serverAISettings.geminiApiKey.slice(0, 4)}...${serverAISettings.geminiApiKey.slice(-4)}` : '',
+    groqApiKeyMasked: serverAISettings.groqApiKey ? `${serverAISettings.groqApiKey.slice(0, 4)}...${serverAISettings.groqApiKey.slice(-4)}` : '',
+    openrouterApiKeyMasked: serverAISettings.openrouterApiKey ? `${serverAISettings.openrouterApiKey.slice(0, 4)}...${serverAISettings.openrouterApiKey.slice(-4)}` : '',
+    fallbackToLocal: serverAISettings.fallbackToLocal
+  });
+});
+
+// POST /api/ai/settings - Admin updates AI provider & keys
+app.post('/api/ai/settings', (req: Request, res: Response) => {
+  const {
+    activeProvider,
+    geminiApiKey,
+    geminiModel,
+    groqApiKey,
+    groqModel,
+    openrouterApiKey,
+    openrouterModel,
+    fallbackToLocal
+  } = req.body;
+
+  if (activeProvider && ['gemini', 'groq', 'openrouter', 'local_only'].includes(activeProvider)) {
+    serverAISettings.activeProvider = activeProvider;
+  }
+  if (geminiApiKey !== undefined) serverAISettings.geminiApiKey = (geminiApiKey || '').trim();
+  if (geminiModel) serverAISettings.geminiModel = geminiModel.trim();
+  if (groqApiKey !== undefined) serverAISettings.groqApiKey = (groqApiKey || '').trim();
+  if (groqModel) serverAISettings.groqModel = groqModel.trim();
+  if (openrouterApiKey !== undefined) serverAISettings.openrouterApiKey = (openrouterApiKey || '').trim();
+  if (openrouterModel) serverAISettings.openrouterModel = openrouterModel.trim();
+  if (fallbackToLocal !== undefined) serverAISettings.fallbackToLocal = Boolean(fallbackToLocal);
+
+  persistAISettings();
+  res.json({
+    success: true,
+    message: 'AI Provider Settings saved successfully',
+    activeProvider: serverAISettings.activeProvider
+  });
+});
+
+// POST /api/ai/test - Test connection to selected AI Provider
+app.post('/api/ai/test', async (req: Request, res: Response) => {
+  const provider = req.body.provider || serverAISettings.activeProvider;
+  const testKey = req.body.apiKey;
+  const testModel = req.body.model;
+  const startTime = Date.now();
+
+  try {
+    let resultText = '';
+    const testPrompt = 'Say "Hello, BS E-Learning AI is connected successfully!" in 1 short sentence in Bengali.';
+
+    if (provider === 'gemini') {
+      const key = testKey || serverAISettings.geminiApiKey;
+      const model = testModel || serverAISettings.geminiModel;
+      resultText = await runGeminiChat(testPrompt, key, model);
+    } else if (provider === 'groq') {
+      const key = testKey || serverAISettings.groqApiKey;
+      const model = testModel || serverAISettings.groqModel;
+      resultText = await runGroqChat(testPrompt, key, model);
+    } else if (provider === 'openrouter') {
+      const key = testKey || serverAISettings.openrouterApiKey;
+      const model = testModel || serverAISettings.openrouterModel;
+      resultText = await runOpenRouterChat(testPrompt, key, model);
+    } else if (provider === 'local_only') {
+      return res.json({
+        success: true,
+        provider: 'local_only',
+        latencyMs: 1,
+        text: 'লোকাল নলেজবেস ও শিক্ষক ভেরিফায়েড ৫ লক্ষ শব্দ ডাটাবেজ সক্রিয় রয়েছে।'
+      });
+    } else {
+      return res.status(400).json({ success: false, error: 'Unknown provider' });
+    }
+
+    const latencyMs = Date.now() - startTime;
+    return res.json({
+      success: true,
+      provider,
+      latencyMs,
+      text: resultText.trim()
+    });
+  } catch (error: any) {
+    const latencyMs = Date.now() - startTime;
+    console.warn(`[AI Test Error - ${provider}]:`, error?.message || error);
+    return res.status(400).json({
+      success: false,
+      provider,
+      latencyMs,
+      error: error?.message || `${provider} connection failed`
+    });
+  }
+});
+
+// POST /api/ai/chat - Dynamic Multi-AI Execution with Safe Fallback
 app.post('/api/ai/chat', async (req: Request, res: Response) => {
-  const { prompt } = req.body;
+  const { prompt, requestedProvider } = req.body;
   if (!prompt || typeof prompt !== 'string') {
     return res.status(400).json({ error: 'Prompt is required' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return res.status(503).json({
-      error: 'GEMINI_API_KEY not configured',
-      available: false
+  // Automatic provider detection: prioritize requested, then configured server provider
+  const provider = requestedProvider || serverAISettings.activeProvider;
+
+  if (provider === 'local_only') {
+    return res.json({
+      success: false,
+      fallback: true,
+      provider: 'local_only',
+      message: 'Local knowledge base mode is active.'
     });
   }
 
-  try {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        systemInstruction: 'You are the intelligent Bengali-speaking AI assistant for BS E-Learning & IT Zone, founded by Borhanuddin Mohim. Help students, teachers, and learners with questions politely, accurately, and encouragingly in Bengali.'
-      }
-    });
+  // Helper to attempt execution with a given provider
+  async function executeProvider(p: 'gemini' | 'groq' | 'openrouter'): Promise<{ text: string; provider: string }> {
+    if (p === 'gemini') {
+      const t = await runGeminiChat(prompt, serverAISettings.geminiApiKey, serverAISettings.geminiModel);
+      return { text: t, provider: 'Google Gemini' };
+    } else if (p === 'groq') {
+      const t = await runGroqChat(prompt, serverAISettings.groqApiKey, serverAISettings.groqModel);
+      return { text: t, provider: `Groq (${serverAISettings.groqModel || 'LLaMA'})` };
+    } else if (p === 'openrouter') {
+      const t = await runOpenRouterChat(prompt, serverAISettings.openrouterApiKey, serverAISettings.openrouterModel);
+      return { text: t, provider: `OpenRouter (${serverAISettings.openrouterModel || 'AI'})` };
+    }
+    throw new Error(`Unsupported provider: ${p}`);
+  }
 
+  try {
+    // 1. Primary execution with active provider
+    const result = await executeProvider(provider as any);
     return res.json({
       success: true,
-      text: response.text
+      text: result.text,
+      providerUsed: result.provider,
+      isAiGenerated: true
     });
-  } catch (error: any) {
-    console.warn('[Gemini API Warning]:', error?.message || error);
-    return res.status(500).json({
-      error: error?.message || 'Gemini generation failed'
+  } catch (primaryError: any) {
+    console.warn(`[AI Engine] Primary provider (${provider}) failed:`, primaryError?.message || primaryError);
+
+    // 2. Fallback logic: check if alternative providers have valid keys configured
+    const alternatives: Array<'gemini' | 'groq' | 'openrouter'> = [];
+    if (provider !== 'gemini' && (serverAISettings.geminiApiKey || process.env.GEMINI_API_KEY)) {
+      alternatives.push('gemini');
+    }
+    if (provider !== 'groq' && (serverAISettings.groqApiKey || process.env.GROQ_API_KEY)) {
+      alternatives.push('groq');
+    }
+    if (provider !== 'openrouter' && (serverAISettings.openrouterApiKey || process.env.OPENROUTER_API_KEY)) {
+      alternatives.push('openrouter');
+    }
+
+    for (const alt of alternatives) {
+      try {
+        console.log(`[AI Engine] Attempting automatic fallback to ${alt}...`);
+        const fallbackRes = await executeProvider(alt);
+        return res.json({
+          success: true,
+          text: fallbackRes.text,
+          providerUsed: fallbackRes.provider,
+          fallback: true,
+          isAiGenerated: true
+        });
+      } catch (altError: any) {
+        console.warn(`[AI Engine] Fallback provider (${alt}) also failed:`, altError?.message || altError);
+      }
+    }
+
+    // 3. Graceful degradation: inform client to safely route to local 500k words knowledge base without crashing
+    return res.json({
+      success: false,
+      fallback: true,
+      error: primaryError?.message || 'AI service temporarily unavailable',
+      message: 'Auto-falling back to local institutional database and mentor routing.'
     });
   }
 });
@@ -747,6 +1047,17 @@ app.post('/api/github/push', async (req: Request, res: Response) => {
       error: error?.message || 'Failed to push to GitHub'
     });
   }
+});
+
+// Supabase Status Endpoint
+app.get('/api/supabase/status', (_req: Request, res: Response) => {
+  const supaUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+  const supaKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+  return res.json({
+    configured: Boolean(supaUrl && supaKey),
+    url: supaUrl ? `${supaUrl.substring(0, 18)}...` : null,
+    hasKey: Boolean(supaKey)
+  });
 });
 
 // Vite Middleware for Full-Stack App

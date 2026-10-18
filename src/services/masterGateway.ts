@@ -17,11 +17,13 @@
 import { db, handleFirestoreError, OperationType, isFirestoreQuotaExhausted, safeFirestoreSet } from '../firebase/config';
 import { collection, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import { io, Socket } from 'socket.io-client';
+import { supabaseService } from './supabaseClient';
 
 export interface GatewayStatus {
   isOnline: boolean;
   socketConnected: boolean;
   firestoreConnected: boolean;
+  supabaseConnected: boolean;
   sseConnected: boolean;
   broadcastChannelReady: boolean;
   lastSyncTime: number | null;
@@ -46,7 +48,7 @@ export interface LiveReaction {
   timestamp: number;
 }
 
-export type GatewaySyncCallback = (key: string, value: any, source: 'firestore' | 'sse' | 'broadcast' | 'local') => void;
+export type GatewaySyncCallback = (key: string, value: any, source: 'firestore' | 'sse' | 'broadcast' | 'local' | 'supabase') => void;
 
 class MasterGatewayEngine {
   private static instance: MasterGatewayEngine;
@@ -54,6 +56,7 @@ class MasterGatewayEngine {
   private channel: BroadcastChannel | null = null;
   private sse: EventSource | null = null;
   private firestoreUnsubscribe: Unsubscribe | null = null;
+  private supabaseUnsubscribe: (() => void) | null = null;
   private listeners: Set<GatewaySyncCallback> = new Set();
   private statusListeners: Set<(status: GatewayStatus) => void> = new Set();
   private messageListeners: Set<(msg: LiveBroadcastMessage) => void> = new Set();
@@ -63,6 +66,7 @@ class MasterGatewayEngine {
     isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
     socketConnected: false,
     firestoreConnected: false,
+    supabaseConnected: false,
     sseConnected: false,
     broadcastChannelReady: false,
     lastSyncTime: Date.now(),
@@ -79,6 +83,7 @@ class MasterGatewayEngine {
     this.setupBroadcastChannel();
     this.setupSSE();
     this.setupFirestoreListener();
+    this.setupSupabaseRealtime();
   }
 
   public static getInstance(): MasterGatewayEngine {
@@ -306,6 +311,11 @@ class MasterGatewayEngine {
    */
   private setupFirestoreListener() {
     if (typeof window === 'undefined') return;
+    if (isFirestoreQuotaExhausted()) {
+      this.status.firestoreConnected = false;
+      this.notifyStatus();
+      return;
+    }
 
     try {
       const colRef = collection(db, 'institute_data');
@@ -366,6 +376,11 @@ class MasterGatewayEngine {
         (error) => {
           this.status.firestoreConnected = false;
           this.notifyStatus();
+          // Unsubscribe immediately to prevent Firebase SDK backoff retry loop
+          if (this.firestoreUnsubscribe) {
+            try { this.firestoreUnsubscribe(); } catch {}
+            this.firestoreUnsubscribe = null;
+          }
           handleFirestoreError(error, OperationType.GET, 'institute_data');
         }
       );
@@ -430,6 +445,21 @@ class MasterGatewayEngine {
         handleFirestoreError(error, OperationType.WRITE, `institute_data/${key}`);
       }
     }
+
+    // 6. Push to Supabase PostgreSQL in real-time if configured
+    if (supabaseService.isConfigured()) {
+      try {
+        supabaseService.pushData(key, value).then((res) => {
+          if (res.success) {
+            this.status.supabaseConnected = true;
+          }
+        }).catch(err => {
+          console.warn('[MasterGateway] Supabase async push notice:', err);
+        });
+      } catch (err) {
+        console.warn('[MasterGateway] Supabase push error:', err);
+      }
+    }
   }
 
   /**
@@ -464,6 +494,19 @@ class MasterGatewayEngine {
         body: JSON.stringify({ all: fullState })
       });
 
+      // Push to Supabase if configured
+      if (supabaseService.isConfigured()) {
+        try {
+          const supaRes = await supabaseService.syncAllToSupabase(fullState);
+          if (supaRes.success) {
+            this.status.supabaseConnected = true;
+            this.notifyStatus();
+          }
+        } catch (supaErr) {
+          console.warn('[MasterGateway] Supabase bulk push error:', supaErr);
+        }
+      }
+
       // Push to Firestore if quota allows
       if (!isFirestoreQuotaExhausted()) {
         for (const [k, v] of Object.entries(fullState)) {
@@ -477,6 +520,56 @@ class MasterGatewayEngine {
       console.error('[MasterGateway] forceSyncAll caught:', e);
       return false;
     }
+  }
+
+  /**
+   * Supabase Real-Time Listener
+   */
+  public setupSupabaseRealtime() {
+    if (typeof window === 'undefined') return;
+
+    if (this.supabaseUnsubscribe) {
+      try { this.supabaseUnsubscribe(); } catch {}
+      this.supabaseUnsubscribe = null;
+    }
+
+    if (!supabaseService.isConfigured()) {
+      this.status.supabaseConnected = false;
+      this.notifyStatus();
+      return;
+    }
+
+    try {
+      this.supabaseUnsubscribe = supabaseService.subscribeToRealtime((key: string, data: any) => {
+        this.status.supabaseConnected = true;
+        this.status.totalReceives++;
+        this.status.lastSyncTime = Date.now();
+        this.notifyStatus();
+
+        // Update local storage
+        try {
+          localStorage.setItem(`bs_${key}`, JSON.stringify(data));
+          localStorage.setItem(`bs_${key}_time`, Date.now().toString());
+        } catch {}
+
+        this.dispatchChange(key, data, 'supabase');
+      });
+
+      // Test connection to verify status
+      supabaseService.testConnection().then((test) => {
+        this.status.supabaseConnected = test.connected;
+        this.notifyStatus();
+      }).catch(() => {
+        this.status.supabaseConnected = false;
+        this.notifyStatus();
+      });
+    } catch (err) {
+      console.warn('[MasterGateway] Supabase realtime setup error:', err);
+    }
+  }
+
+  public reconnectSupabase() {
+    this.setupSupabaseRealtime();
   }
 
   /**
@@ -500,7 +593,7 @@ class MasterGatewayEngine {
     return { ...this.status };
   }
 
-  private dispatchChange(key: string, value: any, source: 'firestore' | 'sse' | 'broadcast' | 'local') {
+  private dispatchChange(key: string, value: any, source: 'firestore' | 'sse' | 'broadcast' | 'local' | 'supabase') {
     this.listeners.forEach((fn) => {
       try {
         fn(key, value, source);
