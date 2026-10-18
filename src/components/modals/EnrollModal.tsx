@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Course, EnrollmentApplication, InstituteSettings } from '../../types';
-import { storage } from '../../services/storage';
+import { storage, compressImage } from '../../services/storage';
 import confetti from 'canvas-confetti';
 import { X, CheckCircle2, UserCheck, Phone, CreditCard, Sparkles, Printer, Upload, Image as ImageIcon } from 'lucide-react';
 import { toBengaliNum } from '../home/CoursesSection';
@@ -42,14 +42,19 @@ export const EnrollModal: React.FC<EnrollModalProps> = ({
 
   const activeCourse = courses.find(c => c.id === selectedCourseId) || course || courses[0];
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPhotoUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 500, 0.75);
+        setPhotoUrl(compressed);
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setPhotoUrl(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

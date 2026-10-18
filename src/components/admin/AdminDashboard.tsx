@@ -837,7 +837,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     if (file) {
       try {
         triggerSaveNotification('ছবি অপটিমাইজ ও আপলোড হচ্ছে...');
-        const compressed = await compressImage(file, 1400, 0.8);
+        const compressed = await compressImage(file, 1000, 0.72);
         const updated = slides.map(s => s.id === slideId ? { ...s, image: compressed } : s);
         setSlides(updated);
         storage.saveSlides(updated);
@@ -847,7 +847,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         const reader = new FileReader();
         reader.onload = async () => {
           const raw = reader.result as string;
-          const updated = slides.map(s => s.id === slideId ? { ...s, image: raw } : s);
+          const compressed = await compressImage(raw, 1000, 0.72).catch(() => raw);
+          const updated = slides.map(s => s.id === slideId ? { ...s, image: compressed } : s);
           setSlides(updated);
           storage.saveSlides(updated);
           await masterGateway.publish('slides', updated);
@@ -1022,15 +1023,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   /* ---------------- MODULE 3: FACULTY PROFILE MANAGEMENT ---------------- */
   const [selectedTeacherForCard, setSelectedTeacherForCard] = useState<Mentor | null>(null);
 
-  const handleTeacherPhotoUpload = (teacherId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTeacherPhotoUpload = async (teacherId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const updated = mentors.map(item => item.id === teacherId ? { ...item, photoUrl: reader.result as string } : item);
+      try {
+        const compressed = await compressImage(file, 600, 0.8);
+        const updated = mentors.map(item => item.id === teacherId ? { ...item, photoUrl: compressed } : item);
         setMentors(updated);
-      };
-      reader.readAsDataURL(file);
+        storage.saveMentors(updated);
+        await masterGateway.publish('mentors', updated);
+        triggerSaveNotification('শিক্ষকের ছবি কম্প্রেস ও সংরক্ষিত হয়েছে!');
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const updated = mentors.map(item => item.id === teacherId ? { ...item, photoUrl: reader.result as string } : item);
+          setMentors(updated);
+          storage.saveMentors(updated);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -1476,14 +1487,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onload = () => {
-                        setEditingStudent({ ...editingStudent, photoUrl: reader.result as string });
-                      };
-                      reader.readAsDataURL(file);
+                      try {
+                        const compressed = await compressImage(file, 500, 0.8);
+                        setEditingStudent({ ...editingStudent, photoUrl: compressed });
+                      } catch {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          setEditingStudent({ ...editingStudent, photoUrl: reader.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
                     }
                   }}
                   className="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:bg-blue-900 file:text-white cursor-pointer"
@@ -2803,15 +2819,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   };
 
   /* ---------------- MODULE 8: COURSE MANAGEMENT & LOGO ---------------- */
-  const handleCourseLogoUpload = (courseId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCourseLogoUpload = async (courseId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const updated = courses.map(item => item.id === courseId ? { ...item, logoUrl: reader.result as string } : item);
+      try {
+        const compressed = await compressImage(file, 500, 0.8);
+        const updated = courses.map(item => item.id === courseId ? { ...item, logoUrl: compressed } : item);
         setCourses(updated);
-      };
-      reader.readAsDataURL(file);
+        storage.saveCourses(updated);
+        await masterGateway.publish('courses', updated);
+      } catch {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const updated = courses.map(item => item.id === courseId ? { ...item, logoUrl: reader.result as string } : item);
+          setCourses(updated);
+          storage.saveCourses(updated);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -3604,12 +3629,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => {
+                onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => setNewNoticeImage(reader.result as string);
-                    reader.readAsDataURL(file);
+                    try {
+                      const compressed = await compressImage(file, 800, 0.75);
+                      setNewNoticeImage(compressed);
+                    } catch {
+                      const reader = new FileReader();
+                      reader.onload = () => setNewNoticeImage(reader.result as string);
+                      reader.readAsDataURL(file);
+                    }
                   }
                 }}
                 className="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-900 file:text-white hover:file:bg-blue-800 cursor-pointer"
@@ -3938,19 +3968,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
           <div className="sm:col-span-2 space-y-1.5">
             <label className="block text-xs font-bold text-slate-700">ডিভাইস থেকে ফাইল আপলোড (Image/Video Upload)</label>
-            <input
-              type="file"
-              accept={newGalleryType === 'image' ? 'image/*' : 'video/*'}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = () => setNewGalleryFile(reader.result as string);
-                  reader.readAsDataURL(file);
-                }
-              }}
-              className="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-pink-700 file:text-white hover:file:bg-pink-600 cursor-pointer"
-            />
+              <input
+                type="file"
+                accept={newGalleryType === 'image' ? 'image/*' : 'video/*'}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (newGalleryType === 'image') {
+                      try {
+                        const compressed = await compressImage(file, 1000, 0.75);
+                        setNewGalleryFile(compressed);
+                        return;
+                      } catch {}
+                    }
+                    const reader = new FileReader();
+                    reader.onload = () => setNewGalleryFile(reader.result as string);
+                    reader.readAsDataURL(file);
+                  }
+                }}
+                className="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-pink-700 file:text-white hover:file:bg-pink-600 cursor-pointer"
+              />
           </div>
 
           <div className="sm:col-span-2 space-y-1.5">
@@ -6574,12 +6611,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onload = () => setNewTeacherPhoto(reader.result as string);
-                        reader.readAsDataURL(file);
+                        try {
+                          const compressed = await compressImage(file, 600, 0.8);
+                          setNewTeacherPhoto(compressed);
+                        } catch {
+                          const reader = new FileReader();
+                          reader.onload = () => setNewTeacherPhoto(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
                       }
                     }}
                     className="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:bg-emerald-700 file:text-white cursor-pointer"
@@ -6811,12 +6853,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onload = () => setNewStdPhoto(reader.result as string);
-                        reader.readAsDataURL(file);
+                        try {
+                          const compressed = await compressImage(file, 500, 0.8);
+                          setNewStdPhoto(compressed);
+                        } catch {
+                          const reader = new FileReader();
+                          reader.onload = () => setNewStdPhoto(reader.result as string);
+                          reader.readAsDataURL(file);
+                        }
                       }
                     }}
                     className="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:bg-purple-900 file:text-white cursor-pointer"

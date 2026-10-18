@@ -304,7 +304,21 @@ export const SupabaseSyncModal: React.FC<SupabaseSyncModalProps> = ({
               ) : (
                 <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
               )}
-              <p className="flex-1">{syncMessage.text}</p>
+              <div className="flex-1 space-y-1.5">
+                <p>{syncMessage.text}</p>
+                {syncMessage.text.includes('INTEGER') && (
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`ALTER TABLE ${tableName || 'institute_data'} ALTER COLUMN id TYPE TEXT;`);
+                      triggerNotification('কলাম ফিক্স SQL কোড কপি হয়েছে! Supabase SQL Editor-এ রান করুন।');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition-colors shadow-xs"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>১-ক্লিকে ফিক্স SQL কপি করুন</span>
+                  </button>
+                )}
+              </div>
             </div>
           )}
 

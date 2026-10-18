@@ -239,7 +239,10 @@ class SupabaseService {
 -- Run this in your Supabase Dashboard: SQL Editor -> New Query -> Run
 -- ==================================================================
 
--- 1. Create table for instant real-time institute data
+-- ১. যদি টেবিলটি আগে থেকেই তৈরি থাকে এবং 'id' কলামটি INTEGER (সংখ্যা) হয়ে থাকে:
+ALTER TABLE IF EXISTS public.${table} ALTER COLUMN id TYPE TEXT;
+
+-- ২. নতুন করে টেবিল তৈরি করতে চাইলে:
 CREATE TABLE IF NOT EXISTS public.${table} (
   id TEXT PRIMARY KEY,
   data JSONB NOT NULL,
@@ -247,17 +250,17 @@ CREATE TABLE IF NOT EXISTS public.${table} (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::TEXT, NOW()) NOT NULL
 );
 
--- 2. Enable Row Level Security (RLS)
+-- ৩. Enable Row Level Security (RLS)
 ALTER TABLE public.${table} ENABLE ROW LEVEL SECURITY;
 
--- 3. Policy: Allow Anyone (Public) to Read Data
+-- ৪. Policy: Allow Anyone (Public) to Read Data
 DROP POLICY IF EXISTS "Public Read Access" ON public.${table};
 CREATE POLICY "Public Read Access"
   ON public.${table}
   FOR SELECT
   USING (true);
 
--- 4. Policy: Allow Anyone with Anon Key to Insert/Update Data
+-- ৫. Policy: Allow Anyone with Anon Key to Insert/Update Data
 DROP POLICY IF EXISTS "Public Upsert Access" ON public.${table};
 CREATE POLICY "Public Upsert Access"
   ON public.${table}
@@ -265,10 +268,10 @@ CREATE POLICY "Public Upsert Access"
   USING (true)
   WITH CHECK (true);
 
--- 5. Enable Real-Time Broadcast on ${table}
+-- ৬. Enable Real-Time Broadcast on ${table}
 ALTER PUBLICATION supabase_realtime ADD TABLE public.${table};
 
--- 6. Trigger for automatic updated_at
+-- ৭. Trigger for automatic updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -309,13 +312,20 @@ CREATE TRIGGER update_${table}_updated_at
         );
 
       if (error) {
-        console.error('[Supabase Push Error]:', error);
+        if (error.code === '22P02' || error.message?.includes('invalid input syntax for type integer')) {
+          console.warn(`[Supabase Notice]: Table '${table}' has an INTEGER 'id' column. Run: ALTER TABLE ${table} ALTER COLUMN id TYPE TEXT;`);
+          return {
+            success: false,
+            message: `সুপারবেস টেবিলে 'id' কলামটি INTEGER (সংখ্যা) টাইপের। মডিউল আইডি ('${id}') টেক্সট হিসেবে সেভ করতে Supabase SQL Editor-এ চালান: ALTER TABLE ${table} ALTER COLUMN id TYPE TEXT;`
+          };
+        }
+        console.warn('[Supabase Push Notice]:', error.message);
         return { success: false, message: error.message };
       }
 
       return { success: true, message: `সুপারবেসে '${id}' সফলভাবে সিঙ্ক হয়েছে!` };
     } catch (e: any) {
-      console.error('[Supabase Push Exception]:', e);
+      console.warn('[Supabase Push Exception]:', e?.message || e);
       return { success: false, message: e?.message || 'Unknown push error' };
     }
   }
@@ -350,6 +360,12 @@ CREATE TRIGGER update_${table}_updated_at
         .upsert(rows, { onConflict: 'id' });
 
       if (error) {
+        if (error.code === '22P02' || error.message?.includes('invalid input syntax for type integer')) {
+          return {
+            success: false,
+            message: `সুপারবেস টেবিলে 'id' কলামটি INTEGER (সংখ্যা) টাইপের। টেক্সট মডিউল আইডিগুলো সেভ করতে Supabase SQL Editor-এ গিয়ে রান করুন: ALTER TABLE ${table} ALTER COLUMN id TYPE TEXT;`
+          };
+        }
         return { success: false, message: `আপলোড ব্যর্থ: ${error.message}` };
       }
 

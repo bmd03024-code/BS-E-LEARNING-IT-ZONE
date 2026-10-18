@@ -99,6 +99,15 @@ export function markFirestoreQuotaExhausted() {
   }
 }
 
+export function getApproxPayloadSize(obj: any): number {
+  try {
+    const str = typeof obj === 'string' ? obj : JSON.stringify(obj);
+    return typeof Blob !== 'undefined' ? new Blob([str]).size : (typeof Buffer !== 'undefined' ? Buffer.byteLength(str, 'utf8') : str.length * 2);
+  } catch {
+    return 0;
+  }
+}
+
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
   const errorStr = error instanceof Error ? error.message : String(error);
 
@@ -106,6 +115,16 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     markFirestoreQuotaExhausted();
     return {
       error: 'Daily free Firestore quota limit reached. Routing all writes through high-speed disk and Socket.io.',
+      authInfo: {},
+      operationType,
+      path
+    };
+  }
+
+  if (errorStr.includes('maximum allowed size') || errorStr.includes('exceeds the maximum allowed size') || errorStr.includes('1,048,576 bytes')) {
+    console.warn(`[Firestore Safe Guard] Document at ${path} exceeds 1MB limit. Routed safely through disk & Socket.io.`);
+    return {
+      error: 'Document exceeds 1MB Firestore limit. Safely persisted to disk & Socket.io.',
       authInfo: {},
       operationType,
       path
@@ -134,9 +153,65 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 export async function safeFirestoreSet(collectionName: string, docId: string, data: any): Promise<boolean> {
   // Prevent any setDoc call if quota is exhausted to avoid SDK retry backoff loops
   if (isFirestoreQuotaExhausted()) return false;
+
   try {
+    const rawPayload = { key: docId, data, updatedAt: Date.now() };
+    const approxSize = getApproxPayloadSize(rawPayload);
+
+    // Hard limit: Firestore documents cannot exceed 1,048,576 bytes. Keep threshold at 850KB.
+    if (approxSize > 850000) {
+      if (Array.isArray(data) && data.length > 1) {
+        // Partition array into safe sub-chunks
+        const chunks: any[][] = [];
+        let currentChunk: any[] = [];
+        let currentSize = 0;
+
+        for (const item of data) {
+          const itemSize = getApproxPayloadSize(item);
+          if (currentSize + itemSize > 600000 && currentChunk.length > 0) {
+            chunks.push(currentChunk);
+            currentChunk = [item];
+            currentSize = itemSize;
+          } else {
+            currentChunk.push(item);
+            currentSize += itemSize;
+          }
+        }
+        if (currentChunk.length > 0) chunks.push(currentChunk);
+
+        // Write each chunk
+        for (let i = 0; i < chunks.length; i++) {
+          const chunkDocRef = doc(db, collectionName, `${docId}__chunk_${i}`);
+          await setDoc(chunkDocRef, {
+            key: `${docId}__chunk_${i}`,
+            isChunk: true,
+            parentKey: docId,
+            chunkIndex: i,
+            totalChunks: chunks.length,
+            data: chunks[i],
+            updatedAt: Date.now()
+          }, { merge: true });
+        }
+
+        // Write parent manifest doc
+        const parentDocRef = doc(db, collectionName, docId);
+        await setDoc(parentDocRef, {
+          key: docId,
+          isChunked: true,
+          chunkCount: chunks.length,
+          totalItems: data.length,
+          updatedAt: Date.now()
+        }, { merge: true });
+
+        return true;
+      } else {
+        console.warn(`[Firestore Guard] Document ${collectionName}/${docId} (${approxSize} bytes) exceeds 850KB. Saved to disk & Socket.io to prevent 1MB limit crash.`);
+        return true;
+      }
+    }
+
     const docRef = doc(db, collectionName, docId);
-    await setDoc(docRef, { key: docId, data, updatedAt: Date.now() }, { merge: true });
+    await setDoc(docRef, rawPayload, { merge: true });
     return true;
   } catch (error: any) {
     handleFirestoreError(error, OperationType.WRITE, `${collectionName}/${docId}`);

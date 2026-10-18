@@ -327,46 +327,45 @@ class MasterGatewayEngine {
           this.notifyStatus();
 
           let changed = false;
-          // Hydrate documents on snapshot only if newer than local admin modifications
+
+          // Process and reassemble chunks if any
+          const chunkMap: Record<string, { index: number; data: any[] }[]> = {};
+          const aggregatedDocs: Record<string, { data: any; updatedAt: any }> = {};
+
           snapshot.docs.forEach((docSnap) => {
-            const data = docSnap.data();
-            if (data && data.data !== undefined) {
-              const localTime = parseInt(localStorage.getItem(`bs_${docSnap.id}_time`) || '0', 10);
-              const cloudTime = typeof data.updatedAt === 'number'
-                ? data.updatedAt
-                : (data.updatedAt ? new Date(data.updatedAt).getTime() : 0);
-
-              const isRecentLocalEdit = (Date.now() - localTime) < 15000;
-              if (!isRecentLocalEdit && (!localTime || cloudTime > localTime)) {
-                try {
-                  localStorage.setItem(`bs_${docSnap.id}`, JSON.stringify(data.data));
-                  changed = true;
-                } catch {}
-              }
+            const d = docSnap.data();
+            if (!d) return;
+            if (d.isChunk && d.parentKey) {
+              if (!chunkMap[d.parentKey]) chunkMap[d.parentKey] = [];
+              chunkMap[d.parentKey].push({ index: d.chunkIndex ?? 0, data: d.data || [] });
+            } else if (!d.isChunked && d.data !== undefined) {
+              aggregatedDocs[docSnap.id] = { data: d.data, updatedAt: d.updatedAt };
             }
           });
 
-          snapshot.docChanges().forEach((change) => {
-            if (change.type === 'added' || change.type === 'modified') {
-              const docData = change.doc.data();
-              if (docData && docData.data !== undefined) {
-                const localTime = parseInt(localStorage.getItem(`bs_${change.doc.id}_time`) || '0', 10);
-                const cloudTime = typeof docData.updatedAt === 'number'
-                  ? docData.updatedAt
-                  : (docData.updatedAt ? new Date(docData.updatedAt).getTime() : 0);
+          for (const [parentKey, chunks] of Object.entries(chunkMap)) {
+            chunks.sort((a, b) => a.index - b.index);
+            aggregatedDocs[parentKey] = {
+              data: chunks.flatMap(c => c.data),
+              updatedAt: Date.now()
+            };
+          }
 
-                const isRecentLocalEdit = (Date.now() - localTime) < 15000;
-                if (!isRecentLocalEdit && (!localTime || cloudTime > localTime)) {
-                  try {
-                    localStorage.setItem(`bs_${change.doc.id}`, JSON.stringify(docData.data));
-                  } catch {}
-                  this.status.totalReceives++;
-                  this.dispatchChange(change.doc.id, docData.data, 'firestore');
-                  changed = true;
-                }
-              }
+          // Hydrate documents on snapshot only if newer than local admin modifications
+          for (const [docId, item] of Object.entries(aggregatedDocs)) {
+            const localTime = parseInt(localStorage.getItem(`bs_${docId}_time`) || '0', 10);
+            const cloudTime = typeof item.updatedAt === 'number'
+              ? item.updatedAt
+              : (item.updatedAt ? new Date(item.updatedAt).getTime() : 0);
+
+            const isRecentLocalEdit = (Date.now() - localTime) < 15000;
+            if (!isRecentLocalEdit && (!localTime || cloudTime > localTime)) {
+              try {
+                localStorage.setItem(`bs_${docId}`, JSON.stringify(item.data));
+                changed = true;
+              } catch {}
             }
-          });
+          }
 
           // Dispatch universal sync event for React re-rendering if data changed
           if (changed) {

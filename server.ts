@@ -135,12 +135,23 @@ async function initServerFirestoreSync() {
     const colRef = collection(firestoreDb, 'institute_data');
     const snap = await getDocs(colRef);
     if (!snap.empty) {
+      const chunkMap: Record<string, { index: number; data: any[] }[]> = {};
       snap.forEach(d => {
         const docData = d.data();
-        if (docData && docData.data !== undefined) {
+        if (!docData) return;
+        if (docData.isChunk && docData.parentKey) {
+          if (!chunkMap[docData.parentKey]) chunkMap[docData.parentKey] = [];
+          chunkMap[docData.parentKey].push({ index: docData.chunkIndex ?? 0, data: docData.data || [] });
+        } else if (!docData.isChunked && docData.data !== undefined) {
           database[d.id] = docData.data;
         }
       });
+
+      for (const [parentKey, chunks] of Object.entries(chunkMap)) {
+        chunks.sort((a, b) => a.index - b.index);
+        database[parentKey] = chunks.flatMap(c => c.data);
+      }
+
       persistDatabase();
       console.log(`[Server] Hydrated ${snap.size} modules directly from Cloud Firestore!`);
     }
@@ -152,6 +163,75 @@ async function initServerFirestoreSync() {
   }
 }
 initServerFirestoreSync();
+
+// Safe write to Firestore with 1MB document size limit guard and automatic chunking
+async function safeServerFirestoreWrite(key: string, value: any) {
+  if (!firestoreDb || serverFirestoreQuotaExhausted) return;
+
+  try {
+    const rawPayload = JSON.stringify({ key, data: value, updatedAt: new Date().toISOString() });
+    const byteSize = Buffer.byteLength(rawPayload, 'utf8');
+
+    // Firestore 1MB document limit guard (1,048,576 bytes). Threshold at 850KB.
+    if (byteSize > 850000) {
+      if (Array.isArray(value) && value.length > 1) {
+        const chunks: any[][] = [];
+        let currentChunk: any[] = [];
+        let currentSize = 0;
+
+        for (const item of value) {
+          const itemSize = Buffer.byteLength(JSON.stringify(item), 'utf8');
+          if (currentSize + itemSize > 600000 && currentChunk.length > 0) {
+            chunks.push(currentChunk);
+            currentChunk = [item];
+            currentSize = itemSize;
+          } else {
+            currentChunk.push(item);
+            currentSize += itemSize;
+          }
+        }
+        if (currentChunk.length > 0) chunks.push(currentChunk);
+
+        for (let i = 0; i < chunks.length; i++) {
+          const chunkRef = doc(firestoreDb, 'institute_data', `${key}__chunk_${i}`);
+          await setDoc(chunkRef, {
+            key: `${key}__chunk_${i}`,
+            isChunk: true,
+            parentKey: key,
+            chunkIndex: i,
+            totalChunks: chunks.length,
+            data: chunks[i],
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        }
+
+        const parentRef = doc(firestoreDb, 'institute_data', key);
+        await setDoc(parentRef, {
+          key,
+          isChunked: true,
+          chunkCount: chunks.length,
+          totalItems: value.length,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        console.log(`[Server] Stored oversized array '${key}' (${byteSize} bytes) into ${chunks.length} safe Firestore chunks.`);
+        return;
+      } else {
+        console.warn(`[Server] Document '${key}' size (${byteSize} bytes) exceeds 850KB. Persisted to disk & Socket.io to prevent 1MB limit crash.`);
+        return;
+      }
+    }
+
+    const docRef = doc(firestoreDb, 'institute_data', key);
+    await setDoc(docRef, { key, data: value, updatedAt: new Date().toISOString() }, { merge: true });
+  } catch (err: any) {
+    if (err?.code === 'resource-exhausted' || String(err).includes('quota') || String(err).includes('Quota')) {
+      flagServerQuotaExhausted();
+    } else {
+      console.warn(`[Server Firestore Write Notice] for ${key}:`, err?.message || err);
+    }
+  }
+}
 
 // Save database to disk and public static paths for 100% reliable Vercel/Express sync
 function persistDatabase() {
@@ -273,14 +353,7 @@ io.on('connection', (socket) => {
 
     // Optional background write to Cloud Firestore
     if (firestoreDb && !serverFirestoreQuotaExhausted) {
-      try {
-        const docRef = doc(firestoreDb, 'institute_data', payload.key);
-        setDoc(docRef, { key: payload.key, data: payload.value, updatedAt: new Date().toISOString() }, { merge: true }).catch((err: any) => {
-          if (err?.code === 'resource-exhausted' || String(err).includes('quota') || String(err).includes('Quota')) {
-            flagServerQuotaExhausted();
-          }
-        });
-      } catch {}
+      safeServerFirestoreWrite(payload.key, payload.value);
     }
   });
 
@@ -438,16 +511,7 @@ app.post('/api/sync/update', async (req: Request, res: Response) => {
 
   // Attempt to sync to Cloud Firestore in background if quota allows
   if (firestoreDb && !serverFirestoreQuotaExhausted) {
-    try {
-      const docRef = doc(firestoreDb, 'institute_data', key);
-      await setDoc(docRef, { key, data: value, updatedAt: new Date().toISOString() }, { merge: true });
-    } catch (e: any) {
-      if (e?.code === 'resource-exhausted' || String(e).includes('quota') || String(e).includes('Quota')) {
-        flagServerQuotaExhausted();
-      } else {
-        console.warn(`[Server] Firestore write notice for ${key}:`, e?.message || e);
-      }
-    }
+    safeServerFirestoreWrite(key, value);
   }
 
   return res.json({ success: true, version: dbVersion });
@@ -469,15 +533,7 @@ app.post('/api/sync/bulk', async (req: Request, res: Response) => {
     (async () => {
       for (const [k, v] of Object.entries(all)) {
         if (!firestoreDb || serverFirestoreQuotaExhausted) break;
-        try {
-          const docRef = doc(firestoreDb, 'institute_data', k);
-          await setDoc(docRef, { key: k, data: v, updatedAt: new Date().toISOString() }, { merge: true });
-        } catch (e: any) {
-          if (e?.code === 'resource-exhausted' || String(e).includes('quota') || String(e).includes('Quota')) {
-            flagServerQuotaExhausted();
-            break;
-          }
-        }
+        await safeServerFirestoreWrite(k, v);
       }
     })();
   }
