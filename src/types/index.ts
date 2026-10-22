@@ -34,16 +34,13 @@ export interface InstituteSettings {
   footerText?: string;
   footerCopyright?: string;
   footerNotice?: string;
-  // GitHub Auto-Push & Vercel Sync
+  // GitHub Single Source of Truth & Vercel Auto-Deployment
   githubRepo?: string;
   githubBranch?: string;
   githubToken?: string;
   githubAutoPushEnabled?: boolean;
-  // Supabase Database & Realtime Sync
-  supabaseUrl?: string;
-  supabaseAnonKey?: string;
-  supabaseTableName?: string;
-  supabaseAutoSyncEnabled?: boolean;
+  githubLastCommitSha?: string;
+  githubLastSyncTime?: number;
 }
 
 export interface HeroSlide {

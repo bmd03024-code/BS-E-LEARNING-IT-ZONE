@@ -4,18 +4,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
 import path from 'path';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
 import { GoogleGenAI } from '@google/genai';
-let firebaseConfig: any = {};
-try {
-  const configPath = path.resolve(process.cwd(), 'firebase-applet-config.json');
-  if (fs.existsSync(configPath)) {
-    firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-  }
-} catch (err) {
-  console.warn('[Server] Could not parse firebase-applet-config.json:', err);
-}
 
 const app = express();
 // Default to 3000 for AI Studio environment and iframe preview, avoiding port 8080 collision with internal proxy
@@ -61,49 +50,6 @@ if (fs.existsSync(DB_FILE)) {
   }
 }
 
-// Initialize Server-side Firebase Firestore instance safely
-let firestoreDb: any = null;
-if (firebaseConfig?.projectId && firebaseConfig?.firestoreDatabaseId) {
-  try {
-    const firebaseApp = initializeApp(firebaseConfig, 'serverApp');
-    firestoreDb = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId);
-  } catch (err) {
-    console.warn('[Server] Could not initialize server Firebase instance:', err);
-  }
-}
-
-// Server Firestore Quota tracking (persisted to disk to eliminate rejected retries)
-const QUOTA_FILE = path.join(DATA_DIR, 'quota_state.json');
-let serverFirestoreQuotaExhausted = false;
-if (fs.existsSync(QUOTA_FILE)) {
-  try {
-    const qData = JSON.parse(fs.readFileSync(QUOTA_FILE, 'utf-8'));
-    if (qData.exhausted && (Date.now() - qData.timestamp < 24 * 60 * 60 * 1000)) {
-      serverFirestoreQuotaExhausted = true;
-      console.log('[Server] Daily Firestore free write quota exhausted. Seamlessly routing all writes through persistent disk and Socket.io.');
-    }
-  } catch {}
-}
-
-function flagServerQuotaExhausted() {
-  if (!serverFirestoreQuotaExhausted) {
-    serverFirestoreQuotaExhausted = true;
-    try {
-      fs.writeFileSync(QUOTA_FILE, JSON.stringify({ exhausted: true, timestamp: Date.now(), reason: 'Daily write limit reached' }), 'utf-8');
-    } catch {}
-    console.warn('[Server] Firestore quota limit reached on write. Routing all future syncs through high-speed disk & Socket.io.');
-  }
-}
-
-// Endpoint to inform clients about Firestore quota state
-app.get('/api/quota-state', (_req: Request, res: Response) => {
-  res.json({
-    exhausted: serverFirestoreQuotaExhausted,
-    firestoreQuotaExhausted: serverFirestoreQuotaExhausted,
-    timestamp: Date.now()
-  });
-});
-
 // Explicit route for institute_db.json with proper JSON headers to prevent HTML fallback
 app.get(['/institute_db.json', '/data/institute_db.json', '/api/institute_db.json'], (_req: Request, res: Response) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -123,115 +69,14 @@ app.get(['/institute_db.json', '/data/institute_db.json', '/api/institute_db.jso
   return res.json({});
 });
 
-// Hydrate server database from Firestore on startup only if disk is empty and quota allows
-async function initServerFirestoreSync() {
-  if (!firestoreDb || serverFirestoreQuotaExhausted) return;
-  if (Object.keys(database).length > 0) {
-    console.log(`[Server] Persistent disk database loaded with ${Object.keys(database).length} modules (Master Source of Truth). Skipping Firestore overwrite.`);
-    return;
-  }
-
-  try {
-    const colRef = collection(firestoreDb, 'institute_data');
-    const snap = await getDocs(colRef);
-    if (!snap.empty) {
-      const chunkMap: Record<string, { index: number; data: any[] }[]> = {};
-      snap.forEach(d => {
-        const docData = d.data();
-        if (!docData) return;
-        if (docData.isChunk && docData.parentKey) {
-          if (!chunkMap[docData.parentKey]) chunkMap[docData.parentKey] = [];
-          chunkMap[docData.parentKey].push({ index: docData.chunkIndex ?? 0, data: docData.data || [] });
-        } else if (!docData.isChunked && docData.data !== undefined) {
-          database[d.id] = docData.data;
-        }
-      });
-
-      for (const [parentKey, chunks] of Object.entries(chunkMap)) {
-        chunks.sort((a, b) => a.index - b.index);
-        database[parentKey] = chunks.flatMap(c => c.data);
-      }
-
-      persistDatabase();
-      console.log(`[Server] Hydrated ${snap.size} modules directly from Cloud Firestore!`);
-    }
-  } catch (err: any) {
-    if (err?.code === 'resource-exhausted' || String(err).includes('quota') || String(err).includes('Quota')) {
-      flagServerQuotaExhausted();
-    }
-    console.warn('[Server] Firestore hydration catch (using disk cache):', err?.message || err);
-  }
-}
-initServerFirestoreSync();
-
-// Safe write to Firestore with 1MB document size limit guard and automatic chunking
-async function safeServerFirestoreWrite(key: string, value: any) {
-  if (!firestoreDb || serverFirestoreQuotaExhausted) return;
-
-  try {
-    const rawPayload = JSON.stringify({ key, data: value, updatedAt: new Date().toISOString() });
-    const byteSize = Buffer.byteLength(rawPayload, 'utf8');
-
-    // Firestore 1MB document limit guard (1,048,576 bytes). Threshold at 850KB.
-    if (byteSize > 850000) {
-      if (Array.isArray(value) && value.length > 1) {
-        const chunks: any[][] = [];
-        let currentChunk: any[] = [];
-        let currentSize = 0;
-
-        for (const item of value) {
-          const itemSize = Buffer.byteLength(JSON.stringify(item), 'utf8');
-          if (currentSize + itemSize > 600000 && currentChunk.length > 0) {
-            chunks.push(currentChunk);
-            currentChunk = [item];
-            currentSize = itemSize;
-          } else {
-            currentChunk.push(item);
-            currentSize += itemSize;
-          }
-        }
-        if (currentChunk.length > 0) chunks.push(currentChunk);
-
-        for (let i = 0; i < chunks.length; i++) {
-          const chunkRef = doc(firestoreDb, 'institute_data', `${key}__chunk_${i}`);
-          await setDoc(chunkRef, {
-            key: `${key}__chunk_${i}`,
-            isChunk: true,
-            parentKey: key,
-            chunkIndex: i,
-            totalChunks: chunks.length,
-            data: chunks[i],
-            updatedAt: new Date().toISOString()
-          }, { merge: true });
-        }
-
-        const parentRef = doc(firestoreDb, 'institute_data', key);
-        await setDoc(parentRef, {
-          key,
-          isChunked: true,
-          chunkCount: chunks.length,
-          totalItems: value.length,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-
-        console.log(`[Server] Stored oversized array '${key}' (${byteSize} bytes) into ${chunks.length} safe Firestore chunks.`);
-        return;
-      } else {
-        console.warn(`[Server] Document '${key}' size (${byteSize} bytes) exceeds 850KB. Persisted to disk & Socket.io to prevent 1MB limit crash.`);
-        return;
-      }
-    }
-
-    const docRef = doc(firestoreDb, 'institute_data', key);
-    await setDoc(docRef, { key, data: value, updatedAt: new Date().toISOString() }, { merge: true });
-  } catch (err: any) {
-    if (err?.code === 'resource-exhausted' || String(err).includes('quota') || String(err).includes('Quota')) {
-      flagServerQuotaExhausted();
-    } else {
-      console.warn(`[Server Firestore Write Notice] for ${key}:`, err?.message || err);
-    }
-  }
-}
+// Endpoint to inform clients about system status
+app.get('/api/quota-state', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    primaryDataSource: 'GitHub Repository (data/institute_db.json)',
+    timestamp: Date.now()
+  });
+});
 
 // Save database to disk and public static paths for 100% reliable Vercel/Express sync
 function persistDatabase() {
@@ -351,10 +196,6 @@ io.on('connection', (socket) => {
       try { client.res.write(`data: ${ssePayload}\n\n`); } catch {}
     }
 
-    // Optional background write to Cloud Firestore
-    if (firestoreDb && !serverFirestoreQuotaExhausted) {
-      safeServerFirestoreWrite(payload.key, payload.value);
-    }
   });
 
   // Client sent bulk updates
@@ -492,9 +333,6 @@ app.get('/api/sync/version', (_req: Request, res: Response) => {
 
 // Get all persisted institutional data
 app.get('/api/sync/all', async (_req: Request, res: Response) => {
-  if (Object.keys(database).length === 0) {
-    await initServerFirestoreSync();
-  }
   res.json({ success: true, version: dbVersion, data: database });
 });
 
@@ -509,11 +347,6 @@ app.post('/api/sync/update', async (req: Request, res: Response) => {
   persistDatabase();
   broadcastUpdate('SYNC_UPDATE', key, value);
 
-  // Attempt to sync to Cloud Firestore in background if quota allows
-  if (firestoreDb && !serverFirestoreQuotaExhausted) {
-    safeServerFirestoreWrite(key, value);
-  }
-
   return res.json({ success: true, version: dbVersion });
 });
 
@@ -527,16 +360,6 @@ app.post('/api/sync/bulk', async (req: Request, res: Response) => {
   database = { ...database, ...all };
   persistDatabase();
   broadcastUpdate('SYNC_ALL');
-
-  // Push keys to Firestore in background if quota allows
-  if (firestoreDb && !serverFirestoreQuotaExhausted) {
-    (async () => {
-      for (const [k, v] of Object.entries(all)) {
-        if (!firestoreDb || serverFirestoreQuotaExhausted) break;
-        await safeServerFirestoreWrite(k, v);
-      }
-    })();
-  }
 
   return res.json({ success: true, version: dbVersion });
 });
@@ -1106,16 +929,7 @@ const putData = responseText ? JSON.parse(responseText) : {};
   }
 });
 
-// Supabase Status Endpoint
-app.get('/api/supabase/status', (_req: Request, res: Response) => {
-  const supaUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
-  const supaKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
-  return res.json({
-    configured: Boolean(supaUrl && supaKey),
-    url: supaUrl ? `${supaUrl.substring(0, 18)}...` : null,
-    hasKey: Boolean(supaKey)
-  });
-});
+
 
 // Vite Middleware for Full-Stack App
 async function startServer() {

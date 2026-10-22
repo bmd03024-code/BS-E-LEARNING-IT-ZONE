@@ -82,7 +82,6 @@ import { masterGateway, GatewayStatus } from '../../services/masterGateway';
 import { toBengaliNum } from '../home/CoursesSection';
 import { ResultGeneratorModule } from './ResultGeneratorModule';
 import { GitHubSyncModal } from './GitHubSyncModal';
-import { SupabaseSyncModal } from './SupabaseSyncModal';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -94,7 +93,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [syncStatus, setSyncStatus] = useState<string>('সবকিছু সিঙ্কড');
   const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
-  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [gatewayStatus, setGatewayStatus] = useState<GatewayStatus>(() => masterGateway.getStatus());
   const [isManualSyncing, setIsManualSyncing] = useState(false);
 
@@ -215,39 +213,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         admin_creds: creds
       };
 
-      const ok = await masterGateway.forceSyncAll(fullState);
-      if (ok) {
-        setSyncStatus('গ্লোবালি সিঙ্কড ✅');
-        setTimeout(() => setSyncStatus('সবকিছু সিঙ্কড'), 3000);
-        alert('✅ আলহামদুলিল্লাহ! ড্যাশবোর্ডের সমস্ত তথ্য মাস্টার গেটওয়ের মাধ্যমে ক্লাউড ডেটাবেজ ও কোডে সফলভাবে রিয়েল-টাইমে সিঙ্ক হয়েছে। পৃথিবীর যেকোনো প্রান্ত থেকে ভিজিটররা এই মুহূর্তে লাইভ দেখতে পাবেন।');
-      } else {
-        setSyncStatus('সংরক্ষিত ✅');
-        setTimeout(() => setSyncStatus('সবকিছু সিঙ্কড'), 3000);
-        alert('✅ তথ্য স্থানীয় ও সার্ভার ক্যাশে সংরক্ষিত হয়েছে।');
+      await masterGateway.publishAll(fullState);
+      setSyncStatus('GitHub-এ সিঙ্কড ✅');
+
+      // Direct commit & push to GitHub (Single Source of Truth -> Vercel Auto-Deploy)
+      let ghSuccess = false;
+      let commitSha = '';
+      try {
+        const ghRes = await storage.pushToGitHub(`Admin Update: ${new Date().toLocaleString('bn-BD')}`);
+        if (ghRes.success) {
+          ghSuccess = true;
+          commitSha = ghRes.commitSha ? ghRes.commitSha.substring(0, 7) : '';
+        }
+      } catch (ghErr) {
+        console.warn('[Admin Save GitHub Notice]:', ghErr);
       }
 
-      // Auto-push to GitHub repository for automatic Vercel live sync
-      if (settings.githubAutoPushEnabled !== false) {
-        const ghToken = settings.githubToken || 'ghp_pIXZV7TX3MvTATEBAddiNkqQ2FbhYK199i0b';
-        const ghRepo = settings.githubRepo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
-        const ghBranch = settings.githubBranch || 'main';
-        fetch('/api/github/push', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            token: ghToken,
-            repo: ghRepo,
-            branch: ghBranch,
-            content: fullState,
-            message: `Admin Auto-Sync: Updates to institute data [${new Date().toISOString()}]`
-          })
-        }).then(r => r.json()).then(res => {
-          if (res.success) {
-            console.log('[GitHub Auto-Push] Committed & Pushed to GitHub:', res.commitSha);
-          }
-        }).catch(err => {
-          console.warn('[GitHub Auto-Push Notice]:', err);
-        });
+      setTimeout(() => setSyncStatus('সবকিছু সিঙ্কড'), 3500);
+
+      if (ghSuccess) {
+        alert(`✅ আলহামদুলিল্লাহ! সমস্ত ডাটা নিরাপদে GitHub রিপোজিটরিতে কমিট (${commitSha}) হয়েছে। Vercel স্বয়ংক্রিয়ভাবে লাইভ সাইট রি-ডিপ্লয় করছে এবং সকল ব্রাউজারে সর্বশেষ আপডেট কার্যকর হয়েছে।`);
+      } else {
+        alert('✅ সমস্ত তথ্য লোকাল স্টোরেজে সফলভাবে সংরক্ষিত হয়েছে। GitHub-এ অটো-কমিটের জন্য Admin Panel > GitHub সেটিংসে Personal Access Token দিন।');
       }
     } catch {
       setSyncStatus('সংরক্ষিত ✅');
@@ -6039,21 +6026,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           <p className="text-[11px] text-slate-500 text-center">টোকেন ভেরিফিকেশন ও লাইভ পুশ টেস্ট</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-emerald-200 bg-gradient-to-b from-white to-emerald-50/30 shadow-xs space-y-2">
-          <div className="flex items-center gap-2 text-emerald-950 font-bold text-sm">
-            <Database className="w-4 h-4 text-emerald-600" />
-            <span>সুপারবেস ক্লাউড ডেটাবেজ</span>
+        <div className="bg-white p-5 rounded-2xl border border-indigo-200 bg-gradient-to-b from-white to-indigo-50/30 shadow-xs space-y-2">
+          <div className="flex items-center gap-2 text-indigo-950 font-bold text-sm">
+            <Github className="w-4 h-4 text-indigo-600" />
+            <span>GitHub একক ডাটাবেজ &amp; Vercel</span>
           </div>
           <button
             type="button"
-            onClick={() => setIsSupabaseModalOpen(true)}
-            className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-800 to-teal-800 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+            onClick={() => setIsGitHubModalOpen(true)}
+            className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-800 to-purple-800 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
           >
-            <Database className="w-3.5 h-3.5 text-emerald-300" />
-            <span>সুপারবেস প্যানেল ও লাইভ সিঙ্ক</span>
+            <Github className="w-3.5 h-3.5 text-indigo-300" />
+            <span>GitHub সেটিংস ও সিঙ্ক কন্ট্রোল</span>
           </button>
           <p className="text-[11px] text-slate-500 text-center font-medium">
-            {gatewayStatus.supabaseConnected ? 'সংযুক্ত ও সক্রিয় ✅' : 'URL ও Key দিয়ে কানেক্ট করুন'}
+            {gatewayStatus.githubConnected ? 'সংযুক্ত ও অটো-পুশ সক্রিয় ✅' : 'Personal Access Token দিয়ে কানেক্ট করুন'}
           </p>
         </div>
       </div>
@@ -6097,17 +6084,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <span className="text-purple-300 font-bold">অটো-পুশ</span>
             </button>
 
-            <button
-              onClick={() => setIsSupabaseModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 hover:border-emerald-500/50 transition-all cursor-pointer shadow-xs"
-              title="সুপারবেস ডেটাবেজ ও রিয়েল-টাইম লাইভ সিঙ্ক প্যানেল খুলুন"
-            >
-              <Database className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="hidden sm:inline">সুপারবেস:</span>
-              <span className="text-emerald-300 font-bold">
-                {gatewayStatus.supabaseConnected ? 'সংযুক্ত ✅' : 'সেটিংস'}
-              </span>
-            </button>
 
             <button
               onClick={handleSaveAll}
@@ -7060,14 +7036,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="p-4 rounded-2xl bg-slate-800/70 border border-slate-700/60">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-slate-400 font-medium">ক্লাউড ডাটাবেজ</span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className={`w-2.5 h-2.5 rounded-full ${gatewayStatus.githubConnected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
                 </div>
                 <div className="text-sm font-bold text-white flex items-center gap-1.5">
-                  <Wifi className="w-4 h-4 text-emerald-400" />
-                  <span>Firestore Cloud</span>
+                  <Github className="w-4 h-4 text-purple-400" />
+                  <span>GitHub Repository</span>
                 </div>
-                <div className="text-[11px] text-emerald-400 mt-1 font-mono">
-                  {gatewayStatus.firestoreConnected ? 'অনলাইন & সংযুক্ত' : 'স্বয়ংক্রিয় সিঙ্ক প্রস্তুত'}
+                <div className="text-[11px] text-purple-300 mt-1 font-mono">
+                  {gatewayStatus.githubConnected ? 'একক ডাটাবেজ সংযুক্ত ✅' : 'টোকেন দিয়ে কানেক্ট করুন'}
                 </div>
               </div>
 
@@ -7160,18 +7136,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       <GitHubSyncModal
         isOpen={isGitHubModalOpen}
         onClose={() => setIsGitHubModalOpen(false)}
-        settings={settings}
-        onUpdateSettings={(newSettings) => {
-          setSettings(newSettings);
-          storage.saveSettings(newSettings);
-        }}
-        triggerNotification={triggerSaveNotification}
-      />
-
-      {/* Supabase Database & Realtime Sync Modal */}
-      <SupabaseSyncModal
-        isOpen={isSupabaseModalOpen}
-        onClose={() => setIsSupabaseModalOpen(false)}
         settings={settings}
         onUpdateSettings={(newSettings) => {
           setSettings(newSettings);

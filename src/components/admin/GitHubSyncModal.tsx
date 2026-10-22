@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { InstituteSettings } from '../../types';
 import { storage } from '../../services/storage';
+import { githubDataService } from '../../services/githubDataService';
 import {
   X,
   GitBranch,
@@ -12,7 +13,7 @@ import {
   Eye,
   EyeOff,
   ExternalLink,
-  ShieldCheck,
+  Download,
   Zap
 } from 'lucide-react';
 
@@ -31,17 +32,15 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
   onUpdateSettings,
   triggerNotification
 }) => {
-  const [token, setToken] = useState(
-    settings.githubToken || ''
-  );
-  const [repo, setRepo] = useState(
-    settings.githubRepo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE'
-  );
-  const [branch, setBranch] = useState(settings.githubBranch || 'main');
-  const [autoPush, setAutoPush] = useState(settings.githubAutoPushEnabled !== false);
+  const currentCfg = githubDataService.getConfig();
+  const [token, setToken] = useState(settings.githubToken || currentCfg.token || '');
+  const [repo, setRepo] = useState(settings.githubRepo || currentCfg.repo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE');
+  const [branch, setBranch] = useState(settings.githubBranch || currentCfg.branch || 'main');
+  const [autoPush, setAutoPush] = useState(settings.githubAutoPushEnabled !== false && currentCfg.autoPushEnabled !== false);
 
   const [showToken, setShowToken] = useState(false);
   const [testingConnection, setTestingConnection] = useState(false);
+  const [pulling, setPulling] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<{
     connected?: boolean;
     message?: string;
@@ -69,25 +68,17 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
     setTestingConnection(true);
     setConnectionStatus(null);
     try {
-      const res = await fetch(`/api/github/status?token=${encodeURIComponent(token)}&repo=${encodeURIComponent(repo)}`);
-      const data = await res.json();
-      if (data.success && data.connected) {
-        setConnectionStatus({
-          connected: true,
-          message: `কানেক্টেড! রিপোজিটরির নাম: ${data.fullName} (ডিফল্ট ব্রাঞ্চ: ${data.defaultBranch})`,
-          repoName: data.fullName,
-          defaultBranch: data.defaultBranch
-        });
-      } else {
-        setConnectionStatus({
-          connected: false,
-          message: data.error || 'GitHub এপিআই অথেনটিকেশন ব্যর্থ হয়েছে। টোকেনটি চেক করুন।'
-        });
-      }
+      const res = await githubDataService.testConnection(token.trim(), repo.trim());
+      setConnectionStatus({
+        connected: res.connected,
+        message: res.message,
+        repoName: res.fullName,
+        defaultBranch: res.defaultBranch
+      });
     } catch (e: any) {
       setConnectionStatus({
         connected: false,
-        message: 'নেটওয়ার্ক এরর অথবা সার্ভার রেসপন্স পাওয়া যায়নি।'
+        message: 'নেটওয়ার্ক এরর অথবা GitHub সার্ভার রেসপন্স পাওয়া যায়নি।'
       });
     } finally {
       setTestingConnection(false);
@@ -104,8 +95,14 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
     };
     onUpdateSettings(updated);
     storage.saveSettings(updated);
+    githubDataService.saveConfig({
+      token: token.trim(),
+      repo: repo.trim(),
+      branch: branch.trim(),
+      autoPushEnabled: autoPush
+    });
     triggerNotification('GitHub কনফিগারেশন সংরক্ষিত হয়েছে!');
-    alert('✅ GitHub অটো-পুশ কনফিগারেশন সফলভাবে সংরক্ষিত হয়েছে!');
+    alert('✅ GitHub একক ডাটাবেজ কনফিগারেশন সফলভাবে সংরক্ষিত হয়েছে!');
   };
 
   const handleManualPush = async () => {
@@ -113,41 +110,28 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
     setPushResult(null);
 
     // Save configuration first
-    const updated: InstituteSettings = {
-      ...settings,
-      githubToken: token.trim(),
-      githubRepo: repo.trim(),
-      githubBranch: branch.trim(),
-      githubAutoPushEnabled: autoPush
-    };
-    onUpdateSettings(updated);
-    storage.saveSettings(updated);
+    handleSaveConfig();
 
     try {
-      const res = await fetch('/api/github/push', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          token: token.trim(),
-          repo: repo.trim(),
-          branch: branch.trim(),
-          message: `Admin Auto-Sync: Updates to BS E-Learning database [${new Date().toLocaleString('bn-BD')}]`
-        })
-      });
+      const fullDb = storage.getFullDatabase();
+      const res = await githubDataService.commitAndPush(
+        fullDb,
+        `Admin Auto-Sync: Updates to BS E-Learning database [${new Date().toLocaleString('bn-BD')}]`,
+        token.trim()
+      );
 
-      const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.success) {
         setPushResult({
           success: true,
-          message: data.message || 'সফলভাবে GitHub-এ পুশ সম্পন্ন হয়েছে!',
-          commitUrl: data.commitUrl,
-          commitSha: data.commitSha
+          message: res.message,
+          commitUrl: res.commitUrl,
+          commitSha: res.commitSha
         });
-        triggerNotification('GitHub-এ অটো পুশ সম্পন্ন ও Vercel সিঙ্ক শুরু হয়েছে!');
+        triggerNotification('GitHub-এ পুশ সম্পন্ন! Vercel স্বয়ংক্রিয়ভাবে নতুন বিল্ড শুরু করেছে।');
       } else {
         setPushResult({
           success: false,
-          message: data.error || 'GitHub পুশ ব্যর্থ হয়েছে। অনুগ্রহ করে টোকেন ও পারমিশন চেক করুন।'
+          message: res.message || 'GitHub পুশ ব্যর্থ হয়েছে। অনুগ্রহ করে টোকেন ও পারমিশন চেক করুন।'
         });
       }
     } catch (e: any) {
@@ -157,6 +141,23 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
       });
     } finally {
       setPushing(false);
+    }
+  };
+
+  const handlePullFromGitHub = async () => {
+    setPulling(true);
+    try {
+      const res = await githubDataService.pullLatestData();
+      if (res.success) {
+        triggerNotification('GitHub থেকে সর্বশেষ ডাটা সফলভাবে নামানো হয়েছে!');
+        alert('✅ আলহামদুলিল্লাহ! GitHub রিপোজিটরির data/institute_db.json থেকে সর্বশেষ ডাটা আপনার ব্রাউজারে সিঙ্ক হয়েছে।');
+      } else {
+        alert('⚠️ GitHub থেকে ডাটা রিড করা যায়নি। ইন্টারনেট সংযোগ ও রিপোজিটরি নাম পরীক্ষা করুন।');
+      }
+    } catch (e: any) {
+      alert(`⚠️ ত্রুটি: ${e?.message || 'GitHub থেকে ডাটা নামানো যায়নি'}`);
+    } finally {
+      setPulling(false);
     }
   };
 
@@ -178,13 +179,13 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
           </div>
           <div>
             <h3 className="text-xl font-black text-white flex items-center gap-2">
-              <span>GitHub অটো-পুশ &amp; Vercel সিঙ্ক</span>
+              <span>GitHub একক ডাটাবেজ &amp; Vercel সিঙ্ক</span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                Live Deployment
+                Single Source of Truth
               </span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              অ্যাডমিন প্যানেলের সমস্ত ডাটা সরাসরি GitHub রিপোজিটরিতে অটো-পুশ এবং Vercel অটোমেটিক রি-ডিপ্লয়মেন্ট
+              GitHub হবে একমাত্র মূল ডাটা সোর্স। Admin থেকে পুশ করলেই Vercel অটো ডিপ্লয় হবে এবং সব ব্রাউজারে আপডেট দেখা যাবে।
             </p>
           </div>
         </div>
@@ -197,13 +198,16 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
           </div>
           <ol className="list-decimal list-inside space-y-1 text-slate-300 leading-relaxed pl-1">
             <li>
-              অ্যাডমিন প্যানেলে যেকোনো মডিউল পরিবর্তন বা সেভ করা মাত্রই সম্পূর্ণ ডাটাবেজ <span className="font-mono text-emerald-300">data/institute_db.json</span> ফাইলে সিঙ্ক হয়।
+              অ্যাডমিন প্যানেলে যেকোনো মডিউল পরিবর্তন বা সেভ করা মাত্রই সম্পূর্ণ ডাটাবেজ <span className="font-mono text-emerald-300">data/institute_db.json</span> ফাইলে সেভ হয়।
             </li>
             <li>
-              GitHub Personal Access Token দিয়ে এপিআই-এর মাধ্যমে আপনার মূল রিপোজিটরিতে (<span className="font-mono text-blue-300">{repo}</span>) নতুন কমিট তৈরি করে পুশ হয়।
+              GitHub Personal Access Token দিয়ে আপনার রিপোজিটরিতে (<span className="font-mono text-blue-300">{repo}</span>) নতুন কমিট তৈরি হয়ে নিরাপদে পুশ হয়।
             </li>
             <li>
-              Vercel যেহেতু GitHub-এর সাথে কানেক্টেড, পুশ পাওয়া মাত্রই Vercel স্বয়ংক্রিয়ভাবে লাইভ সাইট রি-ডিপ্লয় করে সিঙ্ক নিশ্চিত করে।
+              Vercel যেহেতু GitHub-এর সাথে কানেক্টেড, পুশ পাওয়া মাত্রই Vercel স্বয়ংক্রিয়ভাবে লাইভ সাইট রি-ডিপ্লয় করে।
+            </li>
+            <li>
+              অন্যান্য ভিজিটর ও ব্রাউজার সরাসরি GitHub Raw Content এবং Vercel থেকে সর্বশেষ তথ্য রিয়েল-টাইমে দেখতে পায়।
             </li>
           </ol>
         </div>
@@ -235,7 +239,7 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
                 <p className="text-[11px] leading-relaxed">{connectionStatus.message}</p>
                 {!connectionStatus.connected && (
                   <p className="text-[10px] text-amber-300/90 pt-1">
-                    পরামর্শ: GitHub Personal Access Token টি যদি Expired বা Revoked হয়ে থাকে, তবে <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="underline font-bold text-amber-200">GitHub Settings &rarr; Developer Settings &rarr; Personal access tokens</a> থেকে "repo" পারমিশনসহ একটি নতুন Classic Token তৈরি করে নিচের বক্সে পেস্ট করুন।
+                    পরামর্শ: <a href="https://github.com/settings/tokens" target="_blank" rel="noreferrer" className="underline font-bold text-amber-200">GitHub Settings &rarr; Developer Settings &rarr; Personal access tokens</a> থেকে "repo" পারমিশনসহ একটি নতুন Classic Token তৈরি করে নিচের বক্সে পেস্ট করুন।
                   </p>
                 )}
               </div>
@@ -310,7 +314,7 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
             <div>
               <span className="block text-xs font-bold text-white">সেভ করার সাথে সাথে অটো-পুশ চালু রাখুন</span>
               <span className="block text-[11px] text-slate-400">
-                ড্যাশবোর্ডে "সব সেভ করুন" চাপলে স্বয়ংক্রিয়ভাবে GitHub-এও পুশ হবে
+                ড্যাশবোর্ডে যেকোনো তথ্য পরিবর্তন করলে স্বয়ংক্রিয়ভাবে GitHub-এ কমিট হবে
               </span>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -363,7 +367,7 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
               type="button"
               disabled={testingConnection}
               onClick={testGitHubConnection}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
+              className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${testingConnection ? 'animate-spin' : ''}`} />
               <span>কানেকশন টেস্ট</span>
@@ -371,8 +375,19 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
 
             <button
               type="button"
+              disabled={pulling}
+              onClick={handlePullFromGitHub}
+              className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-emerald-300 border border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
+              title="GitHub রিপোজিটরির data/institute_db.json থেকে সর্বশেষ ডাটা ব্রাউজারে রিফ্রেশ করুন"
+            >
+              <Download className={`w-3.5 h-3.5 ${pulling ? 'animate-bounce' : ''}`} />
+              <span>{pulling ? 'ডাটা আসছে...' : 'GitHub থেকে রিফ্রেশ'}</span>
+            </button>
+
+            <button
+              type="button"
               onClick={handleSaveConfig}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 transition-colors"
+              className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 transition-colors"
             >
               কনফিগ সেভ
             </button>
@@ -391,7 +406,7 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
               type="button"
               disabled={pushing}
               onClick={handleManualPush}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-purple-900/40 transition-all active:scale-95 disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-purple-900/40 transition-all active:scale-95 disabled:opacity-50"
             >
               <Send className={`w-4 h-4 ${pushing ? 'animate-pulse' : ''}`} />
               <span>{pushing ? 'পুশ হচ্ছে...' : 'এখনই GitHub-এ পুশ করুন'}</span>

@@ -19,9 +19,7 @@ import {
   EnrollmentApplication,
   AdminCredentials
 } from '../types';
-import { db, handleFirestoreError, OperationType, isFirestoreQuotaExhausted, safeFirestoreSet } from '../firebase/config';
-import { collection, doc, onSnapshot, getDocs, Unsubscribe } from 'firebase/firestore';
-import { supabaseService } from './supabaseClient';
+import { githubDataService } from './githubDataService';
 
 // Default SVG assets for seals, signature, logos, and Bangla QR
 export const DEFAULT_ASSETS = {
@@ -87,11 +85,7 @@ const initialSettings: InstituteSettings = {
   githubRepo: "bmd03024-code/BS-E-LEARNING-IT-ZONE",
   githubBranch: "main",
   githubToken: "",
-  githubAutoPushEnabled: true,
-  supabaseUrl: "",
-  supabaseAnonKey: "",
-  supabaseTableName: "institute_data",
-  supabaseAutoSyncEnabled: true
+  githubAutoPushEnabled: true
 };
 
 // Initial 3 Hero Slides
@@ -996,98 +990,24 @@ export const compressImage = (file: File | string, maxWidth = 800, quality = 0.7
 class StorageService {
   private liveEventSource: EventSource | null = null;
   private currentDbVersion = 0;
-  private unsubscribeFirestore: Unsubscribe | null = null;
-  private isFirestoreReady = false;
 
   constructor() {
-    this.initFirestoreSync();
     this.initLiveSync();
-  }
-
-  // 1. Firebase Firestore Real-Time Global Synchronization
-  public initFirestoreSync() {
-    if (typeof window === 'undefined') return;
-    if (isFirestoreQuotaExhausted()) {
-      this.isFirestoreReady = false;
-      return;
+    if (typeof window !== 'undefined') {
+      // Pull latest from GitHub Single Source of Truth on startup
+      githubDataService.pullLatestData().catch(() => {});
+      githubDataService.startAutoPoll(60);
     }
-
-    try {
-      const colRef = collection(db, 'institute_data');
-      this.unsubscribeFirestore = onSnapshot(
-        colRef,
-        (snapshot) => {
-          this.isFirestoreReady = true;
-          let changedCount = 0;
-
-          // Hydrate documents on snapshot only if newer than local admin modifications
-          snapshot.docs.forEach((d) => {
-            const key = d.id;
-            const docData = d.data();
-            if (docData && docData.data !== undefined) {
-              const localTime = parseInt(localStorage.getItem(`bs_${key}_time`) || '0', 10);
-              const cloudTime = typeof docData.updatedAt === 'number'
-                ? docData.updatedAt
-                : (docData.updatedAt ? new Date(docData.updatedAt).getTime() : 0);
-
-              // If admin just modified this locally within the last 15 seconds, protect local edit
-              const isRecentLocalEdit = (Date.now() - localTime) < 15000;
-              
-              if (!isRecentLocalEdit && (!localTime || cloudTime > localTime)) {
-                this.setLocalSilently(key, docData.data);
-                changedCount++;
-              }
-            }
-          });
-
-          // Immediate notification on changes across application
-          if (changedCount > 0) {
-            window.dispatchEvent(
-              new CustomEvent('bs_sync', {
-                detail: { fromFirestore: true, count: changedCount }
-              })
-            );
-          }
-        },
-        (error) => {
-          this.isFirestoreReady = false;
-          // Unsubscribe immediately to prevent Firebase SDK backoff retry loop
-          if (this.unsubscribeFirestore) {
-            try { this.unsubscribeFirestore(); } catch {}
-            this.unsubscribeFirestore = null;
-          }
-          handleFirestoreError(error, OperationType.GET, 'institute_data');
-        }
-      );
-    } catch (e) {
-      console.warn('[Firestore] Real-time listener init notice:', e);
-    }
-  }
-
-  // Push individual document to Firestore Cloud safely with quota protection
-  private async pushToFirestore<T>(key: string, value: T): Promise<void> {
-    if (isFirestoreQuotaExhausted()) return;
-    try {
-      await safeFirestoreSet('institute_data', key, value);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `institute_data/${key}`);
-    }
-  }
-
-  // Auto-seed Firestore safely without quota exhaustion
-  public async seedFirestoreIfEmpty(): Promise<void> {
-    // Deprecated to prevent write bursts and quota exhaustion; server provides initial defaults.
-    return;
   }
 
   // Real-time synchronization across all browsers worldwide
   public initLiveSync() {
     if (typeof window === 'undefined') return;
 
-    // 1. Initial hydration from server database
+    // 1. Initial hydration from GitHub / server database
     this.hydrateFromServer();
 
-    // 2. Establish live SSE stream as secondary channel
+    // 2. Establish live SSE stream if running full-stack
     try {
       this.liveEventSource = new EventSource('/api/live-sync');
 
@@ -1104,14 +1024,12 @@ class StorageService {
           console.warn('[LiveSync] Message parse error:', e);
         }
       };
-    } catch (e) {
-      console.warn('[LiveSync] SSE setup error:', e);
-    }
+    } catch {}
 
-    // 3. Fallback polling every 5 seconds to guarantee 100% sync
+    // 3. Fallback polling
     setInterval(() => {
       this.checkServerVersion();
-    }, 5000);
+    }, 15000);
   }
 
   private async checkServerVersion() {
@@ -1128,12 +1046,18 @@ class StorageService {
     }
   }
 
-  private async hydrateFromServer() {
+  public async hydrateFromServer() {
     try {
+      // 1. First priority: Pull from GitHub Single Source of Truth
+      const ghResult = await githubDataService.pullLatestData();
+      if (ghResult.success && ghResult.data) {
+        return;
+      }
+
+      // 2. Fallback to server REST API or static institute_db.json
       let data: Record<string, any> | null = null;
       let version = 0;
 
-      // 1. Try server REST API endpoint
       try {
         const res = await fetch('/api/sync/all');
         const cType = res.headers.get('content-type') || '';
@@ -1146,13 +1070,11 @@ class StorageService {
         }
       } catch {}
 
-      // 2. Fallback to static institute_db.json (Vercel / GitHub / static host)
       if (!data) {
         for (const url of ['/institute_db.json', '/data/institute_db.json']) {
           try {
             const res = await fetch(url);
             const cType = res.headers.get('content-type') || '';
-            // Critical: Only parse if valid application/json to avoid HTML error pages
             if (res.ok && cType.includes('application/json')) {
               const parsed = await res.json();
               if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
@@ -1161,18 +1083,6 @@ class StorageService {
               }
             }
           } catch {}
-        }
-      }
-
-      // 3. Fallback to Supabase cloud storage if configured
-      if (!data && supabaseService.isConfigured()) {
-        try {
-          const supa = await supabaseService.pullAllFromSupabase();
-          if (supa.success && supa.data) {
-            data = supa.data;
-          }
-        } catch (e) {
-          console.warn('[Storage] Supabase hydration notice:', e);
         }
       }
 
@@ -1188,13 +1098,14 @@ class StorageService {
     }
   }
 
-  private setLocalSilently<T>(key: string, value: T): void {
+  public setLocalSilently<T>(key: string, value: T): void {
     try {
       localStorage.setItem(`bs_${key}`, JSON.stringify(value));
     } catch (e) {
       console.warn(`LocalStorage quota catch on ${key}:`, e);
     }
   }
+
 
   private get<T>(key: string, fallback: T): T {
     try {
@@ -1210,10 +1121,8 @@ class StorageService {
     try {
       localStorage.setItem(`bs_${key}_time`, Date.now().toString());
     } catch {}
-    if (!isFirestoreQuotaExhausted()) {
-      this.pushToFirestore(key, value);
-    }
-    this.pushToServer(key, value);
+
+    // Cross-tab real-time sync
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         const bc = new BroadcastChannel('bs_master_gateway');
@@ -1221,6 +1130,12 @@ class StorageService {
         bc.close();
       }
     } catch {}
+
+    // Send to server if available
+    this.pushToServer(key, value);
+
+    // Auto-push to GitHub if enabled by admin
+    githubDataService.triggerAutoPush(() => this.getFullDatabase());
   }
 
   private async pushToServer(key: string, value: any) {
@@ -1235,37 +1150,32 @@ class StorageService {
     }
   }
 
+  public getFullDatabase(): Record<string, any> {
+    return {
+      settings: this.getSettings(),
+      slides: this.getSlides(),
+      shortcuts: this.getShortcuts(),
+      courses: this.getCourses(),
+      mentors: this.getMentors(),
+      students: this.getStudents(),
+      applications: this.getApplications(),
+      routines: this.getRoutines(),
+      results: this.getResults(),
+      admit_cards: this.getAdmitCards(),
+      certificates: this.getCertificates(),
+      ledger: this.getLedger(),
+      notices: this.getNotices(),
+      gallery: this.getGallery(),
+      notes: this.getNotes(),
+      demo_classes: this.getDemoClasses(),
+      chatbot: this.getChatbot(),
+      admin_creds: this.getAdminCredentials()
+    };
+  }
+
   public async syncAllToServer(): Promise<void> {
     try {
-      const fullDb = {
-        settings: this.getSettings(),
-        slides: this.getSlides(),
-        shortcuts: this.getShortcuts(),
-        courses: this.getCourses(),
-        mentors: this.getMentors(),
-        students: this.getStudents(),
-        applications: this.getApplications(),
-        routines: this.getRoutines(),
-        results: this.getResults(),
-        admit_cards: this.getAdmitCards(),
-        certificates: this.getCertificates(),
-        ledger: this.getLedger(),
-        notices: this.getNotices(),
-        gallery: this.getGallery(),
-        notes: this.getNotes(),
-        demo_classes: this.getDemoClasses(),
-        chatbot: this.getChatbot(),
-        admin_creds: this.getAdminCredentials()
-      };
-
-      // Push all records to Cloud Firestore only if quota permits
-      if (!isFirestoreQuotaExhausted()) {
-        for (const [k, v] of Object.entries(fullDb)) {
-          if (isFirestoreQuotaExhausted()) break;
-          this.pushToFirestore(k, v);
-        }
-      }
-
+      const fullDb = this.getFullDatabase();
       await fetch('/api/sync/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1274,6 +1184,15 @@ class StorageService {
     } catch (e) {
       console.warn('Sync all error:', e);
     }
+  }
+
+  public async pushToGitHub(commitMsg?: string, customToken?: string) {
+    const fullDb = this.getFullDatabase();
+    return await githubDataService.commitAndPush(fullDb, commitMsg, customToken);
+  }
+
+  public async pullFromGitHub() {
+    return await githubDataService.pullLatestData();
   }
 
   getSettings(): InstituteSettings {
