@@ -559,6 +559,27 @@ const initialResults: ResultRecord[] = [
     grade: "A+"
   },
   {
+    id: "res-101-final",
+    academicYear: "2026",
+    courseId: "course-computer-office",
+    roll: "101",
+    studentName: "মোহাম্মদ আব্দুল্লাহ",
+    fatherName: "রফিকুল ইসলাম",
+    motherName: "নাসিমা বেগম",
+    examType: "সেমিস্টার ফাইনাল পরীক্ষা",
+    published: true,
+    date: "2026-04-10",
+    marks: [
+      { subject: "অফিস অটোমেশন ও সফটওয়্যার প্র্যাকটিস", obtained: 95, total: 100, grade: "A+", gpa: 5.0 },
+      { subject: "উইন্ডোজ ও ইন্টারনেট ব্রাউজিং", obtained: 90, total: 100, grade: "A+", gpa: 5.0 },
+      { subject: "পাওয়ারপয়েন্ট প্রেজেন্টেশন ও ডিজাইন", obtained: 92, total: 100, grade: "A+", gpa: 5.0 },
+      { subject: "চূড়ান্ত ব্যবহারিক ও ল্যাব প্রজেক্ট", obtained: 98, total: 100, grade: "A+", gpa: 5.0 }
+    ],
+    totalMarks: 375,
+    gpa: 5.0,
+    grade: "A+"
+  },
+  {
     id: "res-102",
     academicYear: "2026",
     courseId: "course-ssc-acc",
@@ -574,6 +595,44 @@ const initialResults: ResultRecord[] = [
       { subject: "হিসাববিজ্ঞান ১ম পত্র (এমসিকিউ)", obtained: 27, total: 30, grade: "A+", gpa: 5.0 }
     ],
     totalMarks: 91,
+    gpa: 5.0,
+    grade: "A+"
+  },
+  {
+    id: "res-103",
+    academicYear: "2026",
+    courseId: "course-quran",
+    roll: "103",
+    studentName: "তানভীর আহমেদ",
+    fatherName: "আব্দুর রহিম",
+    motherName: "রোকেয়া খাতুন",
+    examType: "মাসিক মূল্যায়ন পরীক্ষা",
+    published: true,
+    date: "2026-04-05",
+    marks: [
+      { subject: "সহীহ তাজবীদ ও মাখরাজ পরীক্ষা", obtained: 48, total: 50, grade: "A+", gpa: 5.0 },
+      { subject: "সূরা হিফজ ও তিলাওয়াত", obtained: 47, total: 50, grade: "A+", gpa: 5.0 }
+    ],
+    totalMarks: 95,
+    gpa: 5.0,
+    grade: "A+"
+  },
+  {
+    id: "res-104-draft",
+    academicYear: "2026",
+    courseId: "course-spoken-english",
+    roll: "104",
+    studentName: "মাহমুদুল হাসান",
+    fatherName: "দেলোয়ার হোসেন",
+    motherName: "ফারহানা বেগম",
+    examType: "চূড়ান্ত মূল্যায়ন পরীক্ষা",
+    published: false,
+    date: "2026-04-12",
+    marks: [
+      { subject: "English Fluency & Pronunciation", obtained: 82, total: 100, grade: "A+", gpa: 5.0 },
+      { subject: "Listening & Comprehension", obtained: 85, total: 100, grade: "A+", gpa: 5.0 }
+    ],
+    totalMarks: 167,
     gpa: 5.0,
     grade: "A+"
   }

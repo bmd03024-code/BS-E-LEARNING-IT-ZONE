@@ -110,6 +110,7 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
   // Filter States for Result List
   const [filterYear, setFilterYear] = useState('2026');
   const [filterCourse, setFilterCourse] = useState('all');
+  const [filterExamType, setFilterExamType] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Print Preview Modal State
@@ -345,14 +346,18 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
   const displayedResults = results.filter(r => {
     const matchYear = filterYear === 'all' || r.academicYear === filterYear;
     const matchCourse = filterCourse === 'all' || r.courseId === filterCourse;
+    const matchExam = filterExamType === 'all' || r.examType === filterExamType;
     const q = searchQuery.toLowerCase().trim();
     const matchSearch =
       !q ||
       r.roll.toLowerCase().includes(q) ||
       r.studentName.toLowerCase().includes(q) ||
       r.examType.toLowerCase().includes(q);
-    return matchYear && matchCourse && matchSearch;
+    return matchYear && matchCourse && matchExam && matchSearch;
   });
+
+  // Extract distinct exam types from results for filtering
+  const distinctExamTypes = Array.from(new Set(results.map(r => r.examType.trim()))).filter(Boolean);
 
   return (
     <div className="space-y-8">
@@ -454,17 +459,42 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              ৩. পরীক্ষার ধরণ (Exam Type) *
+            <label className="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+              <span>৩. পরীক্ষার ধরণ (Exam Type) *</span>
+              <span className="text-[10px] text-blue-700 font-semibold">ক্লিক বা টাইপ করুন</span>
             </label>
             <input
               type="text"
               required
-              placeholder="যেমন: সেমিস্টার ফাইনাল ২০২৬"
+              list="admin-exam-type-suggestions"
+              placeholder="যেমন: সেমিস্টার ফাইনাল পরীক্ষা"
               value={examType}
               onChange={e => setExamType(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold bg-white focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-bold bg-white focus:ring-2 focus:ring-blue-600 focus:outline-hidden text-blue-950"
             />
+            <datalist id="admin-exam-type-suggestions">
+              <option value="সেমিস্টার ফাইনাল পরীক্ষা" />
+              <option value="মাসিক মূল্যায়ন পরীক্ষা" />
+              <option value="মিড-টার্ম অ্যাসেসমেন্ট" />
+              <option value="মডেল টেস্ট ২০২৬" />
+              <option value="চূড়ান্ত মূল্যায়ন পরীক্ষা" />
+              <option value="বার্ষিক মূল্যায়ন পরীক্ষা" />
+              <option value="সাপ্তাহিক টেস্ট" />
+            </datalist>
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {['সেমিস্টার ফাইনাল পরীক্ষা', 'মাসিক মূল্যায়ন পরীক্ষা', 'মিড-টার্ম অ্যাসেসমেন্ট', 'মডেল টেস্ট ২০২৬'].map((preset, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setExamType(preset)}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${
+                    examType === preset ? 'bg-blue-900 text-amber-300 border-blue-900' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-100'
+                  }`}
+                >
+                  {preset}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
@@ -796,6 +826,19 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
               {courses.map(c => (
                 <option key={c.id} value={c.id}>
                   {c.title}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={filterExamType}
+              onChange={e => setFilterExamType(e.target.value)}
+              className="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold bg-white text-blue-950 max-w-48 truncate"
+            >
+              <option value="all">সকল পরীক্ষার ধরণ</option>
+              {distinctExamTypes.map((ex, idx) => (
+                <option key={idx} value={ex}>
+                  {ex}
                 </option>
               ))}
             </select>
