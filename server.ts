@@ -7,8 +7,8 @@ import path from 'path';
 import { GoogleGenAI } from '@google/genai';
 
 const app = express();
-// Default to 3000 for AI Studio environment and iframe preview, avoiding port 8080 collision with internal proxy
-const port = (Number(process.env.PORT) === 8080 || !process.env.PORT) ? 3000 : Number(process.env.PORT);
+// Default to 3000 for AI Studio environment and iframe preview
+const port = 3000;
 const server = http.createServer(app);
 
 // Initialize Socket.io Server attached to same HTTP server (No extra ports needed!)

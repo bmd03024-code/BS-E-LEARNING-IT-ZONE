@@ -708,79 +708,248 @@
   ],
   "results": [
     {
+      "id": "res-101",
       "academicYear": "2026",
+      "courseId": "course-computer-office",
+      "roll": "101",
+      "studentName": "মোহাম্মদ আব্দুল্লাহ",
+      "fatherName": "রফিকুল ইসলাম",
+      "motherName": "নাসিমা বেগম",
+      "examType": "মিড-টার্ম অ্যাসেসমেন্ট",
+      "published": true,
+      "date": "2026-03-20",
       "marks": [
         {
           "subject": "কম্পিউটার ফান্ডামেন্টাল ও উইন্ডোজ",
-          "total": 100,
-          "gpa": 5,
           "obtained": 92,
-          "grade": "A+"
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
         },
         {
           "subject": "মাইক্রোসফট ওয়ার্ড ও বাংলা টাইপিং",
+          "obtained": 88,
           "total": 100,
-          "gpa": 5,
           "grade": "A+",
-          "obtained": 88
+          "gpa": 5
         },
         {
-          "total": 100,
-          "gpa": 5,
           "subject": "মাইক্রোসফট এক্সেল ও ফর্মুলা",
           "obtained": 85,
-          "grade": "A+"
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
         },
         {
           "subject": "ব্যবহারিক ও মৌখিক পরীক্ষা",
-          "gpa": 5,
-          "grade": "A+",
           "obtained": 95,
-          "total": 100
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
         }
       ],
-      "id": "res-101",
-      "gpa": 5,
-      "published": true,
-      "date": "2026-03-20",
-      "fatherName": "রফিকুল ইসলাম",
-      "motherName": "নাসিমা বেগম",
       "totalMarks": 360,
-      "studentName": "মোহাম্মদ আব্দুল্লাহ",
-      "courseId": "course-computer-office",
-      "examType": "মিড-টার্ম অ্যাসেসমেন্ট",
-      "roll": "101",
+      "gpa": 5,
       "grade": "A+"
     },
     {
+      "id": "res-101-final",
+      "academicYear": "2026",
+      "courseId": "course-computer-office",
+      "roll": "101",
+      "studentName": "মোহাম্মদ আব্দুল্লাহ",
+      "fatherName": "রফিকুল ইসলাম",
+      "motherName": "নাসিমা বেগম",
+      "examType": "সেমিস্টার ফাইনাল পরীক্ষা",
       "published": true,
+      "date": "2026-04-10",
+      "marks": [
+        {
+          "subject": "অফিস অটোমেশন ও সফটওয়্যার প্র্যাকটিস",
+          "obtained": 95,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        },
+        {
+          "subject": "উইন্ডোজ ও ইন্টারনেট ব্রাউজিং",
+          "obtained": 90,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        },
+        {
+          "subject": "পাওয়ারপয়েন্ট প্রেজেন্টেশন ও ডিজাইন",
+          "obtained": 92,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        },
+        {
+          "subject": "চূড়ান্ত ব্যবহারিক ও ল্যাব প্রজেক্ট",
+          "obtained": 98,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        }
+      ],
+      "totalMarks": 375,
+      "gpa": 5,
+      "grade": "A+"
+    },
+    {
       "id": "res-102",
       "academicYear": "2026",
+      "courseId": "course-ssc-acc",
+      "roll": "102",
+      "studentName": "ফাতেমা তুজ জোহরা",
+      "fatherName": "আবুল কালাম",
+      "motherName": "শাহনাজ পারভীন",
+      "examType": "মডেল টেস্ট ২০২৬",
+      "published": true,
       "date": "2026-03-25",
       "marks": [
         {
-          "total": 70,
-          "obtained": 64,
-          "gpa": 5,
           "subject": "হিসাববিজ্ঞান ১ম পত্র (সৃজনশীল)",
-          "grade": "A+"
+          "obtained": 64,
+          "total": 70,
+          "grade": "A+",
+          "gpa": 5
         },
         {
           "subject": "হিসাববিজ্ঞান ১ম পত্র (এমসিকিউ)",
           "obtained": 27,
-          "grade": "A+",
           "total": 30,
+          "grade": "A+",
           "gpa": 5
         }
       ],
-      "gpa": 5,
       "totalMarks": 91,
-      "examType": "মডেল টেস্ট ২০২৬",
-      "motherName": "শাহনাজ পারভীন",
-      "fatherName": "আবুল কালাম",
-      "studentName": "ফাতেমা তুজ জোহরা",
+      "gpa": 5,
+      "grade": "A+"
+    },
+    {
+      "id": "res-102-final",
+      "academicYear": "2026",
       "courseId": "course-ssc-acc",
       "roll": "102",
+      "studentName": "ফাতেমা তুজ জোহরা",
+      "fatherName": "আবুল কালাম",
+      "motherName": "শাহনাজ পারভীন",
+      "examType": "সেমিস্টার ফাইনাল পরীক্ষা",
+      "published": true,
+      "date": "2026-04-15",
+      "marks": [
+        {
+          "subject": "হিসাববিজ্ঞান ১ম ও ২য় পত্র পূর্ণাঙ্গ",
+          "obtained": 92,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        },
+        {
+          "subject": "সৃজনশীল ও আর্থিক বিবরণী মডেল",
+          "obtained": 94,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        }
+      ],
+      "totalMarks": 186,
+      "gpa": 5,
+      "grade": "A+"
+    },
+    {
+      "id": "res-103",
+      "academicYear": "2026",
+      "courseId": "course-quran",
+      "roll": "103",
+      "studentName": "তানভীর হাসান",
+      "fatherName": "মো: কামরুল হাসান",
+      "motherName": "রোকেয়া বেগম",
+      "examType": "মাসিক মূল্যায়ন পরীক্ষা",
+      "published": true,
+      "date": "2026-04-05",
+      "marks": [
+        {
+          "subject": "সহীহ তাজবীদ ও মাখরাজ পরীক্ষা",
+          "obtained": 48,
+          "total": 50,
+          "grade": "A+",
+          "gpa": 5
+        },
+        {
+          "subject": "সূরা হিফজ ও তিলাওয়াত",
+          "obtained": 47,
+          "total": 50,
+          "grade": "A+",
+          "gpa": 5
+        }
+      ],
+      "totalMarks": 95,
+      "gpa": 5,
+      "grade": "A+"
+    },
+    {
+      "id": "res-103-final",
+      "academicYear": "2026",
+      "courseId": "course-quran",
+      "roll": "103",
+      "studentName": "তানভীর হাসান",
+      "fatherName": "মো: কামরুল হাসান",
+      "motherName": "রোকেয়া বেগম",
+      "examType": "সেমিস্টার ফাইনাল পরীক্ষা",
+      "published": true,
+      "date": "2026-04-20",
+      "marks": [
+        {
+          "subject": "পূর্ণাঙ্গ কুরআন তিলাওয়াত ও তাজবীদ",
+          "obtained": 96,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        },
+        {
+          "subject": "প্র্যাকটিক্যাল নামাজ ও দোআ হিফজ",
+          "obtained": 98,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        }
+      ],
+      "totalMarks": 194,
+      "gpa": 5,
+      "grade": "A+"
+    },
+    {
+      "id": "res-104",
+      "academicYear": "2026",
+      "courseId": "course-spoken-english",
+      "roll": "104",
+      "studentName": "মাহমুদুল হাসান",
+      "fatherName": "দেলোয়ার হোসেন",
+      "motherName": "ফারহানা বেগম",
+      "examType": "চূড়ান্ত মূল্যায়ন পরীক্ষা",
+      "published": true,
+      "date": "2026-04-12",
+      "marks": [
+        {
+          "subject": "English Fluency & Pronunciation",
+          "obtained": 88,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        },
+        {
+          "subject": "Listening & Presentation Skills",
+          "obtained": 90,
+          "total": 100,
+          "grade": "A+",
+          "gpa": 5
+        }
+      ],
+      "totalMarks": 178,
+      "gpa": 5,
       "grade": "A+"
     }
   ],
