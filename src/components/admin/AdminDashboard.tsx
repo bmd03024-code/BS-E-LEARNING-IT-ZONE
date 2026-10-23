@@ -91,7 +91,6 @@ interface AdminDashboardProps {
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onViewWebsite }) => {
   const [activeModule, setActiveModule] = useState<number | null>(null);
   const [syncStatus, setSyncStatus] = useState<string>('সবকিছু সিঙ্কড');
-  const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
   const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
   const [gatewayStatus, setGatewayStatus] = useState<GatewayStatus>(() => masterGateway.getStatus());
   const [isManualSyncing, setIsManualSyncing] = useState(false);
@@ -6064,24 +6063,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
           <div className="flex items-center gap-2 sm:gap-3">
             <button
-              onClick={() => setIsGatewayModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 hover:border-emerald-500/50 transition-all cursor-pointer shadow-xs"
-              title="মাস্টার গেটওয়ে রিয়েল-টাইম ক্লাউড স্ট্যাটাস দেখতে ক্লিক করুন"
-            >
-              <Globe className="w-3.5 h-3.5 text-emerald-400 animate-spin" style={{ animationDuration: '8s' }} />
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="hidden sm:inline">গেটওয়ে:</span>
-              <span className="text-emerald-300 font-bold">{syncStatus}</span>
-            </button>
-
-            <button
               onClick={() => setIsGitHubModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 hover:border-purple-500/50 transition-all cursor-pointer shadow-xs"
-              title="GitHub অটো-পুশ ও Vercel লাইভ সিঙ্ক উইন্ডো ওপেন করুন"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 hover:border-purple-500/50 transition-all cursor-pointer shadow-xs"
+              title="GitHub একক ডাটাবেজ ও লাইভ Vercel সিঙ্ক উইন্ডো ওপেন করুন"
             >
-              <Github className="w-3.5 h-3.5 text-purple-400" />
-              <span className="hidden sm:inline">GitHub:</span>
-              <span className="text-purple-300 font-bold">অটো-পুশ</span>
+              <Github className="w-4 h-4 text-purple-400" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="hidden sm:inline">GitHub সিঙ্ক:</span>
+              <span className="text-purple-300 font-bold">{syncStatus}</span>
             </button>
 
 
@@ -6977,160 +6966,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         </div>
       )}
 
-      {/* Master Gateway Real-Time Control & Status Modal */}
-      {isGatewayModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-3xl shadow-2xl p-6 sm:p-8 text-white relative animate-in fade-in zoom-in-95 duration-200">
-            <button
-              onClick={() => setIsGatewayModalOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <Globe className="w-6 h-6 text-white animate-spin" style={{ animationDuration: '10s' }} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <span>মাস্টার গেটওয়ে রিয়েল-টাইম কন্ট্রোল</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                    Active & Live
-                  </span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  গ্লোবাল ক্লাউড সিঙ্ক্রোনাইজেশন ও অ্যাডমিন-টু-কোড লাইভ লেয়ার
-                </p>
-              </div>
-            </div>
-
-            {/* Core Principle Notice */}
-            <div className="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-800/60 mb-6 space-y-1.5 text-xs">
-              <div className="flex items-center gap-2 text-emerald-300 font-bold">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>অ্যাডমিন পরিবর্তনই চূড়ান্ত & বিশ্বব্যাপী তাৎক্ষণিক সিঙ্ক</span>
-              </div>
-              <p className="text-slate-300 leading-relaxed pl-6">
-                অ্যাডমিন প্যানেল থেকে যেকোনো তথ্য (কোর্স, শিক্ষক, নোটিস, সিল-স্বাক্ষর, ফি বা সেটিংস) পরিবর্তন বা সেভ করা মাত্রই তা সরাসরি মাস্টার গেটওয়ের মাধ্যমে ক্লাউডে সিঙ্ক হয়ে যায়। পৃথিবীর যেকোনো স্থান থেকে ওয়েবসাইট ওপেন করলেই অ্যাডমিনের সর্বশেষ পরিবর্তনটি ১ সেকেন্ডেরও কম সময়ে লাইভ দেখা যাবে।
-              </p>
-            </div>
-
-            {/* Channel Metrics Grid - 4 Pillars of Lifetime Sync */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-950/80 to-slate-900 border border-indigo-700/60 shadow-md">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-indigo-300 font-bold">Socket.io (Render)</span>
-                  <span className={`w-2.5 h-2.5 rounded-full ${gatewayStatus.socketConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-                </div>
-                <div className="text-sm font-bold text-white flex items-center gap-1.5">
-                  <Activity className="w-4 h-4 text-emerald-400" />
-                  <span>লাইভ WebSocket</span>
-                </div>
-                <div className="text-[11px] text-emerald-400 mt-1 font-mono">
-                  {gatewayStatus.socketConnected ? `${gatewayStatus.activeSocketsCount || 1} টি ব্রাউজার সংযুক্ত (${gatewayStatus.pingMs}ms)` : 'রিকানেক্ট হচ্ছে...'}
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-800/70 border border-slate-700/60">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-slate-400 font-medium">ক্লাউড ডাটাবেজ</span>
-                  <span className={`w-2.5 h-2.5 rounded-full ${gatewayStatus.githubConnected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                </div>
-                <div className="text-sm font-bold text-white flex items-center gap-1.5">
-                  <Github className="w-4 h-4 text-purple-400" />
-                  <span>GitHub Repository</span>
-                </div>
-                <div className="text-[11px] text-purple-300 mt-1 font-mono">
-                  {gatewayStatus.githubConnected ? 'একক ডাটাবেজ সংযুক্ত ✅' : 'টোকেন দিয়ে কানেক্ট করুন'}
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-800/70 border border-slate-700/60">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-slate-400 font-medium">সার্ভার পুশ স্ট্রিম</span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                </div>
-                <div className="text-sm font-bold text-white flex items-center gap-1.5">
-                  <Globe className="w-4 h-4 text-emerald-400" />
-                  <span>Live SSE Stream</span>
-                </div>
-                <div className="text-[11px] text-emerald-400 mt-1 font-mono">
-                  {gatewayStatus.sseConnected ? 'লাইভ সকেট একটিভ' : 'ব্যাকগ্রাউন্ড পোলিং রেডি'}
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-800/70 border border-slate-700/60">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-slate-400 font-medium">মাল্টি-ট্যাব সিঙ্ক</span>
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                </div>
-                <div className="text-sm font-bold text-white flex items-center gap-1.5">
-                  <Layers className="w-4 h-4 text-emerald-400" />
-                  <span>BroadcastChannel</span>
-                </div>
-                <div className="text-[11px] text-emerald-400 mt-1 font-mono">
-                  ০ মিলিসেকেন্ড লেটেন্সি
-                </div>
-              </div>
-            </div>
-
-            {/* Gateway Statistics */}
-            <div className="p-4 rounded-2xl bg-slate-800/40 border border-slate-700/40 text-xs mb-6 space-y-2">
-              <div className="flex items-center justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">সর্বশেষ সফল সিঙ্ক:</span>
-                <span className="font-mono text-emerald-300 font-bold">
-                  {gatewayStatus.lastSyncTime ? new Date(gatewayStatus.lastSyncTime).toLocaleTimeString('bn-BD') : 'এখনই'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">মোট ক্লাউড পুশ (Pushes):</span>
-                <span className="font-mono text-white font-bold">{gatewayStatus.totalPushes} টি ইভেন্ট</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-slate-800">
-                <span className="text-slate-400">মোট লাইভ রিসিভ (Receives):</span>
-                <span className="font-mono text-white font-bold">{gatewayStatus.totalReceives} টি ইভেন্ট</span>
-              </div>
-              <div className="flex items-center justify-between py-1">
-                <span className="text-slate-400">লাইটওয়েট গেটওয়ে স্ক্রিপ্ট:</span>
-                <span className="font-mono text-amber-300 font-bold">/master-gateway.js (পাবলিক)</span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('bs_sync', { detail: { key: 'manual_ping', fromGateway: true } }));
-                  alert('⚡ পিং টেস্ট সম্পন্ন! মাস্টার গেটওয়ে সম্পূর্ণরূপে সক্রিয় ও কার্যকর।');
-                }}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-600 transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Activity className="w-3.5 h-3.5 text-amber-400" />
-                <span>গেটওয়ে টেস্ট (Ping Test)</span>
-              </button>
-
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    setIsManualSyncing(true);
-                    await handleSaveAll();
-                    setIsManualSyncing(false);
-                  }}
-                  disabled={isManualSyncing}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isManualSyncing ? 'animate-spin' : ''}`} />
-                  <span>{isManualSyncing ? 'সিঙ্ক হচ্ছে...' : 'সকল ডাটা ক্লাউডে পুশ করুন (Force Push)'}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* GitHub Auto-Push & Vercel Sync Modal */}
       <GitHubSyncModal

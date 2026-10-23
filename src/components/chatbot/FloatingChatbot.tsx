@@ -3,6 +3,7 @@ import { storage } from '../../services/storage';
 import { aiKnowledgeStore } from '../../services/aiKnowledgeStore';
 import { MessageSquare, X, Send, Sparkles, Bot, User, Calculator, Globe, BookOpen, ExternalLink, Phone, MessageCircle, HelpCircle } from 'lucide-react';
 import { toBengaliNum } from '../home/CoursesSection';
+import { safeResponseJson } from '../../services/githubDataService';
 
 interface WhatsAppButtonInfo {
   teacherName: string;
@@ -635,7 +636,7 @@ export const FloatingChatbot: React.FC = () => {
     try {
       const wikiRes = await fetch(`/api/wiki?q=${encodeURIComponent(query)}`);
       if (wikiRes.ok) {
-        const wikiData = await wikiRes.json();
+        const wikiData = await safeResponseJson<any>(wikiRes, {});
         if (wikiData.success && wikiData.extract) {
           setMessages((prev) => [
             ...prev,
@@ -670,7 +671,7 @@ export const FloatingChatbot: React.FC = () => {
           })
         });
         if (aiRes.ok) {
-          const aiData = await aiRes.json();
+          const aiData = await safeResponseJson<any>(aiRes, {});
           if (aiData.success && aiData.text) {
             setMessages((prev) => [
               ...prev,

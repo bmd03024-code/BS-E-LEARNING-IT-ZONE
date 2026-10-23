@@ -272,6 +272,10 @@ export const GitHubSyncModal: React.FC<GitHubSyncModalProps> = ({
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-xs font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
               />
             </div>
+            <p className="text-[11px] text-emerald-400/90 mt-1.5 flex items-start gap-1.5 font-medium bg-emerald-950/30 p-2 rounded-xl border border-emerald-800/40">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
+              <span>Once the Personal Access Token is entered and saved, it will remain active until its expiration date, ensuring continuous operation for automated deployments and synchronization without needing manual updates.</span>
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

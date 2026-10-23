@@ -56,6 +56,19 @@ const DEFAULT_REPO = 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
 const DEFAULT_BRANCH = 'main';
 const DEFAULT_PATH = 'data/institute_db.json';
 
+/**
+ * Safely parse JSON from a fetch Response, preventing "Unexpected end of JSON input" errors.
+ */
+export async function safeResponseJson<T = any>(res: Response, fallback: T = {} as T): Promise<T> {
+  try {
+    const text = await res.text();
+    if (!text || !text.trim()) return fallback;
+    return JSON.parse(text) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 class GitHubDataService {
   private static instance: GitHubDataService;
   private channel: BroadcastChannel | null = null;
@@ -65,6 +78,7 @@ class GitHubDataService {
   private constructor() {
     this.setupBroadcastChannel();
     this.setupFocusListener();
+    this.hydrateServerConfig().catch(() => {});
   }
 
   public static getInstance(): GitHubDataService {
@@ -72,6 +86,25 @@ class GitHubDataService {
       GitHubDataService.instance = new GitHubDataService();
     }
     return GitHubDataService.instance;
+  }
+
+  /**
+   * Hydrate saved GitHub token & config from persistent server store
+   */
+  private async hydrateServerConfig(): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const res = await fetch('/api/github/config');
+      if (res.ok) {
+        const srvCfg = await safeResponseJson<any>(res, {});
+        if (srvCfg && srvCfg.token) {
+          const currentToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+          if (!currentToken) {
+            this.saveConfig(srvCfg);
+          }
+        }
+      }
+    } catch {}
   }
 
   private setupBroadcastChannel() {
@@ -102,7 +135,8 @@ class GitHubDataService {
   }
 
   /**
-   * Retrieve current GitHub configuration from localStorage / defaults
+   * Retrieve current GitHub configuration from localStorage / settings / defaults
+   * Guarantees Personal Access Token remains permanently active until its expiration date.
    */
   public getConfig(): GitHubConfig {
     if (typeof window === 'undefined') {
@@ -115,7 +149,20 @@ class GitHubDataService {
       };
     }
 
-    const token = localStorage.getItem(STORAGE_KEYS.TOKEN) || '';
+    let token = localStorage.getItem(STORAGE_KEYS.TOKEN) || '';
+    if (!token) {
+      try {
+        const rawSettings = localStorage.getItem('bs_settings');
+        if (rawSettings) {
+          const parsed = JSON.parse(rawSettings);
+          if (parsed?.githubToken) {
+            token = parsed.githubToken;
+            localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+          }
+        }
+      } catch {}
+    }
+
     const repo = localStorage.getItem(STORAGE_KEYS.REPO) || DEFAULT_REPO;
     const branch = localStorage.getItem(STORAGE_KEYS.BRANCH) || DEFAULT_BRANCH;
     const autoPush = localStorage.getItem(STORAGE_KEYS.AUTOPUSH) !== 'false';
@@ -130,20 +177,43 @@ class GitHubDataService {
   }
 
   /**
-   * Save GitHub configuration
+   * Save GitHub configuration permanently across localStorage, settings, and server
    */
   public saveConfig(config: Partial<GitHubConfig>): void {
     if (typeof window === 'undefined') return;
-    if (config.token !== undefined) localStorage.setItem(STORAGE_KEYS.TOKEN, config.token.trim());
+    const cleanToken = config.token !== undefined ? config.token.trim() : '';
+
+    if (config.token !== undefined) {
+      localStorage.setItem(STORAGE_KEYS.TOKEN, cleanToken);
+      try {
+        const rawSettings = localStorage.getItem('bs_settings');
+        if (rawSettings) {
+          const s = JSON.parse(rawSettings);
+          s.githubToken = cleanToken;
+          localStorage.setItem('bs_settings', JSON.stringify(s));
+        }
+      } catch {}
+    }
     if (config.repo !== undefined) localStorage.setItem(STORAGE_KEYS.REPO, config.repo.trim());
     if (config.branch !== undefined) localStorage.setItem(STORAGE_KEYS.BRANCH, config.branch.trim());
     if (config.autoPushEnabled !== undefined) {
       localStorage.setItem(STORAGE_KEYS.AUTOPUSH, config.autoPushEnabled ? 'true' : 'false');
     }
+
+    // Persist to server store so token is never lost across dev container restarts
+    const fullConfig = this.getConfig();
+    try {
+      fetch('/api/github/save-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fullConfig)
+      }).catch(() => {});
+    } catch {}
   }
 
   /**
    * Test connection to GitHub repository using personal access token
+   * Safe against empty / non-JSON responses
    */
   public async testConnection(token?: string, repo?: string): Promise<GitHubConnectionResult> {
     const cfg = this.getConfig();
@@ -159,7 +229,7 @@ class GitHubDataService {
       try {
         const srvRes = await fetch(`/api/github/status?token=${encodeURIComponent(finalToken)}&repo=${encodeURIComponent(finalRepo)}`);
         if (srvRes.ok) {
-          const srvData = await srvRes.json();
+          const srvData = await safeResponseJson<any>(srvRes, {});
           if (srvData.success && srvData.connected) {
             return {
               connected: true,
@@ -171,7 +241,7 @@ class GitHubDataService {
           }
         }
       } catch {
-        // Fallback to direct client-side GitHub REST API (100% works on Vercel static)
+        // Fallback to direct client-side GitHub REST API
       }
 
       // 2. Direct client-side GitHub REST API
@@ -184,17 +254,17 @@ class GitHubDataService {
 
       const res = await fetch(`https://api.github.com/repos/${finalRepo}`, { headers });
       if (res.ok) {
-        const data = await res.json();
+        const data = await safeResponseJson<any>(res, {});
         const canPush = Boolean(data.permissions ? data.permissions.push : finalToken);
         return {
           connected: true,
-          fullName: data.full_name,
-          defaultBranch: data.default_branch,
+          fullName: data.full_name || finalRepo,
+          defaultBranch: data.default_branch || 'main',
           canPush,
-          message: `কানেক্টেড! রিপোজিটরি: ${data.full_name} (${canPush ? 'রাইট পারমিশন সক্রিয় ✅' : 'রিড-অনলি পারমিশন'})`
+          message: `কানেক্টেড! রিপোজিটরি: ${data.full_name || finalRepo} (${canPush ? 'রাইট পারমিশন সক্রিয় ✅' : 'রিড-অনলি পারমিশন'})`
         };
       } else {
-        const err = await res.json().catch(() => ({}));
+        const err = await safeResponseJson<any>(res, {});
         return {
           connected: false,
           message: err.message || `GitHub HTTP Error ${res.status}: টোকেন বা রিপোজিটরি নাম পরীক্ষা করুন`
@@ -225,7 +295,7 @@ class GitHubDataService {
       try {
         const res = await fetch(rawUrl, { cache: 'no-store' });
         if (res.ok) {
-          const parsed = await res.json();
+          const parsed = await safeResponseJson<any>(res, null);
           if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
             data = parsed;
             source = `GitHub Raw (${cfg.repo}@${cfg.branch})`;
@@ -243,9 +313,9 @@ class GitHubDataService {
         try {
           const res = await fetch(`${p}?t=${timestamp}`, { cache: 'no-store' });
           const cType = res.headers.get('content-type') || '';
-          if (res.ok && cType.includes('application/json')) {
-            const parsed = await res.json();
-            const actual = parsed.data || parsed;
+          if (res.ok && (cType.includes('application/json') || cType === '')) {
+            const parsed = await safeResponseJson<any>(res, null);
+            const actual = parsed?.data || parsed;
             if (actual && typeof actual === 'object' && Object.keys(actual).length > 0) {
               data = actual;
               source = p;
@@ -334,7 +404,7 @@ class GitHubDataService {
       });
 
       if (srvRes.ok) {
-        const srvData = await srvRes.json();
+        const srvData = await safeResponseJson<any>(srvRes, {});
         if (srvData.success) {
           if (srvData.commitSha) localStorage.setItem(STORAGE_KEYS.LAST_SHA, srvData.commitSha);
           localStorage.setItem(STORAGE_KEYS.LAST_SYNC, String(Date.now()));
@@ -379,7 +449,7 @@ class GitHubDataService {
             }
           });
           if (checkRes.ok) {
-            const fileInfo = await checkRes.json();
+            const fileInfo = await safeResponseJson<any>(checkRes, {});
             currentSha = fileInfo.sha;
           }
         } catch {}
@@ -405,11 +475,11 @@ class GitHubDataService {
         });
 
         if (putRes.ok) {
-          const putData = await putRes.json();
+          const putData = await safeResponseJson<any>(putRes, {});
           lastCommitSha = putData.commit?.sha || lastCommitSha;
           lastCommitUrl = putData.commit?.html_url || lastCommitUrl;
         } else {
-          const errData = await putRes.json().catch(() => ({}));
+          const errData = await safeResponseJson<any>(putRes, {});
           console.warn(`[GitHub Push Warning] Failed for ${filePath}:`, errData);
           if (filePath === cfg.dataPath) {
             return {

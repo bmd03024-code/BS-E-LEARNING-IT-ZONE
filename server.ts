@@ -282,18 +282,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-// Render free tier keep-alive ping loop (if RENDER_EXTERNAL_URL is configured)
-if (process.env.RENDER_EXTERNAL_URL) {
-  const renderUrl = process.env.RENDER_EXTERNAL_URL;
-  console.log(`[Render] Auto Keep-Alive enabled for: ${renderUrl}`);
-  setInterval(async () => {
-    try {
-      await fetch(`${renderUrl}/health`);
-    } catch {
-      // Ignore network ping errs
-    }
-  }, 13 * 60 * 1000); // Ping every 13 mins (free tier sleeps after 15 mins)
-}
 
 // SSE Real-Time Sync Endpoint
 app.get('/api/live-sync', (req: Request, res: Response) => {
@@ -799,37 +787,106 @@ app.get('/api/wiki', async (req: Request, res: Response) => {
   }
 });
 
-// GitHub Auto-Push & Vercel Sync REST API Endpoints
-app.get('/api/github/status', async (req: Request, res: Response) => {
-  const token = (req.query.token as string) || process.env.GITHUB_TOKEN || '';
-  const repo = (req.query.repo as string) || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
+// Helper to safely parse JSON from a fetch Response, avoiding "Unexpected end of JSON input"
+async function safeJsonFromResponse<T = any>(res: any, fallback: T = {} as T): Promise<T> {
+  try {
+    const text = await res.text();
+    if (!text || !text.trim()) return fallback;
+    return JSON.parse(text) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+// Persistent GitHub Configuration on Server
+const GITHUB_CONFIG_FILE = path.join(DATA_DIR, 'github_config.json');
+interface SavedGithubConfig {
+  token?: string;
+  repo?: string;
+  branch?: string;
+  autoPushEnabled?: boolean;
+}
+let savedGithubConfig: SavedGithubConfig = {
+  token: process.env.GITHUB_TOKEN || '',
+  repo: 'bmd03024-code/BS-E-LEARNING-IT-ZONE',
+  branch: 'main',
+  autoPushEnabled: true
+};
+
+if (fs.existsSync(GITHUB_CONFIG_FILE)) {
+  try {
+    const raw = fs.readFileSync(GITHUB_CONFIG_FILE, 'utf-8');
+    const parsed = JSON.parse(raw);
+    savedGithubConfig = { ...savedGithubConfig, ...parsed };
+    console.log('[GitHub Service] Loaded persisted GitHub configuration');
+  } catch (err) {
+    console.warn('[GitHub Service] Failed to read github_config.json:', err);
+  }
+}
+
+// GET /api/github/config - Return current active GitHub config
+app.get('/api/github/config', (_req: Request, res: Response) => {
+  res.json({
+    token: savedGithubConfig.token || process.env.GITHUB_TOKEN || '',
+    repo: savedGithubConfig.repo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE',
+    branch: savedGithubConfig.branch || 'main',
+    autoPushEnabled: savedGithubConfig.autoPushEnabled !== false
+  });
+});
+
+// POST /api/github/save-config - Permanently save GitHub Personal Access Token on server
+app.post('/api/github/save-config', (req: Request, res: Response) => {
+  const { token, repo, branch, autoPushEnabled } = req.body || {};
+  if (token !== undefined) savedGithubConfig.token = (token || '').trim();
+  if (repo !== undefined) savedGithubConfig.repo = (repo || '').trim();
+  if (branch !== undefined) savedGithubConfig.branch = (branch || '').trim();
+  if (autoPushEnabled !== undefined) savedGithubConfig.autoPushEnabled = Boolean(autoPushEnabled);
 
   try {
-    const ghRes = await fetch(`https://api.github.com/repos/${repo}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'BS-ELearning-Admin'
-      }
-    });
+    fs.writeFileSync(GITHUB_CONFIG_FILE, JSON.stringify(savedGithubConfig, null, 2), 'utf-8');
+    console.log('[GitHub Service] GitHub configuration saved permanently to disk');
+  } catch (err) {
+    console.error('[GitHub Service] Failed to save github_config.json:', err);
+  }
+
+  res.json({
+    success: true,
+    message: 'GitHub Personal Access Token সফলভাবে স্থায়ীভাবে সংরক্ষিত হয়েছে।'
+  });
+});
+
+// GitHub Auto-Push & Vercel Sync REST API Endpoints
+app.get('/api/github/status', async (req: Request, res: Response) => {
+  const token = (req.query.token as string) || savedGithubConfig.token || process.env.GITHUB_TOKEN || '';
+  const repo = (req.query.repo as string) || savedGithubConfig.repo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
+
+  try {
+    const headers: Record<string, string> = {
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'BS-ELearning-Admin'
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const ghRes = await fetch(`https://api.github.com/repos/${repo}`, { headers });
+    const data: any = await safeJsonFromResponse(ghRes, {});
 
     if (ghRes.ok) {
-      const data: any = await ghRes.json();
       return res.json({
         success: true,
         connected: true,
-        fullName: data.full_name,
-        defaultBranch: data.default_branch,
+        fullName: data.full_name || repo,
+        defaultBranch: data.default_branch || 'main',
         updatedAt: data.updated_at,
         htmlUrl: data.html_url
       });
     } else {
-      const errData: any = await ghRes.json().catch(() => ({}));
       return res.json({
         success: false,
         connected: false,
         status: ghRes.status,
-        error: errData.message || `GitHub HTTP Error ${ghRes.status}`
+        error: data.message || `GitHub HTTP Error ${ghRes.status}`
       });
     }
   } catch (error: any) {
@@ -842,9 +899,9 @@ app.get('/api/github/status', async (req: Request, res: Response) => {
 });
 
 app.post('/api/github/push', async (req: Request, res: Response) => {
-  const token = req.body.token || process.env.GITHUB_TOKEN || '';
-  const repo = req.body.repo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
-  const branch = req.body.branch || 'main';
+  const token = req.body.token || savedGithubConfig.token || process.env.GITHUB_TOKEN || '';
+  const repo = req.body.repo || savedGithubConfig.repo || 'bmd03024-code/BS-E-LEARNING-IT-ZONE';
+  const branch = req.body.branch || savedGithubConfig.branch || 'main';
   const filePath = req.body.path || 'data/institute_db.json';
   const commitMsg = req.body.message || `Admin Auto-Sync: Updates to institute data [${new Date().toISOString()}]`;
 
@@ -862,21 +919,23 @@ app.post('/api/github/push', async (req: Request, res: Response) => {
 
     // 1. Check if file already exists in repository to get its current SHA
     let existingSha: string | undefined;
-    try {
-      const getFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'BS-ELearning-Admin'
-        }
-      });
+    if (token) {
+      try {
+        const getFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'BS-ELearning-Admin'
+          }
+        });
 
-      if (getFileRes.ok) {
-        const fileData: any = await getFileRes.json();
-        existingSha = fileData.sha;
+        if (getFileRes.ok) {
+          const fileData: any = await safeJsonFromResponse(getFileRes, {});
+          existingSha = fileData.sha;
+        }
+      } catch (e) {
+        console.warn('[GitHub Sync] Could not fetch existing file SHA:', e);
       }
-    } catch (e) {
-      console.warn('[GitHub Sync] Could not fetch existing file SHA:', e);
     }
 
     // 2. Put file to commit directly to GitHub repository
@@ -889,19 +948,22 @@ app.post('/api/github/push', async (req: Request, res: Response) => {
       putPayload.sha = existingSha;
     }
 
+    const headers: Record<string, string> = {
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
+      'User-Agent': 'BS-ELearning-Admin'
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'BS-ELearning-Admin'
-      },
+      headers,
       body: JSON.stringify(putPayload)
     });
 
-    const responseText = await putRes.text();
-const putData = responseText ? JSON.parse(responseText) : {};
+    const putData: any = await safeJsonFromResponse(putRes, {});
 
     if (putRes.ok) {
       console.log(`[GitHub Sync] Successfully committed and pushed ${filePath} to ${repo}@${branch}`);

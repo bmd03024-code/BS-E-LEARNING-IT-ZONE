@@ -31,8 +31,9 @@ class LocalChatbot {
       const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(term)}`;
       const r = await fetch(url);
       if (!r.ok) return null;
-      const j = await r.json();
-      return j.extract || null;
+      const text = await r.text();
+      const j = text ? JSON.parse(text) : null;
+      return j?.extract || null;
     } catch { return null; }
   }
   async ask(question: string) {
