@@ -9,6 +9,7 @@ interface LogoProps {
   instituteName?: string;
   subName?: string;
   founderName?: string;
+  language?: 'bn' | 'en';
 }
 
 export const Logo: React.FC<LogoProps> = ({
@@ -19,7 +20,8 @@ export const Logo: React.FC<LogoProps> = ({
   textSize = 'normal',
   instituteName,
   subName,
-  founderName
+  founderName,
+  language = 'bn'
 }) => {
   const sizeMap = {
     sm: { box: 'w-9 h-9', text: 'text-sm' },
@@ -74,9 +76,9 @@ export const Logo: React.FC<LogoProps> = ({
             )}
           </h1>
           <p className="brand-sub font-medium text-slate-600 tracking-normal whitespace-nowrap hidden sm:block">
-            {subName || (
+            {(language === 'en' ? ({ 'স্বাগতম': 'Welcome', 'দক্ষতা ও সাফল্যের সেরা ডিজিটাল একাডেমি': 'A Digital Academy for Skills & Success', 'প্রতিষ্ঠাতা ও প্রধান শিক্ষক': 'Founder & Head Teacher' }[subName || ''] || subName) : subName) || (
               <>
-                প্রতিষ্ঠাতা ও প্রধান শিক্ষক: <span className="text-blue-900 font-semibold">{founderName || 'বোরহানউদ্দিন মহিম'}</span>
+                {language === 'en' ? 'Founder & Head Teacher: ' : 'প্রতিষ্ঠাতা ও প্রধান শিক্ষক: '}<span className="text-blue-900 font-semibold">{founderName || (language === 'en' ? 'Borhan Uddin Mahim' : 'বোরহানউদ্দিন মহিম')}</span>
               </>
             )}
           </p>
