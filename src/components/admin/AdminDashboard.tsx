@@ -6437,7 +6437,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="relative z-10 py-3 space-y-2 text-slate-800">
                 <p className="text-xs font-serif italic text-slate-600">This is to proudly certify that</p>
                 <h2 className="text-2xl sm:text-3xl font-black text-blue-950 font-serif underline decoration-amber-500 underline-offset-8">
-                  {selectedCertForPrint.studentNameEnglish || selectedCertForPrint.studentName}
+                  {selectedCertForPrint.studentNameEnglish || 'English student name not provided'}
                 </h2>
                 <p className="text-xs text-slate-700 pt-1">
                   Son / Daughter of <b>{selectedCertForPrint.fatherName || 'Not Provided'}</b> and <b>{selectedCertForPrint.motherName || 'Not Provided'}</b>
@@ -6456,7 +6456,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     <p>
                       has successfully completed the comprehensive training course on{' '}
                       <span className="font-extrabold text-blue-950 text-sm">
-                        {selectedCertForPrint.courseTitle || courses.find(c => c.id === selectedCertForPrint.courseId)?.title || selectedCertForPrint.courseId}
+                        {selectedCertForPrint.courseTitle || selectedCertForPrint.courseId}
                       </span>{' '}
                       and achieved the outstanding grade of{' '}
                       <span className="font-black text-emerald-800 text-sm">{selectedCertForPrint.grade}</span>.
