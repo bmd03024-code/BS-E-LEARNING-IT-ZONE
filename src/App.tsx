@@ -53,6 +53,70 @@ export default function App() {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [idCardModalOpen, setIdCardModalOpen] = useState(false);
 
+  // Remember the selected language and translate shared public UI labels.
+  useEffect(() => {
+    localStorage.setItem('bs_site_language', language);
+    document.documentElement.lang = language;
+    const bnToEn: Record<string, string> = {
+      'ভর্তি চলছে': 'Admissions Open',
+      'কোর্সসমূহ': 'Courses',
+      'প্রতিষ্ঠাতা ও ম্যানেজমেন্ট': 'Founder & Management',
+      'ক্লাস রুটিন': 'Class Routine',
+      'মাসিক ফি / পেমেন্ট': 'Monthly Fee / Payment',
+      'মার্কশিট / ফলাফল': 'Marksheet / Results',
+      'সনদপত্র': 'Certificate',
+      'শিক্ষকবৃন্দ': 'Our Instructors',
+      'স্মার্ট AI': 'Smart AI',
+      'নির্ধারিত কোর্স ফি ও বিশেষ অফার প্যাকেজ': 'Course Fees & Special Offers',
+      'আমাদের অফিশিয়াল কোর্সসমূহ': 'Our Courses',
+      'সীমিত সময়ের বিশেষ ভর্তি অফার চলছে!': 'Limited-time admission offer!',
+      'কাটা মূল্যে স্পেশাল ছাড়ে এখনই এনরোল করুন': 'Enroll now and enjoy a special discount',
+      'দিন': 'Days', 'ঘণ্টা': 'Hours', 'মিনিট': 'Minutes', 'সেকেন্ড': 'Seconds',
+      'সরকারি সনদ': 'Government certificate', 'সনদ ফ্রি': 'Free certificate',
+      'ভর্তি ফি:': 'Admission fee:', 'মাসিক ফি:': 'Monthly fee:',
+      'মাসিক ফি নেই': 'No monthly fee', 'সনদ ফি:': 'Certificate fee:',
+      'সম্পূর্ণ ফ্রি': 'Completely free', 'পাঠ্য বিষয়সমূহ:': 'Subjects:',
+      'এনরোল করুন': 'Enroll now', 'মেয়াদ:': 'Duration:',
+      'অনলাইন ভর্তি ও কোর্স রেজিস্ট্রেশন': 'Online Admission & Course Registration',
+      'বাংলা নাম * (আবশ্যিক)': 'Name in Bengali * (Required)',
+      'ইংরেজি নাম * (আবশ্যিক)': 'Name in English * (Required)',
+      'বাংলায় পূর্ণ নাম লিখুন': 'Enter full name in Bengali',
+      'ইংরেজিতে পূর্ণ নাম লিখুন': 'Enter full name in English',
+      'ভর্তি আবেদন দাখিল করুন': 'Submit admission application'
+    };
+    const enToBn = Object.fromEntries(Object.entries(bnToEn).map(([bn, en]) => [en, bn]));
+    const dictionary = language === 'en' ? bnToEn : enToBn;
+    const translate = (root: Node) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const nodes: Text[] = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+      nodes.forEach(node => {
+        const value = node.nodeValue || '';
+        const trimmed = value.trim();
+        if (trimmed && dictionary[trimmed]) node.nodeValue = value.replace(trimmed, dictionary[trimmed]);
+      });
+      if (root instanceof HTMLElement) {
+        [root, ...Array.from(root.querySelectorAll<HTMLElement>('[placeholder],[title],[aria-label]'))].forEach(el => {
+          ['placeholder', 'title', 'aria-label'].forEach(attr => {
+            const value = el.getAttribute(attr);
+            if (value && dictionary[value]) el.setAttribute(attr, dictionary[value]);
+          });
+        });
+      }
+    };
+    translate(document.body);
+    const observer = new MutationObserver(records => {
+      records.forEach(record => {
+        record.addedNodes.forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.TEXT_NODE) translate(node);
+        });
+        if (record.type === 'characterData' && record.target.parentNode) translate(record.target.parentNode);
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    return () => observer.disconnect();
+  }, [language]);
+
   // Robust Real-Time Sync function for all tabs and admin updates
   const refreshAppData = () => {
     setSettings(storage.getSettings());
