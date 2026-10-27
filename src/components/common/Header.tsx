@@ -31,10 +31,10 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-[11px] sm:text-xs">
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-              ভর্তি চলছে
+              {language === 'en' ? 'Admissions Open' : 'ভর্তি চলছে'}
             </span>
             <span className="truncate max-w-[200px] sm:max-w-none text-slate-200">
-              ২০২৬ শিক্ষাবর্ষে সকল কোর্সে স্পেশাল অফার ফি-তে ভর্তি চলছে!
+              {language === 'en' ? 'Special admission offers are available for all courses in the 2026 academic year!' : '২০২৬ শিক্ষাবর্ষে সকল কোর্সে স্পেশাল অফার ফি-তে ভর্তি চলছে!'}
             </span>
           </div>
 
@@ -44,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="inline-flex items-center gap-1.5 font-medium text-amber-300 hover:text-amber-200 transition-colors"
             >
               <PhoneCall className="w-3.5 h-3.5" />
-              <span>হটলাইন: {hotline}</span>
+              <span>{language === 'en' ? 'Hotline: ' : 'হটলাইন: '}{hotline}</span>
             </a>
           </div>
         </div>
@@ -63,6 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
               instituteName={settings?.name}
               subName={settings?.subName}
               founderName={settings?.founderName}
+              language={language}
             />
           </div>
 
@@ -73,46 +74,46 @@ export const Header: React.FC<HeaderProps> = ({
               className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5"
             >
               <BookOpen className="w-4 h-4 text-blue-800" />
-              কোর্সসমূহ
+              {language === 'en' ? 'Courses' : 'কোর্সসমূহ'}
             </button>
             <button
               onClick={() => onNavigate('founder')}
               className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5 text-blue-900 font-bold"
             >
               <Award className="w-4 h-4 text-amber-500" />
-              প্রতিষ্ঠাতা ও ম্যানেজমেন্ট
+              {language === 'en' ? 'Founder & Management' : 'প্রতিষ্ঠাতা ও ম্যানেজমেন্ট'}
             </button>
             <button
               onClick={() => onNavigate('routine')}
               className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5"
             >
               <Calendar className="w-4 h-4 text-blue-800" />
-              ক্লাস রুটিন
+              {language === 'en' ? 'Class Routine' : 'ক্লাস রুটিন'}
             </button>
             <button
               onClick={() => onNavigate('fee')}
               className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5 text-emerald-800 font-bold"
             >
-              মাসিক ফি / পেমেন্ট
+              {language === 'en' ? 'Monthly Fees / Payment' : 'মাসিক ফি / পেমেন্ট'}
             </button>
             <button
               onClick={() => onNavigate('marksheet')}
               className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5 text-blue-900 font-bold"
             >
-              মার্কশিট / ফলাফল
+              {language === 'en' ? 'Marksheet / Results' : 'মার্কশিট / ফলাফল'}
             </button>
             <button
               onClick={() => onNavigate('certificate')}
               className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5 text-amber-700 font-bold"
             >
-              সনদপত্র
+              {language === 'en' ? 'Certificate' : 'সনদপত্র'}
             </button>
             <button
               onClick={() => onNavigate('mentors')}
               className="px-3 py-1.5 rounded-lg hover:text-blue-900 hover:bg-blue-50 transition-colors inline-flex items-center gap-1.5"
             >
               <Users className="w-4 h-4 text-slate-600" />
-              শিক্ষকবৃন্দ
+              {language === 'en' ? 'Instructors' : 'শিক্ষকবৃন্দ'}
             </button>
           </nav>
 
@@ -128,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
               title="BS AI সহকারী"
             >
               <HelpCircle className="w-4 h-4 text-blue-700" />
-              <span>স্মার্ট AI</span>
+              <span>{language === 'en' ? 'Smart AI' : 'স্মার্ট AI'}</span>
             </button>
 
             <button
@@ -137,7 +138,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 group-hover:rotate-12 transition-transform" />
               <span className="tracking-wide">Admin Panel</span>
-              <span className="hidden xl:inline text-[10px] py-0.5 px-1.5 bg-amber-400/20 text-amber-300 rounded font-normal">লগইন</span>
+              <span className="hidden xl:inline text-[10px] py-0.5 px-1.5 bg-amber-400/20 text-amber-300 rounded font-normal">{language === 'en' ? 'Login' : 'লগইন'}</span>
             </button>
           </div>
         </div>
