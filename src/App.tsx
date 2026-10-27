@@ -339,7 +339,17 @@ export default function App() {
       nodes.forEach(node => {
         const value = node.nodeValue || '';
         const trimmed = value.trim();
-        if (trimmed && dictionary[trimmed]) node.nodeValue = value.replace(trimmed, dictionary[trimmed]);
+        if (trimmed) {
+          // Translate known phrases even when a text node contains a label plus dynamic content.
+          // Longest phrases first prevent short entries from partially replacing longer phrases.
+          let translated = value;
+          Object.keys(dictionary).sort((a, b) => b.length - a.length).forEach(source => {
+            if (source && translated.includes(source)) {
+              translated = translated.split(source).join(dictionary[source]);
+            }
+          });
+          if (translated !== value) node.nodeValue = translated;
+        }
       });
       if (root instanceof HTMLElement) {
         [root, ...Array.from(root.querySelectorAll<HTMLElement>('[placeholder],[title],[aria-label]'))].forEach(el => {
