@@ -2278,7 +2278,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       isFree: certIsFree,
       feeAmount: certIsFree ? 0 : (Number(certFeeInput) || 0),
       hasEverPaid: certIsFree,
-      hasGovtCert: certHasGovtCert,
+      hasGovtCert: false,
       certificateTitle: certTitle,
       bodyText: certBodyText,
       duration: certDuration || courseObj?.duration,
@@ -2507,15 +2507,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   </div>
                 )}
 
-                <label className="text-xs flex items-center gap-1 font-semibold text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={certHasGovtCert}
-                    onChange={(e) => setCertHasGovtCert(e.target.checked)}
-                    className="rounded text-emerald-700"
-                  />
-                  <span>সরকারি সনদ অন্তর্ভুক্ত</span>
-                </label>
               </div>
             </div>
 
@@ -2845,7 +2836,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               offerTimerExpiry: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
               certificateFee: 0,
               certificateFeeSecondTime: 0,
-              hasGovtCert: true,
+              hasGovtCert: false,
               paymentDetails: 'ভর্তি ফি ১,০০০ টাকা। দ্বিতীয় মাস থেকে নিয়মিত মাসিক ফি।',
               category: 'আইটি ও প্রফেশনাল স্কিল',
               subjects: ['মৌলিক বিষয়', 'অ্যাডভান্সড মডিউল'],
@@ -2887,18 +2878,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 </div>
 
                 <div className="flex items-center gap-2 self-end sm:self-center">
-                  <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={!!c.hasGovtCert}
-                      onChange={(e) => {
-                        const updated = courses.map(item => item.id === c.id ? { ...item, hasGovtCert: e.target.checked } : item);
-                        setCourses(updated);
-                      }}
-                      className="rounded text-blue-900"
-                    />
-                    <span>সরকারি সনদ ব্যাজ</span>
-                  </label>
 
                   <button
                     onClick={() => {
@@ -6774,7 +6753,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   isFree: true,
                   feeAmount: 0,
                   hasEverPaid: true,
-                  hasGovtCert: true
+                  hasGovtCert: false
                 };
 
                 const updatedStudents = [newStd, ...students];
