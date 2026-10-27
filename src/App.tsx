@@ -104,7 +104,7 @@ export default function App() {
     if (reduceMotion) return;
 
     const targets = document.querySelectorAll(
-      'main > *, main section [class*="rounded-2xl"], main section [class*="rounded-xl"]'
+      'main > *, main section [class*="rounded-2xl"], main section [class*="rounded-xl"], main section .qr-slide-in'
     );
     targets.forEach((target) => target.classList.add('scroll-reveal'));
 
