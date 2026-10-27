@@ -44,7 +44,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
   const [viewMode, setViewMode] = useState<'edit' | 'print'>('edit');
 
   // Editable Form Fields State
-  const [editTitle, setEditTitle] = useState('CERTIFICATE OF COMPLETION');
+  const [editTitle, setEditTitle] = useState('SKILLS ACHIEVEMENT CERTIFICATE');
   const [editStudentName, setEditStudentName] = useState('');
   const [editFatherName, setEditFatherName] = useState('');
   const [editMotherName, setEditMotherName] = useState('');
@@ -70,7 +70,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
   };
 
   const populateEditFields = (cert: CertificateRecord) => {
-    setEditTitle(cert.certificateTitle || 'CERTIFICATE OF COMPLETION');
+    setEditTitle(cert.certificateTitle || 'SKILLS ACHIEVEMENT CERTIFICATE');
     setEditStudentName(englishOnly(cert.studentNameEnglish, englishOnly(cert.studentName)));
     setEditFatherName(englishOnly(cert.fatherName));
     setEditMotherName(englishOnly(cert.motherName));
@@ -83,7 +83,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
     setEditAddress(englishOnly(cert.address, 'Dhaka, Bangladesh'));
     setEditBodyText(
       cert.bodyText ||
-      `has successfully completed the ${cert.courseTitle || selectedCourse?.title} course (${cert.duration || selectedCourse?.duration || '6 months'}) and achieved ${cert.grade || 'A+ (Excellent)'} in the final assessment. We wish the student continued success in future endeavors.`
+      `has successfully completed the ${cert.courseTitle || selectedCourse?.title} skills course (${cert.duration || selectedCourse?.duration || '6 months'}) and demonstrated the skills recorded in the final assessment. We wish the student continued success in future endeavors. This is an institutional skills-achievement certificate, not a government-issued academic certificate.`
     );
     setEditFounderName(englishOnly(cert.founderName, englishOnly(settings.founderName, 'Borhan Uddin Mahim')));
     setEditFounderTitle(englishOnly(cert.founderTitle, englishOnly(settings.founderTitle, 'Founder & Lead Instructor')));
@@ -723,7 +723,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     
                     <div className="pt-3">
                       <span className="inline-block px-4 py-1.5 text-[#333333] font-bold text-xs sm:text-base tracking-wider uppercase border-y border-[#b8aa8c]">
-                        {foundCert.certificateTitle || 'CERTIFICATE OF COMPLETION'}
+                        {foundCert.certificateTitle || 'SKILLS ACHIEVEMENT CERTIFICATE'}
                       </span>
                     </div>
                   </div>
@@ -766,7 +766,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     <div className="p-3 bg-transparent text-justify sm:text-center text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
                       {englishOnly(foundCert.bodyText) || (
                         <span>
-                          has successfully completed the <b>{englishOnly(foundCert.courseTitle, englishOnly(selectedCourse.titleEnglish, ''))}</b> course ({foundCert.duration || selectedCourse.duration}) and achieved <b>"{foundCert.grade}"</b> in the final assessment. We wish the student continued success in future endeavors.
+                          has successfully completed the <b>{englishOnly(foundCert.courseTitle, englishOnly(selectedCourse.titleEnglish, ''))}</b> skills course ({foundCert.duration || selectedCourse.duration}) and demonstrated the skills recorded in the final assessment. We wish the student continued success in future endeavors. This is an institutional skills-achievement certificate, not a government-issued academic certificate.
                         </span>
                       )}
                     </div>
