@@ -98,6 +98,30 @@ export default function App() {
     };
   }, []);
 
+  // Replay subtle reveal animations whenever page sections/cards enter the viewport.
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    const targets = document.querySelectorAll(
+      'main > *, main section [class*="rounded-2xl"], main section [class*="rounded-xl"]'
+    );
+    targets.forEach((target) => target.classList.add('scroll-reveal'));
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        } else {
+          entry.target.classList.remove('is-visible');
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -4% 0px' });
+
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, []);
+
   // Universal Navigation & Shortcut Handler
   const handleNavigate = (target: string) => {
     switch (target) {
@@ -192,7 +216,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-amber-400 selection:text-slate-950">
+    <div className="page-enter min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-amber-400 selection:text-slate-950">
       <Header
         onOpenAdminLogin={() => setIsAdminLoginModalOpen(true)}
         onNavigate={handleNavigate}
