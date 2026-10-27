@@ -2882,6 +2882,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     }}
                     className="font-bold text-sm sm:text-base text-blue-950 border rounded-xl px-3 py-1.5 w-full sm:w-96"
                   />
+                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mt-2">Course title (English):</label>
+                   <input type="text" value={c.titleEnglish || ''} placeholder="Enter English course title" onChange={(e) => { const updated = courses.map(item => item.id === c.id ? { ...item, titleEnglish: e.target.value } : item); setCourses(updated); storage.saveCourses(updated); }} className="text-sm border rounded-xl px-3 py-1.5 w-full sm:w-96" />
                 </div>
 
                 <div className="flex items-center gap-2 self-end sm:self-center">
@@ -6729,6 +6731,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   courseId: selectedCourseObj.id,
                   roll: newStdRoll.trim(),
                   name: newStdName.trim(),
+                   englishName: newStdNameEnglish.trim(),
                   fatherName: newStdFather.trim(),
                   motherName: newStdMother.trim(),
                   phone: newStdPhone.trim() || '01700000000',
@@ -6890,6 +6893,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     onChange={(e) => setNewStdName(e.target.value)}
                     className="w-full px-3 py-2 border rounded-xl font-bold text-slate-900"
                   />
+                   <label className="font-bold text-slate-700 block mb-1 mt-3">Student name (English)</label>
+                   <input type="text" placeholder="Enter English spelling" value={newStdNameEnglish} onChange={(e) => setNewStdNameEnglish(e.target.value)} className="w-full px-3 py-2 border rounded-xl" />
                 </div>
               </div>
 
