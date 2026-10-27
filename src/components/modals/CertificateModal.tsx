@@ -671,7 +671,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 </div>
 
                 {/* The Luxury Official Printable Certificate */}
-                <div className="printable-area certificate-border relative bg-radial from-amber-50/40 via-white to-amber-50/30 p-8 sm:p-14 rounded-2xl shadow-xl overflow-hidden text-center my-2">
+                <div className="printable-area certificate-print-layout certificate-border relative bg-white p-8 sm:p-12 shadow-xl overflow-hidden text-center my-2">
                   
                   {/* Subtle Center Watermark */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] select-none">
