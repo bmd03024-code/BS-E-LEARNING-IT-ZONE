@@ -546,7 +546,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                       <div className="bg-amber-100 border border-amber-400/80 px-4 py-1.5 rounded-xl shadow-xs inline-flex items-center gap-2">
                         <FileText className="w-4 h-4 text-blue-950 shrink-0" />
                         <span className="text-xs sm:text-sm font-black text-blue-950">
-                          পরীক্ষার ধরণ: <span className="text-rose-900 underline underline-offset-2">{foundResult.examType}</span>
+                          Exam Type: <span className="text-rose-900 underline underline-offset-2">{foundResult.examType}</span>
                         </span>
                         <span className="text-[11px] font-bold text-slate-600 ml-1">
                           (শিক্ষাবর্ষ: {toBengaliNum(foundResult.academicYear)})
@@ -559,7 +559,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                 {/* Student Details Grid */}
                 <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-xs sm:text-sm bg-slate-50/80 p-4 rounded-xl border border-slate-300">
                   <div className="flex">
-                    <span className="w-32 text-slate-600 font-bold shrink-0">শিক্ষার্থীর নাম:</span>
+                    <span className="w-32 text-slate-600 font-bold shrink-0">Student Name:</span>
                     <span className="font-extrabold text-slate-950">{foundResult.studentName}</span>
                   </div>
 
@@ -569,12 +569,12 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   </div>
 
                   <div className="flex">
-                    <span className="w-32 text-slate-600 font-bold shrink-0">পিতার নাম:</span>
+                    <span className="w-32 text-slate-600 font-bold shrink-0">Father’s Name:</span>
                     <span className="font-bold text-slate-900">{foundResult.fatherName}</span>
                   </div>
 
                   <div className="flex">
-                    <span className="w-32 text-slate-600 font-bold shrink-0">মাতার নাম:</span>
+                    <span className="w-32 text-slate-600 font-bold shrink-0">Mother’s Name:</span>
                     <span className="font-bold text-slate-900">{foundResult.motherName}</span>
                   </div>
 
@@ -673,19 +673,19 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     <Award className="w-6 h-6 text-emerald-700 shrink-0" />
                     <div>
                       <span className="font-black text-emerald-950 block">
-                        চূড়ান্ত মূল্যায়ন ফলাফল: উত্তীর্ণ (Passed)
+                        Final Assessment Result: PASSED
                       </span>
                       <span className="text-xs text-emerald-800 font-bold">
-                        অর্জিত জিপিএ: {foundResult.gpa.toFixed(2)} | লেটার গ্রেড: {foundResult.grade} | পরীক্ষার ধরণ: {foundResult.examType}
+                        GPA: {foundResult.gpa.toFixed(2)} | Letter Grade: {foundResult.grade} | Exam: {foundResult.examType}
                       </span>
                     </div>
                   </div>
                   <div className="text-right">
                     <span className="text-slate-600 text-xs font-semibold block">
-                      প্রকাশের তারিখ: {foundResult.date}
+                      Issue Date: {foundResult.date}
                     </span>
                     <span className="text-[10px] text-emerald-700 font-bold">
-                      ভেরিফায়েড অনলাইন রেকর্ড
+                      VERIFIED ONLINE RECORD
                     </span>
                   </div>
                 </div>
@@ -696,10 +696,10 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   <div className="flex flex-col items-center">
                     <img
                       src={settings.institutionSealUrl}
-                      alt="অফিশিয়াল সিল"
+                      alt="Institutional Seal"
                       className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
                     />
-                    <span className="text-[10px] font-bold text-slate-600 mt-0.5">অফিশিয়াল সিল</span>
+                    <span className="text-[10px] font-bold text-slate-600 mt-0.5">Institutional Seal</span>
                   </div>
 
                   {/* Head Teacher Signature Seal */}
@@ -707,10 +707,10 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     <div className="flex flex-col items-center">
                       <img
                         src={settings.signatureSealUrl}
-                        alt="প্রধান শিক্ষকের সিলমোহর"
+                        alt="Principal's Seal"
                         className="w-14 h-14 sm:w-16 sm:h-16 object-contain"
                       />
-                      <span className="text-[9px] font-bold text-rose-800 mt-0.5">প্রধান শিক্ষকের সিল</span>
+                      <span className="text-[9px] font-bold text-rose-800 mt-0.5">Principal's Seal</span>
                     </div>
                   )}
 
@@ -719,7 +719,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     <div className="relative">
                       <img
                         src={settings.signatureUrl}
-                        alt="প্রধান শিক্ষকের স্বাক্ষর"
+                        alt="Principal's Signature"
                         className="h-10 sm:h-12 w-auto object-contain"
                       />
                     </div>
@@ -737,7 +737,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                 <div className="text-xs text-slate-500 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>
-                    এই মার্কশিটটি প্রধান শিক্ষক কর্তৃক অনুমোদিত ও ভেরিফায়েড। আপনি এটি সরাসরি প্রিন্ট বা PDF হিসেবে সংরক্ষণ করতে পারবেন।
+                    This marksheet is approved and verified by the Head Teacher. You can print it or save it as a PDF.
                   </span>
                 </div>
 
