@@ -424,6 +424,7 @@ export default function App() {
         <HeroSlider
           slides={slides}
           onCtaClick={handleNavigate}
+          language={language}
         />
 
         <QuickActionGrid
