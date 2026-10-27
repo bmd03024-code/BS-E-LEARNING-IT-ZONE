@@ -395,7 +395,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             <label className="block text-xs font-bold text-slate-700 mb-1">১. মূল প্রাতিষ্ঠানিক লোগো (Institutional Logo)</label>
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-full border-2 border-amber-400 p-0.5 bg-slate-900 overflow-hidden shrink-0 shadow-md">
-                <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-contain" />
               </div>
               <div className="space-y-1.5 grow">
                 <input
