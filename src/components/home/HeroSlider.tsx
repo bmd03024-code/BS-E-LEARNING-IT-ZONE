@@ -14,6 +14,15 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ slides, onCtaClick, lang
     if (!value || !en) return value;
     const phrases: Record<string, string> = {
       'স্বাগতম': 'Welcome',
+      'BS E-Learning & IT Zone এ স্বাগতম': 'Welcome to BS E-Learning & IT Zone',
+      'অভিজ্ঞ শিক্ষক মণ্ডলীর তত্ত্বাবধানে বেসিক টু অ্যাডভান্সড একাডেমিক ও স্কিল ডেভেলপমেন্ট কোর্স। গড়ে তুলুন আপনার সফল ভবিষ্যৎ।': 'Academic and skill-development courses from basic to advanced levels, guided by experienced instructors. Build a successful future.',
+      'কোর্সসমূহ দেখুন': 'Explore Courses',
+      'কম্পিউটার অফিস অ্যাপ্লিকেশন কোর্স (৬ মাস)': 'Computer Office Applications Course (6 Months)',
+      'প্র্যাকটিক্যাল ল্যাব ও অনলাইন সাপোর্টে সরকারি সার্টিফিকেট অর্জনের অনন্য সুযোগ! সীমিত আসনে স্পেশাল অফার মূল্যে ভর্তি চলছে।': 'Gain practical lab experience and online support. Enrollment is open for a limited-time offer.',
+      'এখনই এনরোল করুন': 'Enroll Now',
+      'সহীহ কুরআন ও স্পোকেন ইংলিশ স্পেশাল ব্যাচ': 'Quran Recitation & Spoken English Special Batch',
+      'সহজ ও প্রাঞ্জল পদ্ধতিতে তাজবীদ সহ কুরআন তিলাওয়াত এবং ফ্লুয়েন্ট স্পোকেন ইংলিশ দক্ষতা অর্জন করুন ঘরে বসেই।': 'Learn Quran recitation with Tajweed and develop spoken English skills from home.',
+      'মাসিক ফি ও রুটিন': 'Monthly Fees & Routine',
       'আধুনিক ডিজিটাল শিক্ষাসেবা': 'Modern Digital Education Services',
       'শুরু করুন': 'Get Started',
       'ক্লাস রুটিন দেখুন': 'View Class Routine',
