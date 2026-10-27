@@ -3166,6 +3166,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           courseId: app.courseId,
           roll: nextRoll,
           name: app.studentName,
+          englishName: app.studentNameEnglish,
           phone: app.phone,
           photoUrl: app.photoUrl,
           fatherName: app.fatherName,
