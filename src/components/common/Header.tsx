@@ -10,6 +10,8 @@ interface HeaderProps {
   logoUrl?: string;
   headerTextSize?: 'normal' | 'large' | 'extra-large';
   settings?: InstituteSettings;
+  language: 'bn' | 'en';
+  onLanguageChange: (language: 'bn' | 'en') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,7 +20,9 @@ export const Header: React.FC<HeaderProps> = ({
   hotline,
   logoUrl,
   headerTextSize,
-  settings
+  settings,
+  language,
+  onLanguageChange
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
@@ -114,6 +118,10 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Right Action: Smart AI & Admin Panel Protected Entry */}
           <div className="flex items-center gap-2 shrink-0">
+            <div className="inline-flex items-center rounded-xl border border-blue-200 bg-blue-50 p-1" aria-label="Language selector">
+              <button type="button" onClick={() => onLanguageChange('bn')} aria-pressed={language === 'bn'} className={'px-2.5 py-1.5 rounded-lg text-xs font-extrabold transition-colors ' + (language === 'bn' ? 'bg-blue-900 text-white shadow-sm' : 'text-blue-900 hover:bg-white')}>বাংলা</button>
+              <button type="button" onClick={() => onLanguageChange('en')} aria-pressed={language === 'en'} className={'px-2.5 py-1.5 rounded-lg text-xs font-extrabold transition-colors ' + (language === 'en' ? 'bg-blue-900 text-white shadow-sm' : 'text-blue-900 hover:bg-white')}>English</button>
+            </div>
             <button
               onClick={() => onNavigate('chatbot')}
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
