@@ -671,7 +671,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 </div>
 
                 {/* The Luxury Official Printable Certificate */}
-                <div className="printable-area certificate-print-layout certificate-border relative bg-white p-8 sm:p-12 shadow-xl overflow-hidden text-center my-2">
+                <div className="printable-area certificate-print-layout certificate-border relative bg-[#fffdf5] p-5 sm:p-10 shadow-xl overflow-hidden text-center my-2 border-[8px] border-double border-[#8b7745] outline outline-1 outline-offset-[-14px] outline-[#b59b56]">
                   
                   {/* Subtle Center Watermark */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] select-none">
@@ -695,8 +695,13 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     <span>Issue Date: <b className="text-slate-900 font-bold">{foundCert.issueDate}</b></span>
                   </div>
 
-                  {/* Institution Branding */}
+                  {/* Institution Branding: existing site logo and institution details */}
                   <div className="relative z-10 mt-6 space-y-1">
+                    {(settings.logoUrl || settings.watermarkUrl) && (
+                      <div className="flex justify-center mb-3">
+                        <img src={settings.logoUrl || settings.watermarkUrl} alt="Institution Logo" className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
+                      </div>
+                    )}
                     <h3 className="text-2xl sm:text-4xl font-black text-blue-950 tracking-wider">
                       {foundCert.institutionName || settings.name}
                     </h3>
@@ -763,7 +768,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   </div>
 
                   {/* Bottom Signature, Seal & QR Code */}
-                  <div className="relative z-10 mt-12 pt-6 border-t border-amber-300/60 flex items-end justify-between px-2 sm:px-6">
+                  <div className="relative z-10 mt-10 sm:mt-12 pt-5 sm:pt-6 border-t-2 border-double border-[#b59b56] flex items-end justify-between gap-3 px-0 sm:px-6">
                     
                     {/* Institutional Seal */}
                     <div className="flex flex-col items-center">
