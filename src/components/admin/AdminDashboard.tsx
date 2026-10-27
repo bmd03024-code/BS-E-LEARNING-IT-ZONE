@@ -6400,94 +6400,85 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </button>
             </div>
 
-            {/* High-Fidelity Printable Certificate */}
-            <div className="printable-area certificate-border relative bg-gradient-to-br from-amber-50/40 via-white to-amber-50/60 p-8 sm:p-12 rounded-2xl shadow-xl text-center space-y-4 overflow-hidden border-8 border-double border-blue-950">
-              {/* Subtle Watermark */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5 select-none">
-                {settings.logoUrl ? (
-                  <img src={settings.logoUrl} alt="" className="w-72 h-72 object-contain" />
-                ) : (
-                  <div className="text-6xl font-black text-slate-900">BS ZONE</div>
-                )}
-              </div>
-
-              {/* Institution Header */}
-              <div className="relative z-10 space-y-1">
-                <div className="w-16 h-16 mx-auto rounded-full overflow-hidden border-2 border-amber-500 p-0.5 bg-slate-900 shadow-md">
-                  <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover" />
-                </div>
-                <h1 className="text-xl sm:text-2xl font-black text-blue-950 tracking-wider uppercase font-serif">
-                  BS E-LEARNING &amp; IT ZONE
-                </h1>
-                <p className="text-xs text-amber-800 font-bold uppercase tracking-widest">
-                  Government Registered Professional Training Academy
-                </p>
-                <div className="pt-2">
-                  <span className="inline-block px-6 py-1 rounded-full bg-blue-950 text-amber-300 font-serif font-black text-sm tracking-widest uppercase shadow-sm">
-                    CERTIFICATE OF ACHIEVEMENT
-                  </span>
-                  <p className="text-[11px] text-slate-600 mt-1 font-semibold">
-                    Official Professional Training Completion Certificate
-                  </p>
-                </div>
-              </div>
-
-              {/* Body */}
-              <div className="relative z-10 py-3 space-y-2 text-slate-800">
-                <p className="text-xs font-serif italic text-slate-600">This is to proudly certify that</p>
-                <h2 className="text-2xl sm:text-3xl font-black text-blue-950 font-serif underline decoration-amber-500 underline-offset-8">
-                  {selectedCertForPrint.studentNameEnglish || 'English student name not provided'}
-                </h2>
-                <p className="text-xs text-slate-700 pt-1">
-                  Son / Daughter of <b>{selectedCertForPrint.fatherName || 'Not Provided'}</b> and <b>{selectedCertForPrint.motherName || 'Not Provided'}</b>
-                </p>
-                <div className="inline-flex items-center gap-3 text-xs font-mono font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
-                  <span>Roll: {selectedCertForPrint.roll}</span>
-                  <span>•</span>
-                  <span>Certificate No.: {selectedCertForPrint.certificateNo}</span>
-                </div>
-                <div className="text-xs text-slate-700 leading-relaxed max-w-lg mx-auto pt-2">
-                  {selectedCertForPrint.bodyText && !/[\u0980-\u09FF]/.test(selectedCertForPrint.bodyText) ? (
-                    <p className="p-3 bg-amber-50/60 rounded-xl border border-amber-200/60 text-slate-800 font-medium">
-                      {selectedCertForPrint.bodyText}
-                    </p>
+            {/* Professional course completion certificate — shared by every course */}
+            <div className="printable-area certificate-border relative bg-[#fffdf7] p-3 sm:p-6 shadow-xl text-center overflow-hidden">
+              <div className="absolute inset-[5px] border-[3px] border-double border-[#20365f] pointer-events-none" />
+              <div className="absolute inset-[11px] border border-[#c59a45] pointer-events-none" />
+              <div className="relative z-10 px-4 py-5 sm:px-8 sm:py-7">
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  {settings.logoUrl ? (
+                    <img src={settings.logoUrl} alt="BS E-Learning & IT Zone logo" className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-full border border-[#c59a45] p-1 bg-white" />
                   ) : (
-                    <p>
-                      has successfully completed the comprehensive training course on{' '}
-                      <span className="font-extrabold text-blue-950 text-sm">
-                        {selectedCertForPrint.courseTitle || selectedCertForPrint.courseId}
-                      </span>{' '}
-                      and achieved the outstanding grade of{' '}
-                      <span className="font-black text-emerald-800 text-sm">{selectedCertForPrint.grade}</span>.
-                    </p>
+                    <div className="w-14 h-14 rounded-full border-2 border-[#c59a45] flex items-center justify-center text-[#20365f] font-black text-xs">BS</div>
                   )}
                 </div>
-              </div>
+                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.22em] text-[#8a6827] font-bold">Professional Training & Skills Development</p>
+                <h1 className="mt-1 text-xl sm:text-3xl font-black text-[#20365f] tracking-wide font-serif uppercase">
+                  BS E-Learning &amp; IT Zone
+                </h1>
+                <div className="w-24 h-[2px] bg-[#c59a45] mx-auto my-3" />
+                <p className="text-[10px] sm:text-xs text-slate-600 tracking-widest uppercase">Certificate of Completion</p>
+                <h2 className="mt-2 inline-block px-4 sm:px-8 py-2 border-y border-[#c59a45] text-lg sm:text-2xl font-serif font-bold text-[#20365f]">
+                  {selectedCertForPrint.certificateTitle || 'Course Completion Certificate'}
+                </h2>
 
-              {/* Seal & Signatures */}
-              <div className="relative z-10 pt-6 flex items-end justify-between text-xs">
-                {/* QR Code */}
-                <div className="text-center space-y-1">
-                  <div className="w-16 h-16 bg-white p-1 rounded-lg border border-slate-300 mx-auto shadow-xs flex items-center justify-center">
-                    <QrCode className="w-12 h-12 text-slate-900" />
+                <div className="mt-6 sm:mt-8">
+                  <p className="text-xs sm:text-sm italic text-slate-600 font-serif">This certificate is proudly presented to</p>
+                  <h3 className="mt-2 text-2xl sm:text-4xl font-serif font-bold text-[#17294d] break-words">
+                    {selectedCertForPrint.studentNameEnglish || selectedCertForPrint.studentName || 'Student Name'}
+                  </h3>
+                  <div className="w-3/4 max-w-md mx-auto border-b-2 border-[#c59a45] mt-2" />
+                  <p className="mt-3 text-[10px] sm:text-xs text-slate-700">
+                    Son / Daughter of <strong>{selectedCertForPrint.fatherName || 'Not provided'}</strong>
+                    {selectedCertForPrint.motherName ? <> and <strong>{selectedCertForPrint.motherName}</strong></> : null}
+                  </p>
+                </div>
+
+                <p className="max-w-2xl mx-auto mt-5 text-xs sm:text-sm leading-6 text-slate-700">
+                  {selectedCertForPrint.bodyText && !/[\u0980-\u09FF]/.test(selectedCertForPrint.bodyText)
+                    ? selectedCertForPrint.bodyText
+                    : <>has successfully completed the course <strong className="text-[#20365f]">{selectedCertForPrint.courseTitle || selectedCertForPrint.courseId}</strong> and has been awarded the grade <strong className="text-[#276749]">{selectedCertForPrint.grade}</strong>.</>}
+                </p>
+
+                <div className="mt-5 mx-auto max-w-xl grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+                  <div className="border border-[#dfd4b8] bg-white/80 p-2 rounded-sm">
+                    <p className="text-[8px] uppercase tracking-wider text-slate-500">Academic year</p>
+                    <p className="text-xs font-bold text-[#20365f]">{selectedCertForPrint.academicYear || '—'}</p>
                   </div>
-                  <span className="text-[9px] font-bold text-slate-500 uppercase block">Verify Certificate</span>
-                </div>
-
-                {/* Seal */}
-                <div className="text-center space-y-1">
-                  <img src={settings.institutionSealUrl} alt="Seal" className="h-16 w-auto mx-auto object-contain filter drop-shadow" />
-                  <span className="text-[9px] font-bold text-amber-900 uppercase tracking-wider block">Official Seal</span>
-                </div>
-
-                {/* Principal Signature */}
-                <div className="text-center space-y-1">
-                  <img src={settings.signatureUrl} alt="Signature" className="h-12 w-auto mx-auto object-contain" />
-                  <div className="border-t border-slate-800 pt-0.5">
-                    <p className="font-bold text-slate-900 text-[11px]">{settings.founderName}</p>
-                    <p className="text-[9px] text-slate-600 font-semibold">Founder &amp; Principal Director</p>
+                  <div className="border border-[#dfd4b8] bg-white/80 p-2 rounded-sm">
+                    <p className="text-[8px] uppercase tracking-wider text-slate-500">Student roll</p>
+                    <p className="text-xs font-bold text-[#20365f]">{selectedCertForPrint.roll || '—'}</p>
+                  </div>
+                  <div className="border border-[#dfd4b8] bg-white/80 p-2 rounded-sm">
+                    <p className="text-[8px] uppercase tracking-wider text-slate-500">Grade</p>
+                    <p className="text-xs font-bold text-[#20365f]">{selectedCertForPrint.grade || '—'}</p>
+                  </div>
+                  <div className="border border-[#dfd4b8] bg-white/80 p-2 rounded-sm">
+                    <p className="text-[8px] uppercase tracking-wider text-slate-500">Certificate no.</p>
+                    <p className="text-[10px] sm:text-xs font-bold text-[#20365f] break-all">{selectedCertForPrint.certificateNo || '—'}</p>
                   </div>
                 </div>
+
+                <div className="mt-7 sm:mt-9 grid grid-cols-3 gap-3 items-end text-center">
+                  <div className="flex flex-col items-center justify-end min-h-[72px]">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 border border-[#dfd4b8] bg-white flex items-center justify-center rounded-sm">
+                      <QrCode className="w-9 h-9 text-[#20365f]" />
+                    </div>
+                    <p className="mt-1 text-[8px] uppercase tracking-wide text-slate-500">Certificate reference</p>
+                  </div>
+                  <div className="flex flex-col items-center justify-end min-h-[72px]">
+                    {settings.institutionSealUrl ? <img src={settings.institutionSealUrl} alt="Institution seal" className="h-12 sm:h-14 w-auto max-w-full object-contain" /> : <div className="h-12 sm:h-14 w-14 rounded-full border border-[#c59a45] flex items-center justify-center text-[8px] font-bold text-[#20365f]">BS ZONE</div>}
+                    <p className="mt-1 text-[8px] uppercase tracking-wide text-[#8a6827]">Institution seal</p>
+                  </div>
+                  <div className="flex flex-col items-center justify-end min-h-[72px]">
+                    {settings.signatureUrl ? <img src={settings.signatureUrl} alt="Authorized signature" className="h-9 sm:h-11 w-auto max-w-full object-contain mb-1" /> : <div className="h-9 sm:h-11" />}
+                    <div className="w-full max-w-[150px] border-t border-slate-700 pt-1">
+                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-900">{settings.founderName || 'Authorized Signatory'}</p>
+                      <p className="text-[8px] text-slate-600">Authorized Signatory</p>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-5 text-[8px] tracking-wider text-slate-500">Issued by BS E-Learning &amp; IT Zone • {selectedCertForPrint.certificateNo}</p>
               </div>
             </div>
 
