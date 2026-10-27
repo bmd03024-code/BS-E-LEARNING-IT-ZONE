@@ -110,7 +110,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
       .forEach(r => {
         const engRoll = toEnglishNum(r.roll);
         if (engRoll && !map.has(engRoll)) {
-          map.set(engRoll, r.studentName || `শিক্ষার্থী রোল ${String(engRoll)}`);
+          map.set(engRoll, r.studentName || `Student Roll ${String(engRoll)}`);
         }
       });
 
@@ -120,7 +120,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
       .forEach(s => {
         const engRoll = toEnglishNum(s.roll);
         if (engRoll && !map.has(engRoll)) {
-          map.set(engRoll, s.name || `শিক্ষার্থী রোল ${String(engRoll)}`);
+          map.set(engRoll, s.name || `Student Roll ${String(engRoll)}`);
         }
       });
 
@@ -200,7 +200,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
         setFoundResult(null);
         setSearchStatus('unpublished');
         setStatusMessage(
-          `রোল ${String(cleanRoll)}-এর "${matchedRecord.examType}" পরীক্ষার ফলাফল ডাটাবেজে সংরক্ষিত রয়েছে, কিন্তু এডমিন প্যানেল থেকে এখনও এটি পাবলিশ করা হয়নি।`
+          `Results for roll ${String(cleanRoll)} in the "${matchedRecord.examType}" exam are saved in the database but have not been published by the admin yet.`
         );
       }
     } else {
@@ -214,11 +214,11 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
 
       if (otherExams.length > 0) {
         setStatusMessage(
-          `রোল ${String(cleanRoll)}-এর "${cleanExam}" পরীক্ষার ফলাফল পাওয়া যায়নি। তবে এই শিক্ষার্থীর "${otherExams.join(', ')}" পরীক্ষার ফলাফল প্রকাশিত আছে। পরীক্ষার ধরণ পরিবর্তন করে সার্চ করুন।`
+          `No results were found for roll ${String(cleanRoll)} in the "${cleanExam}" exam. Published results exist for this student in: ${otherExams.join(', ')}. Change the exam type and search again.`
         );
       } else {
         setStatusMessage(
-          `প্রদত্ত শিক্ষাবর্ষ (${String(targetYear)}), কোর্স, পরীক্ষার ধরণ ("${cleanExam}") ও রোল নম্বরের (${String(cleanRoll)}) কোনো ফলাফল পাওয়া যায়নি।`
+          `No results found for the selected academic year (${String(targetYear)}), course, exam type ("${cleanExam}"), and roll number (${String(cleanRoll)}).`
         );
       }
     }
@@ -778,7 +778,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                 {statusMessage}
               </p>
               <div className="text-[11px] text-slate-600 pt-1">
-                পরামর্শ: উপরে শিক্ষাবর্ষ, কোর্স, পরীক্ষার ধরণ ও রোল নম্বর সঠিক আছে কিনা দেখে পুনরায় &quot;View Results & Marksheet&quot; চাপুন।
+                Tip: Check the academic year, course, exam type, and roll number above, then click &quot;View Results & Marksheet&quot; again.
               </div>
             </div>
           ) : (
@@ -786,16 +786,16 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="text-center py-10 text-slate-500 space-y-3 bg-white rounded-2xl border border-dashed border-slate-300 p-6 shadow-xs">
               <BarChart3 className="w-14 h-14 mx-auto text-blue-900/40" />
               <h4 className="text-sm sm:text-base font-bold text-slate-800">
-                শিক্ষাবর্ষ, কোর্স, পরীক্ষার ধরণ ও রোল সিলেক্ট করে ফলাফল খুঁজুন
+                Select the academic year, course, exam type, and roll to search for results
               </h4>
               <p className="text-xs text-slate-600 max-w-md mx-auto">
-                উপরে থাকা ৪টি Dropdown থেকে তথ্য সিলেক্ট করুন এবং &quot;View Results & Marksheet&quot; বাটনে ক্লিক করলেই শিক্ষার্থীর সম্পূর্ণ ফলাফল ও অফিশিয়াল সিলযুক্ত মার্কশিট দেখা যাবে এবং প্রিন্ট করা যাবে।
+                Select the four dropdowns above and click &quot;View Results & Marksheet&quot; to view and print the student's complete result and official institution-sealed marksheet.
               </p>
 
               {/* Quick try presets */}
               <div className="pt-3">
                 <span className="text-xs font-bold text-slate-700 block mb-2">
-                  দ্রুত টেস্ট করতে ক্লিক করতে পারেন:
+                  Quick test examples:
                 </span>
                 <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
                   <button
@@ -811,7 +811,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     }}
                     className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 font-bold hover:bg-blue-100 transition-colors cursor-pointer"
                   >
-                    কম্পিউটার অফিস: রোল ১০১ (মিড-টার্ম)
+                    Computer Office: Roll 101 (Mid-Term)
                   </button>
                   <button
                     type="button"
@@ -826,7 +826,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     }}
                     className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 font-bold hover:bg-blue-100 transition-colors cursor-pointer"
                   >
-                    কম্পিউটার অফিস: রোল ১০১ (সেমিস্টার ফাইনাল)
+                    Computer Office: Roll 101 (Semester Final)
                   </button>
                   <button
                     type="button"
@@ -841,7 +841,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     }}
                     className="px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-bold hover:bg-amber-100 transition-colors cursor-pointer"
                   >
-                    এসএসসি হিসাববিজ্ঞান: রোল ১০২ (মডেল টেস্ট)
+                    SSC Accounting: Roll 102 (Model Test)
                   </button>
                 </div>
               </div>
