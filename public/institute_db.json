@@ -846,25 +846,6 @@
   ],
   "certificates": [
     {
-      "feeAmount": 500,
-      "hasEverPaid": true,
-      "isFirstIssue": false,
-      "studentName": "মোহাম্মদ আব্দুল্লাহ",
-      "issueDate": "2026-04-10",
-      "courseId": "course-computer-office",
-      "academicYear": "2026",
-      "grade": "A+ (অসাধারণ)",
-      "id": "cert-101",
-      "certificateNo": "BS-IT-2026-00101",
-      "roll": "101",
-      "feePaid": true,
-      "fatherName": "রফিকুল ইসলাম",
-      "motherName": "নাসিমা বেগম",
-      "hasGovtCert": true,
-      "isFree": false,
-      "address": "উত্তরা, ঢাকা"
-    },
-    {
       "hasEverPaid": true,
       "studentName": "তানভীর হাসান",
       "fatherName": "মো: কামরুল হাসান",
