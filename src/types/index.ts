@@ -66,6 +66,11 @@ export interface ShortcutItem {
 export interface Course {
   id: string;
   title: string;
+  titleEnglish?: string;
+  descriptionEnglish?: string;
+  categoryEnglish?: string;
+  subjectsEnglish?: string[];
+  examsEnglish?: string[];
   logoUrl?: string; // Course-specific logo / thumbnail
   duration: string;
   description: string;
@@ -107,7 +112,9 @@ export interface Student {
   name: string;
   englishName?: string;
   fatherName?: string;
+  fatherNameEnglish?: string;
   motherName?: string;
+  motherNameEnglish?: string;
   phone: string;
   address?: string;
   trxId: string;
