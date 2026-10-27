@@ -137,6 +137,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [newStdCourse, setNewStdCourse] = useState(storage.getCourses()[0]?.id || '');
   const [newStdRoll, setNewStdRoll] = useState('');
   const [newStdName, setNewStdName] = useState('');
+  const [newStdNameEnglish, setNewStdNameEnglish] = useState('');
   const [newStdFather, setNewStdFather] = useState('');
   const [newStdMother, setNewStdMother] = useState('');
   const [newStdPhone, setNewStdPhone] = useState('');
@@ -1767,28 +1768,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   /* ---------------- MODULE 5: SUBJECTS & EXAMS MANAGEMENT ---------------- */
   const [selectedCourseForSetup, setSelectedCourseForSetup] = useState<string>(courses[0]?.id || '');
   const [newSubjectInput, setNewSubjectInput] = useState('');
+  const [newSubjectEnglishInput, setNewSubjectEnglishInput] = useState('');
   const [newExamInput, setNewExamInput] = useState('');
+  const [newExamEnglishInput, setNewExamEnglishInput] = useState('');
 
   const targetCourse = courses.find(c => c.id === selectedCourseForSetup) || courses[0];
 
   const handleAddSubject = () => {
     if (!newSubjectInput.trim()) return;
     const currentSubs = targetCourse.subjects || [];
-    const updated = courses.map(c => c.id === targetCourse.id ? { ...c, subjects: [...currentSubs, newSubjectInput.trim()] } : c);
+    const currentEnglishSubs = targetCourse.subjectsEnglish || [];
+    const updated = courses.map(c => c.id === targetCourse.id ? { ...c, subjects: [...currentSubs, newSubjectInput.trim()], subjectsEnglish: [...currentEnglishSubs, newSubjectEnglishInput.trim()] } : c);
     setCourses(updated);
     storage.saveCourses(updated);
     setNewSubjectInput('');
-    triggerSaveNotification('বিষয় যুক্ত হয়েছে!');
+    setNewSubjectEnglishInput('');
+    triggerSaveNotification('বাংলা ও ইংরেজি বিষয় যুক্ত হয়েছে!');
   };
 
   const handleAddExam = () => {
     if (!newExamInput.trim()) return;
     const currentExams = targetCourse.exams || [];
-    const updated = courses.map(c => c.id === targetCourse.id ? { ...c, exams: [...currentExams, newExamInput.trim()] } : c);
+    const currentEnglishExams = targetCourse.examsEnglish || [];
+    const updated = courses.map(c => c.id === targetCourse.id ? { ...c, exams: [...currentExams, newExamInput.trim()], examsEnglish: [...currentEnglishExams, newExamEnglishInput.trim()] } : c);
     setCourses(updated);
     storage.saveCourses(updated);
     setNewExamInput('');
-    triggerSaveNotification('পরীক্ষা যুক্ত হয়েছে!');
+    setNewExamEnglishInput('');
+    triggerSaveNotification('বাংলা ও ইংরেজি পরীক্ষার নাম যুক্ত হয়েছে!');
   };
 
   const renderModule5 = () => (
@@ -1817,14 +1824,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <span>পাঠ্য বিষয়সমূহ ({targetCourse.subjects?.length || 0} টি)</span>
             </h4>
 
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="নতুন বিষয়ের নাম..."
-                value={newSubjectInput}
-                onChange={(e) => setNewSubjectInput(e.target.value)}
-                className="grow px-3 py-1.5 border rounded-xl text-xs bg-white font-semibold"
-              />
+            <div className="grid grid-cols-1 gap-2">
+              <input type="text" placeholder="নতুন বিষয়ের নাম (বাংলা)..." value={newSubjectInput} onChange={(e) => setNewSubjectInput(e.target.value)} className="grow px-3 py-1.5 border rounded-xl text-xs bg-white font-semibold" />
+              <input type="text" placeholder="Subject name (English)..." value={newSubjectEnglishInput} onChange={(e) => setNewSubjectEnglishInput(e.target.value)} className="grow px-3 py-1.5 border rounded-xl text-xs bg-white font-semibold" />
               <button
                 onClick={handleAddSubject}
                 className="px-3 py-1.5 rounded-xl bg-blue-900 text-white text-xs font-bold"
@@ -1860,14 +1862,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <span>নির্ধারিত পরীক্ষাসমূহ ({targetCourse.exams?.length || 0} টি)</span>
             </h4>
 
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="নতুন পরীক্ষার নাম (যেমন: মডেল টেস্ট)..."
-                value={newExamInput}
-                onChange={(e) => setNewExamInput(e.target.value)}
-                className="grow px-3 py-1.5 border rounded-xl text-xs bg-white font-semibold"
-              />
+            <div className="grid grid-cols-1 gap-2">
+              <input type="text" placeholder="নতুন পরীক্ষার নাম (বাংলা)..." value={newExamInput} onChange={(e) => setNewExamInput(e.target.value)} className="grow px-3 py-1.5 border rounded-xl text-xs bg-white font-semibold" />
+              <input type="text" placeholder="Exam name (English)..." value={newExamEnglishInput} onChange={(e) => setNewExamEnglishInput(e.target.value)} className="grow px-3 py-1.5 border rounded-xl text-xs bg-white font-semibold" />
               <button
                 onClick={handleAddExam}
                 className="px-3 py-1.5 rounded-xl bg-amber-600 text-white text-xs font-bold"
