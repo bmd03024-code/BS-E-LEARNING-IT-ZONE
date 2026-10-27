@@ -43,7 +43,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
             </div>
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              {settings.footerText || 'BS E-Learning & IT Zone — আধুনিক একাডেমিক শিক্ষা ও প্র্যাকটিক্যাল আইটি স্কিল অর্জনের বিশ্বস্ত প্রতিষ্ঠান। অভিজ্ঞ শিক্ষক মণ্ডলী এবং ডিজিটাল ল্যাব সাপোর্ট।'}
+              {footerText}
             </p>
 
             <div className="pt-2 text-xs text-slate-400 space-y-1">
@@ -169,7 +169,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
             <ul className="space-y-2.5 text-xs sm:text-sm text-slate-400">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>{settings.address}</span>
+                <span>{en ? ({ 'বাগানবাড়ি রোড, উত্তরা / মিরপুর শাখা, ঢাকা-১২৩০, বাংলাদেশ': 'Baganbari Road, Uttara / Mirpur Branch, Dhaka-1230, Bangladesh' }[settings.address] || settings.address) : settings.address}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -206,7 +206,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
         {/* Bottom Sub-bar */}
         <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <div>
-            {settings.footerCopyright || `© ${new Date().getFullYear()} ${settings.name}. {text('সর্বস্বত্ব সংরক্ষিত।', 'All rights reserved.')}`}
+            {settings.footerCopyright ? (en ? settings.footerCopyright.replace('সর্বস্বত্ব সংরক্ষিত।', 'All rights reserved.') : settings.footerCopyright) : `© ${new Date().getFullYear()} ${settings.name}. ${text('সর্বস্বত্ব সংরক্ষিত।', 'All rights reserved.')}`}
           </div>
 
           <div className="flex items-center gap-4">
