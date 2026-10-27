@@ -116,11 +116,11 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                 <div className="p-5 sm:p-6 pb-4">
                   {/* Course Thumbnail / Logo */}
                   {course.logoUrl && (
-                    <div className="w-full h-36 rounded-xl overflow-hidden mb-4 bg-slate-900 border border-slate-200 relative">
+                    <div className="course-banner-reveal w-full h-36 rounded-xl overflow-hidden mb-4 bg-slate-900 border border-slate-200 relative">
                       <img
                         src={course.logoUrl}
                         alt={course.title}
-                        className="course-banner-reveal w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                         }}
