@@ -28,6 +28,7 @@ import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 
 export default function App() {
+  const [language, setLanguage] = useState<'bn' | 'en'>(() => (localStorage.getItem('bs_site_language') as 'bn' | 'en') || 'bn');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
 
@@ -224,6 +225,8 @@ export default function App() {
         logoUrl={settings.logoUrl}
         headerTextSize={settings.headerTextSize}
         settings={settings}
+        language={language}
+        onLanguageChange={setLanguage}
       />
 
       <main className="grow">
