@@ -105,6 +105,7 @@ export interface Student {
   courseId: string;
   roll: string;
   name: string;
+  englishName?: string;
   fatherName?: string;
   motherName?: string;
   phone: string;
@@ -123,7 +124,8 @@ export interface EnrollmentApplication {
   type: 'admission' | 'monthly';
   courseId: string;
   academicYear: string;
-  studentName: string; // Required
+  studentName: string; // Required Bengali name
+  studentNameEnglish?: string; // English spelling for records
   phone: string; // Required
   photoUrl: string; // Required
   fatherName?: string; // Optional
