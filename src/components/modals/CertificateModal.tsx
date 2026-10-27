@@ -651,7 +651,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
               </div>
             ) : (
               /* ========================================================================= */
-              /* CASE 3: DEMO-INSPIRED FORMAL LANDSCAPE CERTIFICATE                        */
+              /* CASE 3: BS ZONE FORMAL LANDSCAPE INSTITUTIONAL CERTIFICATE                 */
               /* ========================================================================= */
               <div className="space-y-4">
                 {/* Print Action Bar */}
@@ -682,8 +682,8 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   </div>
                 </div>
 
-                {/* The Luxury Official Printable Certificate */}
-                <div className="printable-area certificate-print-layout certificate-border relative bg-[#fffdf7] px-6 py-7 sm:px-12 sm:py-9 shadow-xl overflow-hidden text-center my-2 border-[12px] border-double border-[#74664d] outline outline-2 outline-offset-[-19px] outline-[#c5ad70] font-serif min-h-[560px]" style={{ aspectRatio: '1.414 / 1' }}>
+                {/* Branded printable certificate — landscape, layered ornamental-style border */}
+                <div className="printable-area certificate-print-layout certificate-border relative bg-[#fffdf7] px-5 py-5 sm:px-10 sm:py-7 shadow-xl overflow-hidden text-center my-2 border-[10px] border-double border-[#716044] outline outline-1 outline-offset-[-17px] outline-[#c7ad70] font-serif min-h-[560px]" style={{ aspectRatio: '1.414 / 1', backgroundImage: 'radial-gradient(ellipse at center, rgba(255,255,255,0.96) 0%, rgba(255,253,247,0.98) 72%, rgba(243,235,214,0.95) 100%)' }}>
                   
                   {/* Subtle Center Watermark */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] select-none">
@@ -702,45 +702,45 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   </div>
 
                   {/* Top Number & Date Bar */}
-                  <div className="relative z-10 flex justify-between items-center text-[10px] sm:text-xs text-[#343434] pb-3 border-b-2 border-[#9b8964] font-serif tracking-wide">
+                  <div className="relative z-10 flex justify-between items-center text-[9px] sm:text-[11px] text-[#343434] pb-2 border-b border-[#9b8964] font-serif tracking-wide">
                     <span>Certificate No.: <b className="text-slate-900 font-bold">{foundCert.certificateNo}</b></span>
                     <span>Issue Date: <b className="text-slate-900 font-bold">{foundCert.issueDate}</b></span>
                   </div>
 
                   {/* Institution Branding: existing site logo and institution details */}
-                  <div className="relative z-10 mt-4 space-y-1">
+                  <div className="relative z-10 mt-3 space-y-1">
                     {(settings.logoUrl || settings.watermarkUrl) && (
                       <div className="flex justify-center mb-3">
-                        <img src={settings.logoUrl || settings.watermarkUrl} alt="Institution Logo" className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
+                        <img src={settings.logoUrl || settings.watermarkUrl} alt="Institution Logo" className="w-14 h-14 sm:w-[4.5rem] sm:h-[4.5rem] object-contain" />
                       </div>
                     )}
-                    <h3 className="text-xl sm:text-3xl font-bold text-[#171717] tracking-[0.08em] uppercase leading-tight">
+                    <h3 className="text-lg sm:text-2xl font-bold text-[#171717] tracking-[0.06em] uppercase leading-tight">
                       {englishOnly(foundCert.institutionName, 'BS E-LEARNING IT ZONE')}
                     </h3>
                     <p className="text-[10px] sm:text-xs text-slate-700 font-medium">
                       {englishOnly(foundCert.institutionSubName, englishOnly(settings.subName))}{englishOnly(settings.address) ? ` • ${englishOnly(settings.address)}` : ''}
                     </p>
                     
-                    <div className="pt-3">
-                      <span className="inline-block px-5 py-2 text-[#242424] font-bold text-sm sm:text-lg tracking-[0.12em] uppercase border-y-2 border-[#9b8964]">
+                    <div className="pt-2">
+                      <span className="inline-block px-4 py-1.5 text-[#242424] font-bold text-xs sm:text-base tracking-[0.1em] uppercase border-y-2 border-[#9b8964]">
                         {foundCert.certificateTitle || 'SKILLS ACHIEVEMENT CERTIFICATE'}
                       </span>
                     </div>
                   </div>
 
                   {/* Body Text & Student Details */}
-                  <div className="relative z-10 mt-7 space-y-5 text-[#292929] max-w-3xl mx-auto text-sm sm:text-base leading-relaxed">
+                  <div className="relative z-10 mt-5 space-y-3 sm:space-y-4 text-[#292929] max-w-3xl mx-auto text-sm sm:text-base leading-relaxed">
                     
                     <p className="text-slate-600 font-medium text-xs sm:text-sm">
                       This is to certify that
                     </p>
 
-                    <h4 className="text-2xl sm:text-4xl font-bold text-[#171717] underline decoration-[#8c7a55] decoration-1 underline-offset-4 leading-snug">
+                    <h4 className="text-xl sm:text-3xl font-bold italic text-[#171717] underline decoration-[#8c7a55] decoration-1 underline-offset-4 leading-snug">
                       {englishOnly(foundCert.studentName)}
                     </h4>
 
                     {/* Parents' Names & Address Box */}
-                    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm text-[#303030] bg-transparent p-3 border-y border-[#b6a477] leading-relaxed">
+                    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[11px] sm:text-xs text-[#303030] bg-transparent p-2.5 border-y border-[#b6a477] leading-relaxed">
                       <div>
                         Father’s Name: <b className="text-slate-900 font-bold">{englishOnly(foundCert.fatherName, 'N/A')}</b>
                       </div>
@@ -763,7 +763,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     </div>
 
                     {/* Main Certification Statement */}
-                    <div className="p-3 bg-transparent text-justify sm:text-center text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
+                    <div className="p-2 sm:p-3 bg-transparent text-justify sm:text-center text-[11px] sm:text-xs text-slate-800 leading-relaxed font-medium">
                       {englishOnly(foundCert.bodyText) || (
                         <span>
                           has successfully completed the <b>{englishOnly(foundCert.courseTitle, englishOnly(selectedCourse.titleEnglish, ''))}</b> skills course ({foundCert.duration || selectedCourse.duration}) and demonstrated the skills recorded in the final assessment. We wish the student continued success in future endeavors. This is an institutional skills-achievement certificate, not a government-issued academic certificate.
@@ -780,7 +780,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   </div>
 
                   {/* Bottom Signature, Seal & QR Code */}
-                  <div className="relative z-10 mt-8 sm:mt-10 pt-4 border-t border-[#b8aa8c] flex items-end justify-between gap-3 px-0 sm:px-6">
+                  <div className="relative z-10 mt-5 sm:mt-7 pt-3 border-t border-[#b8aa8c] flex items-end justify-between gap-3 px-0 sm:px-5">
                     
                     {/* Institutional Seal */}
                     <div className="flex flex-col items-center">
@@ -789,7 +789,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                         alt="Institutional Seal"
                         className="w-20 h-20 sm:w-24 sm:h-24 object-contain filter drop-shadow-xs"
                       />
-                      <span className="text-[10px] font-bold text-slate-600 mt-1">Institutional Seal</span>
+                      <span className="text-[9px] font-bold text-slate-600 mt-1">BS Zone Institutional Mark</span>
                     </div>
 
                     {/* Verification QR / Signature Seal */}
@@ -797,7 +797,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       <div className="p-1.5 bg-white rounded-xl border border-slate-300 shadow-xs">
                         <QrCode className="w-12 h-12 text-slate-900" />
                       </div>
-                      <span className="text-[9px] font-bold text-slate-600 mt-1">Digital Verification</span>
+                      <span className="text-[9px] font-bold text-slate-600 mt-1">Certificate Reference</span>
                     </div>
 
                     {/* Principal Signature */}
