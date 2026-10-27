@@ -79,9 +79,9 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
     setEditAddress(cert.address || 'Dhaka, Bangladesh');
     setEditBodyText(
       cert.bodyText ||
-      `সফলতার সাথে আমাদের প্রতিষ্ঠানে ${cert.courseTitle || selectedCourse?.title} কোর্সটি (${cert.duration || selectedCourse?.duration || '৬ মাস'}) কৃতিত্বের সাথে সম্পন্ন করেছেন এবং চূড়ান্ত মূল্যায়ন পরীক্ষায় "${cert.grade || 'A+ (Excellent)'}" অর্জন করেছেন। আমরা তার ভবিষ্যৎ জীবনের সর্বাঙ্গীন সাফল্য ও উন্নতি কামনা করি।`
+      `has successfully completed the ${cert.courseTitle || selectedCourse?.title} course (${cert.duration || selectedCourse?.duration || '6 months'}) and achieved ${cert.grade || 'A+ (Excellent)'} in the final assessment. We wish the student continued success in future endeavors.`
     );
-    setEditFounderName(cert.founderName || settings.founderName || 'বোরহানউদ্দিন মহিম');
+    setEditFounderName(cert.founderName || settings.founderName || 'Borhan Uddin Mahim');
     setEditFounderTitle(cert.founderTitle || settings.founderTitle || 'Founder & Lead Instructor');
   };
 
@@ -172,9 +172,9 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
     const newLedgerItem: LedgerItem = {
       id: `ledger-cert-${Date.now()}`,
       type: 'income',
-      category: 'সনদপত্র ফি',
-      title: `সনদপত্র ফি - রোল ${foundCert.roll} (${foundCert.studentName})`,
-      description: `বাংলা কিউআর পেমেন্ট TrxID: ${trimmedTrx}`,
+      category: 'Certificate Fee',
+      title: `Certificate Fee - Roll ${foundCert.roll} (${foundCert.studentName})`,
+      description: `QR payment transaction ID: ${trimmedTrx}`,
       amount: foundCert.feeAmount,
       date: new Date().toISOString().split('T')[0],
       academicYear: foundCert.academicYear
@@ -189,7 +189,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
     setTrxInput('');
     setPaymentSuccess(true);
     setViewMode('edit');
-    triggerToast('সনদ ফি সফলভাবে পরিশোধিত হয়েছে! সনদপত্রটি আনলক করা হয়েছে।');
+    triggerToast('Certificate fee paid successfully. The certificate is now unlocked.');
   };
 
   // Handle saving edits and switching to print layout
@@ -225,7 +225,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
     masterGateway.publish('certificates', newCertList);
 
     setViewMode('print');
-    triggerToast('সনদের লেখা সংরক্ষিত হয়েছে এবং Print Layout প্রস্তুত করা হয়েছে!');
+    triggerToast('Certificate details saved. Print layout is ready.');
   };
 
   const handlePrint = () => {
@@ -332,8 +332,8 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>
                   {isFreeOrPaid
-                    ? `শিক্ষার্থী: ${foundCert.studentName} (রোল: ${foundCert.roll}) — সনদপত্রটি সফলভাবে প্রস্তুত আছে!`
-                    : `শিক্ষার্থী: ${foundCert.studentName} (রোল: ${foundCert.roll}) — এই কোর্সের সনদের জন্য নির্ধারিত ফি: ${toBengaliNum(foundCert.feeAmount)} টাকা।`}
+                    ? `Student: ${foundCert.studentName} (Roll: ${foundCert.roll}) — Certificate is ready.`
+                    : `Student: ${foundCert.studentName} (Roll: ${foundCert.roll}) — Certificate fee: ${foundCert.feeAmount} BDT.`}
                 </span>
               </div>
 
@@ -384,8 +384,8 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 <div>
                   <h3 className="text-lg font-black text-slate-900">Certificate Fee Required</h3>
                   <p className="text-xs text-slate-600 mt-1">
-                    এই সনদের জন্য নির্ধারিত ফি: <b className="text-amber-800 text-sm">{toBengaliNum(foundCert.feeAmount)} টাকা</b>।
-                    বাংলা কিউআর কোড স্ক্যান করে ফি পরিশোধ করে নিচে TrxID দিন।
+                    Required certificate fee: <b className="text-amber-800 text-sm">{foundCert.feeAmount} BDT</b>।
+                    Scan the payment QR code, pay the fee, and enter the transaction ID below.
                   </p>
                 </div>
 
@@ -401,10 +401,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 <div className="text-[11px] text-slate-500 bg-white p-2.5 rounded-xl border border-slate-200 text-left space-y-1">
                   <p className="font-bold text-slate-700">Payment Instructions:</p>
                   <ol className="list-decimal list-inside space-y-0.5">
-                    <li>বিকাশ, নগদ, রকেট বা যেকোনো ব্যাংক অ্যাপ ওপেন করুন।</li>
-                    <li>"বাংলা কিউআর (QR)" অপশনে গিয়ে উপরের কোডটি স্ক্যান করুন।</li>
-                    <li>টাকার পরিমাণ <b>{toBengaliNum(foundCert.feeAmount)}৳</b> দিয়ে পেমেন্ট সম্পন্ন করুন।</li>
-                    <li>পেমেন্ট শেষে পাওয়া <b>TrxID</b> নিচের বক্সে লিখে সাবমিট করুন।</li>
+                    <li>Open bKash, Nagad, Rocket, or your banking app.</li>
+                    <li>Select the QR payment option and scan the code above.</li>
+                    <li>Pay <b>{foundCert.feeAmount} BDT</b> to complete the transaction.</li>
+                    <li>Enter the <b>transaction ID</b> in the field below and submit.</li>
                   </ol>
                 </div>
 
@@ -413,7 +413,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     <input
                       type="text"
                       required
-                      placeholder="বাংলা কিউআর পেমেন্ট TrxID (যেমন: BL7A99X2)"
+                      placeholder="Payment transaction ID (e.g., BL7A99X2)"
                       value={trxInput}
                       onChange={(e) => setTrxInput(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-mono uppercase text-center font-bold text-blue-950 focus:outline-hidden focus:ring-2 focus:ring-amber-500 bg-white"
@@ -423,7 +423,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     type="submit"
                     className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 active:scale-98 transition-all"
                   >
-                    <span>ফি সাবমিট করুন ও সনদ আনলক করুন</span>
+                    <span>Submit Fee and Unlock Certificate</span>
                     <ArrowRight className="w-4 h-4 text-emerald-200" />
                   </button>
                 </form>
@@ -437,7 +437,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
                     <Edit3 className="w-4 h-4 text-amber-600 shrink-0" />
                     <span>
-                      সনদের সম্পূর্ণ লেখা নিচে ইনপুট ফিল্ড ও বক্সে সাজানো আছে। যেকোনো তথ্য এডিট করার পর <b>"সাবমিট ও Print Layout দেখুন"</b> বাটনে চাপ দিন।
+                      Certificate details are available in the fields below. Edit any information, then click <b>Save and Preview Certificate</b>.
                     </span>
                   </div>
 
@@ -447,7 +447,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     className="px-4 py-1.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs shrink-0"
                   >
                     <Printer className="w-3.5 h-3.5 text-blue-900" />
-                    <span>সরাসরি প্রিন্ট প্রিভিউ দেখুন</span>
+                    <span>Preview Certificate</span>
                   </button>
                 </div>
 
@@ -632,7 +632,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 active:scale-98 transition-all"
                     >
                       <Printer className="w-4 h-4 text-emerald-200" />
-                      <span>সাবমিট ও Print Layout দেখুন</span>
+                      <span>Save and Preview Certificate</span>
                     </button>
                   </div>
                 </form>
@@ -818,7 +818,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
               <Award className="w-14 h-14 mx-auto text-amber-400/70" />
               <h4 className="text-sm font-bold text-slate-700">Search for a Certificate</h4>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                উপরে শিক্ষাবর্ষ, কোর্স ও আপনার রোল নম্বর ইনপুট দিয়ে <b>"Search Certificate"</b> বাটনে চাপ দিন।
+                Enter the academic year, course, and roll number above, then click <b>Search Certificate</b>.
               </p>
             </div>
           )}
