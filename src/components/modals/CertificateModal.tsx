@@ -47,7 +47,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
   const [editRoll, setEditRoll] = useState('');
   const [editCourseTitle, setEditCourseTitle] = useState('');
   const [editDuration, setEditDuration] = useState('');
-  const [editGrade, setEditGrade] = useState('A+ (প্রথম শ্রেণি)');
+  const [editGrade, setEditGrade] = useState('A+ (Excellent)');
   const [editCertificateNo, setEditCertificateNo] = useState('');
   const [editIssueDate, setEditIssueDate] = useState('');
   const [editAddress, setEditAddress] = useState('');
@@ -72,17 +72,17 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
     setEditMotherName(cert.motherName || '');
     setEditRoll(cert.roll || '');
     setEditCourseTitle(cert.courseTitle || selectedCourse?.title || '');
-    setEditDuration(cert.duration || selectedCourse?.duration || '৬ মাস (২৪ সপ্তাহ)');
-    setEditGrade(cert.grade || 'A+ (প্রথম শ্রেণি)');
+    setEditDuration(cert.duration || selectedCourse?.duration || '6 Months (24 Weeks)');
+    setEditGrade(cert.grade || 'A+ (Excellent)');
     setEditCertificateNo(cert.certificateNo || `BS-ZONE-${cert.academicYear}-${cert.roll.padStart(4, '0')}`);
     setEditIssueDate(cert.issueDate || new Date().toISOString().split('T')[0]);
-    setEditAddress(cert.address || 'ঢাকা, বাংলাদেশ');
+    setEditAddress(cert.address || 'Dhaka, Bangladesh');
     setEditBodyText(
       cert.bodyText ||
-      `সফলতার সাথে আমাদের প্রতিষ্ঠানে ${cert.courseTitle || selectedCourse?.title} কোর্সটি (${cert.duration || selectedCourse?.duration || '৬ মাস'}) কৃতিত্বের সাথে সম্পন্ন করেছেন এবং চূড়ান্ত মূল্যায়ন পরীক্ষায় "${cert.grade || 'A+ (প্রথম শ্রেণি)'}" অর্জন করেছেন। আমরা তার ভবিষ্যৎ জীবনের সর্বাঙ্গীন সাফল্য ও উন্নতি কামনা করি।`
+      `সফলতার সাথে আমাদের প্রতিষ্ঠানে ${cert.courseTitle || selectedCourse?.title} কোর্সটি (${cert.duration || selectedCourse?.duration || '৬ মাস'}) কৃতিত্বের সাথে সম্পন্ন করেছেন এবং চূড়ান্ত মূল্যায়ন পরীক্ষায় "${cert.grade || 'A+ (Excellent)'}" অর্জন করেছেন। আমরা তার ভবিষ্যৎ জীবনের সর্বাঙ্গীন সাফল্য ও উন্নতি কামনা করি।`
     );
     setEditFounderName(cert.founderName || settings.founderName || 'বোরহানউদ্দিন মহিম');
-    setEditFounderTitle(cert.founderTitle || settings.founderTitle || 'প্রতিষ্ঠাতা ও প্রধান প্রশিক্ষক');
+    setEditFounderTitle(cert.founderTitle || settings.founderTitle || 'Founder & Lead Instructor');
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -124,10 +124,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
         studentName: stdMatch.name,
         fatherName: stdMatch.fatherName,
         motherName: stdMatch.motherName,
-        address: stdMatch.address || 'ঢাকা, বাংলাদেশ',
+        address: stdMatch.address || 'Dhaka, Bangladesh',
         issueDate: new Date().toISOString().split('T')[0],
         certificateNo: `BS-ZONE-${stdMatch.academicYear}-${stdMatch.roll.padStart(4, '0')}`,
-        grade: 'A+ (প্রথম শ্রেণি)',
+        grade: 'A+ (Excellent)',
         isFirstIssue: true,
         feePaid: isFreeCourse,
         isFree: isFreeCourse,
@@ -225,7 +225,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
     masterGateway.publish('certificates', newCertList);
 
     setViewMode('print');
-    triggerToast('সনদের লেখা সংরক্ষিত হয়েছে এবং প্রিন্ট লেআউট প্রস্তুত করা হয়েছে!');
+    triggerToast('সনদের লেখা সংরক্ষিত হয়েছে এবং Print Layout প্রস্তুত করা হয়েছে!');
   };
 
   const handlePrint = () => {
@@ -255,10 +255,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
             </div>
             <div>
               <h2 className="text-base sm:text-xl font-black text-white">
-                কোর্স সমাপ্তি সনদপত্র (Course Certificate)
+                Course Completion Certificate
               </h2>
               <p className="text-xs text-amber-200">
-                শিক্ষাবর্ষ, কোর্স ও রোল নম্বর দিয়ে সনদ অনুসন্ধান, এডিট ও প্রিন্ট করুন
+                Search, edit, and print a certificate by academic year, course, and roll number
               </p>
             </div>
           </div>
@@ -276,20 +276,20 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
         <div className="no-print p-4 sm:p-5 bg-slate-50 border-b border-slate-200 shrink-0">
           <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
             <div className="sm:col-span-3">
-              <label className="block text-[11px] font-bold text-slate-600 mb-1">শিক্ষাবর্ষ</label>
+              <label className="block text-[11px] font-bold text-slate-600 mb-1">Academic Year</label>
               <select
                 value={academicYear}
                 onChange={(e) => setAcademicYear(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white"
               >
-                <option value="2026">২০২৬ সেশন</option>
-                <option value="2025">২০২৫ সেশন</option>
-                <option value="2027">২০২৭ সেশন</option>
+                <option value="2026">2026 Session</option>
+                <option value="2025">2025 Session</option>
+                <option value="2027">2027 Session</option>
               </select>
             </div>
 
             <div className="sm:col-span-4">
-              <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্স</label>
+              <label className="block text-[11px] font-bold text-slate-600 mb-1" >Course</label>
               <select
                 value={courseId}
                 onChange={(e) => setCourseId(e.target.value)}
@@ -304,11 +304,11 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
             </div>
 
             <div className="sm:col-span-3">
-              <label className="block text-[11px] font-bold text-slate-600 mb-1">শিক্ষার্থীর রোল *</label>
+              <label className="block text-[11px] font-bold text-slate-600 mb-1">Student Roll *</label>
               <input
                 type="text"
                 required
-                placeholder="যেমন: 101 বা 102"
+                placeholder="e.g. 101 or 102"
                 value={roll}
                 onChange={(e) => setRoll(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold font-mono text-blue-900 bg-white"
@@ -321,7 +321,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <Search className="w-3.5 h-3.5" />
-                <span>সনদ খুঁজুন</span>
+                <span>Search Certificate</span>
               </button>
             </div>
           </form>
@@ -349,7 +349,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     }`}
                   >
                     <Edit3 className="w-3.5 h-3.5" />
-                    <span>টেক্সট এডিট মোড</span>
+                    <span>Edit Text</span>
                   </button>
                   <button
                     type="button"
@@ -361,7 +361,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     }`}
                   >
                     <Printer className="w-3.5 h-3.5" />
-                    <span>প্রিন্ট লেআউট</span>
+                    <span>Print Layout</span>
                   </button>
                 </div>
               )}
@@ -382,7 +382,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 </div>
                 
                 <div>
-                  <h3 className="text-lg font-black text-slate-900">সনদপত্র ফি পরিশোধ আবশ্যক</h3>
+                  <h3 className="text-lg font-black text-slate-900">Certificate Fee Required</h3>
                   <p className="text-xs text-slate-600 mt-1">
                     এই সনদের জন্য নির্ধারিত ফি: <b className="text-amber-800 text-sm">{toBengaliNum(foundCert.feeAmount)} টাকা</b>।
                     বাংলা কিউআর কোড স্ক্যান করে ফি পরিশোধ করে নিচে TrxID দিন।
@@ -399,7 +399,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 </div>
 
                 <div className="text-[11px] text-slate-500 bg-white p-2.5 rounded-xl border border-slate-200 text-left space-y-1">
-                  <p className="font-bold text-slate-700">পেমেন্ট করার নিয়ম:</p>
+                  <p className="font-bold text-slate-700">Payment Instructions:</p>
                   <ol className="list-decimal list-inside space-y-0.5">
                     <li>বিকাশ, নগদ, রকেট বা যেকোনো ব্যাংক অ্যাপ ওপেন করুন।</li>
                     <li>"বাংলা কিউআর (QR)" অপশনে গিয়ে উপরের কোডটি স্ক্যান করুন।</li>
@@ -437,7 +437,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-950">
                     <Edit3 className="w-4 h-4 text-amber-600 shrink-0" />
                     <span>
-                      সনদের সম্পূর্ণ লেখা নিচে ইনপুট ফিল্ড ও বক্সে সাজানো আছে। যেকোনো তথ্য এডিট করার পর <b>"সাবমিট ও প্রিন্ট লেআউট দেখুন"</b> বাটনে চাপ দিন।
+                      সনদের সম্পূর্ণ লেখা নিচে ইনপুট ফিল্ড ও বক্সে সাজানো আছে। যেকোনো তথ্য এডিট করার পর <b>"সাবমিট ও Print Layout দেখুন"</b> বাটনে চাপ দিন।
                     </span>
                   </div>
 
@@ -455,15 +455,15 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   <div className="border-b border-slate-200 pb-2 flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                       <FileText className="w-4 h-4 text-amber-600" />
-                      সনদের লেখা ও তথ্য সংশোধন ফরম
+                      Edit Certificate Details
                     </span>
-                    <span className="text-[11px] text-slate-500">সকল ফিল্ড এডিটেবল</span>
+                    <span className="text-[11px] text-slate-500">All fields are editable</span>
                   </div>
 
                   {/* Row 1: Certificate Title & Certificate No */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">সনদপত্রের শিরোনাম (Title)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Certificate Title</label>
                       <input
                         type="text"
                         value={editTitle}
@@ -472,7 +472,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">সনদ নম্বর (Certificate No)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Certificate Number</label>
                       <input
                         type="text"
                         value={editCertificateNo}
@@ -485,7 +485,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   {/* Row 2: Student Name & Roll */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="sm:col-span-2">
-                      <label className="block text-xs font-bold text-slate-700 mb-1">শিক্ষার্থীর নাম (Student Name)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Student Name</label>
                       <input
                         type="text"
                         required
@@ -495,7 +495,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">রোল নম্বর (Roll)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Roll Number</label>
                       <input
                         type="text"
                         required
@@ -509,7 +509,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   {/* Row 3: Father's Name & Mother's Name */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">পিতার নাম (Father's Name)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Father's Name</label>
                       <input
                         type="text"
                         value={editFatherName}
@@ -518,7 +518,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">মাতার নাম (Mother's Name)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Mother's Name</label>
                       <input
                         type="text"
                         value={editMotherName}
@@ -531,7 +531,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   {/* Row 4: Course Title, Duration & Grade */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">কোর্সের নাম (Course Title)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Course Title</label>
                       <input
                         type="text"
                         value={editCourseTitle}
@@ -540,7 +540,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">মেয়াদকাল (Duration)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Duration</label>
                       <input
                         type="text"
                         value={editDuration}
@@ -549,7 +549,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">গ্রেড / ফলাফল (Grade)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Grade / Result</label>
                       <input
                         type="text"
                         value={editGrade}
@@ -562,7 +562,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   {/* Row 5: Issue Date & Address */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">ইস্যুর তারিখ (Issue Date)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Issue Date</label>
                       <input
                         type="text"
                         value={editIssueDate}
@@ -571,7 +571,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">ঠিকানা (Address)</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Address</label>
                       <input
                         type="text"
                         value={editAddress}
@@ -584,7 +584,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   {/* Row 6: Main Certificate Statement / Body Text */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      সনদের মূল বক্তব্য (Certificate Body Text / Statement)
+                      Certificate Statement
                     </label>
                     <textarea
                       rows={3}
@@ -597,7 +597,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   {/* Row 7: Principal / Signatory Details */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">স্বাক্ষরকারী / প্রতিষ্ঠাতা</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Signatory / Founder</label>
                       <input
                         type="text"
                         value={editFounderName}
@@ -606,7 +606,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">পদবী</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Title</label>
                       <input
                         type="text"
                         value={editFounderTitle}
@@ -624,7 +624,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-1.5"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
-                      <span>রিসেট করুন</span>
+                      <span>Reset</span>
                     </button>
 
                     <button
@@ -632,7 +632,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 active:scale-98 transition-all"
                     >
                       <Printer className="w-4 h-4 text-emerald-200" />
-                      <span>সাবমিট ও প্রিন্ট লেআউট দেখুন</span>
+                      <span>সাবমিট ও Print Layout দেখুন</span>
                     </button>
                   </div>
                 </form>
@@ -646,7 +646,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 <div className="no-print flex flex-col sm:flex-row items-center justify-between p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 gap-3">
                   <div className="flex items-center gap-2 text-xs font-bold text-emerald-900">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>সনদপত্র প্রস্তুত! নিচের প্রিন্ট বাটনে ক্লিক করে সরাসরি প্রিন্ট বা PDF ডাউনলোড করুন।</span>
+                    <span>Certificate is ready. Click Print to print or save as PDF.</span>
                   </div>
 
                   <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -656,7 +656,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs"
                     >
                       <Edit3 className="w-3.5 h-3.5 text-amber-600" />
-                      <span>তথ্য পুনরায় এডিট করুন</span>
+                      <span>Edit Details</span>
                     </button>
 
                     <button
@@ -665,7 +665,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs sm:text-sm font-black flex items-center gap-2 shadow-md transition-all active:scale-98"
                     >
                       <Printer className="w-4 h-4" />
-                      <span>সনদপত্র প্রিন্ট / ডাউনলোড করুন</span>
+                      <span>Print / Download Certificate</span>
                     </button>
                   </div>
                 </div>
@@ -807,18 +807,18 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
             <div className="text-center py-12 space-y-3">
               <AlertCircle className="w-12 h-12 text-amber-500 mx-auto" />
               <h4 className="text-base font-bold text-slate-800">
-                এই রোল নম্বরের কোনো শিক্ষার্থী বা সনদপত্র পাওয়া যায়নি
+                No student or certificate was found for this roll number.
               </h4>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                অনুগ্রহ করে সঠিক শিক্ষাবর্ষ, কোর্স ও রোল নম্বর (যেমন: 101, 102) প্রদান করুন।
+                Please enter the correct academic year, course, and roll number (e.g., 101 or 102).
               </p>
             </div>
           ) : (
             <div className="text-center py-14 text-slate-400 space-y-2">
               <Award className="w-14 h-14 mx-auto text-amber-400/70" />
-              <h4 className="text-sm font-bold text-slate-700">সনদপত্র অনুসন্ধান করুন</h4>
+              <h4 className="text-sm font-bold text-slate-700">Search for a Certificate</h4>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                উপরে শিক্ষাবর্ষ, কোর্স ও আপনার রোল নম্বর ইনপুট দিয়ে <b>"সনদ খুঁজুন"</b> বাটনে চাপ দিন।
+                উপরে শিক্ষাবর্ষ, কোর্স ও আপনার রোল নম্বর ইনপুট দিয়ে <b>"Search Certificate"</b> বাটনে চাপ দিন।
               </p>
             </div>
           )}
