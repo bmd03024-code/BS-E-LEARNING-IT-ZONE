@@ -20,6 +20,10 @@ import {
 } from 'lucide-react';
 import { toBengaliNum } from '../home/CoursesSection';
 
+// Certificates are English-only: never allow Bengali-script text into the printed record.
+const containsBengali = (value: string) => /[\u0980-\u09FF]/.test(value || '');
+const englishOnly = (value: string | undefined, fallback = '') => value && !containsBengali(value) ? value : fallback;
+
 interface CertificateModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -67,22 +71,22 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
 
   const populateEditFields = (cert: CertificateRecord) => {
     setEditTitle(cert.certificateTitle || 'CERTIFICATE OF COMPLETION');
-    setEditStudentName(cert.studentName || '');
-    setEditFatherName(cert.fatherName || '');
-    setEditMotherName(cert.motherName || '');
+    setEditStudentName(englishOnly(cert.studentName));
+    setEditFatherName(englishOnly(cert.fatherName));
+    setEditMotherName(englishOnly(cert.motherName));
     setEditRoll(cert.roll || '');
-    setEditCourseTitle(cert.courseTitle || selectedCourse?.title || '');
+    setEditCourseTitle(englishOnly(cert.courseTitle, englishOnly(selectedCourse?.titleEnglish, '')));
     setEditDuration(cert.duration || selectedCourse?.duration || '6 Months (24 Weeks)');
     setEditGrade(cert.grade || 'A+ (Excellent)');
     setEditCertificateNo(cert.certificateNo || `BS-ZONE-${cert.academicYear}-${cert.roll.padStart(4, '0')}`);
     setEditIssueDate(cert.issueDate || new Date().toISOString().split('T')[0]);
-    setEditAddress(cert.address || 'Dhaka, Bangladesh');
+    setEditAddress(englishOnly(cert.address, 'Dhaka, Bangladesh'));
     setEditBodyText(
       cert.bodyText ||
       `has successfully completed the ${cert.courseTitle || selectedCourse?.title} course (${cert.duration || selectedCourse?.duration || '6 months'}) and achieved ${cert.grade || 'A+ (Excellent)'} in the final assessment. We wish the student continued success in future endeavors.`
     );
-    setEditFounderName(cert.founderName || settings.founderName || 'Borhan Uddin Mahim');
-    setEditFounderTitle(cert.founderTitle || settings.founderTitle || 'Founder & Lead Instructor');
+    setEditFounderName(englishOnly(cert.founderName, englishOnly(settings.founderName, 'Borhan Uddin Mahim')));
+    setEditFounderTitle(englishOnly(cert.founderTitle, englishOnly(settings.founderTitle, 'Founder & Lead Instructor')));
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -121,10 +125,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
         academicYear,
         courseId,
         roll: stdMatch.roll,
-        studentName: stdMatch.name,
-        fatherName: stdMatch.fatherName,
-        motherName: stdMatch.motherName,
-        address: stdMatch.address || 'Dhaka, Bangladesh',
+        studentName: englishOnly((stdMatch as typeof stdMatch & { englishName?: string }).englishName),
+        fatherName: englishOnly(stdMatch.fatherName),
+        motherName: englishOnly(stdMatch.motherName),
+        address: englishOnly(stdMatch.address, 'Dhaka, Bangladesh'),
         issueDate: new Date().toISOString().split('T')[0],
         certificateNo: `BS-ZONE-${stdMatch.academicYear}-${stdMatch.roll.padStart(4, '0')}`,
         grade: 'A+ (Excellent)',
@@ -134,12 +138,12 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
         feeAmount: certFee,
         hasEverPaid: isFreeCourse,
         hasGovtCert: !!selectedCourse.hasGovtCert,
-        courseTitle: selectedCourse.title,
+        courseTitle: englishOnly(selectedCourse.titleEnglish),
         duration: selectedCourse.duration,
-        institutionName: settings.name,
-        institutionSubName: settings.subName,
-        founderName: settings.founderName,
-        founderTitle: settings.founderTitle,
+        institutionName: englishOnly(settings.name, 'BS E-LEARNING IT ZONE'),
+        institutionSubName: englishOnly(settings.subName),
+        founderName: englishOnly(settings.founderName, 'Borhan Uddin Mahim'),
+        founderTitle: englishOnly(settings.founderTitle, 'Founder & Lead Instructor'),
         published: true
       };
       setFoundCert(newCert);
@@ -173,7 +177,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
       id: `ledger-cert-${Date.now()}`,
       type: 'income',
       category: 'Certificate Fee',
-      title: `Certificate Fee - Roll ${foundCert.roll} (${foundCert.studentName})`,
+      title: `Certificate Fee - Roll ${foundCert.roll} (${englishOnly(foundCert.studentName)})`,
       description: `QR payment transaction ID: ${trimmedTrx}`,
       amount: foundCert.feeAmount,
       date: new Date().toISOString().split('T')[0],
@@ -196,6 +200,13 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
   const handleSaveAndSwitchToPrint = (e: React.FormEvent) => {
     e.preventDefault();
     if (!foundCert) return;
+
+    const requiredEnglishFields = [editTitle, editStudentName, editRoll, editCourseTitle, editDuration, editGrade, editCertificateNo, editIssueDate, editAddress, editFounderName, editFounderTitle];
+    const optionalEnglishFields = [editFatherName, editMotherName, editBodyText];
+    if (requiredEnglishFields.some(value => !value.trim() || containsBengali(value)) || optionalEnglishFields.some(containsBengali)) {
+      triggerToast('Please enter English-only certificate details. Add the student English name and English course title before printing.');
+      return;
+    }
 
     const updatedCert: CertificateRecord = {
       ...foundCert,
@@ -703,7 +714,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       </div>
                     )}
                     <h3 className="text-2xl sm:text-4xl font-black text-blue-950 tracking-wider">
-                      {foundCert.institutionName || settings.name}
+                      {englishOnly(foundCert.institutionName, 'BS E-LEARNING IT ZONE')}
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-600 font-medium">
                       {foundCert.institutionSubName || settings.subName} • {settings.address}
@@ -754,7 +765,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     <div className="p-4 rounded-2xl bg-white/60 border border-amber-200/60 shadow-xs text-justify sm:text-center text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
                       {foundCert.bodyText || (
                         <span>
-                          has successfully completed the <b>{foundCert.courseTitle || selectedCourse.title}</b> course ({foundCert.duration || selectedCourse.duration}) and achieved <b>"{foundCert.grade}"</b> in the final assessment. We wish the student continued success in future endeavors.
+                          has successfully completed the <b>{englishOnly(foundCert.courseTitle, englishOnly(selectedCourse.titleEnglish, ''))}</b> course ({foundCert.duration || selectedCourse.duration}) and achieved <b>"{foundCert.grade}"</b> in the final assessment. We wish the student continued success in future endeavors.
                         </span>
                       )}
                     </div>
