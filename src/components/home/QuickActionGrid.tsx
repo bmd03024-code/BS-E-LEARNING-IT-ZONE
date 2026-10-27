@@ -83,7 +83,7 @@ export const QuickActionGrid: React.FC<QuickActionGridProps> = ({ shortcuts, onA
 
               {/* Icon with gradient badge */}
               <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center text-white mb-2.5 shadow-md bg-gradient-to-br ${
+                className={`quick-action-icon w-12 h-12 rounded-full flex items-center justify-center text-white mb-2.5 shadow-md bg-gradient-to-br ${
                   item.color || 'from-blue-600 to-indigo-700'
                 } group-hover:scale-110 transition-transform`}
               >
