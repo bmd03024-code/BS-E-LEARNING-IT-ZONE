@@ -343,8 +343,8 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>
                   {isFreeOrPaid
-                    ? `Student: ${foundCert.studentName} (Roll: ${foundCert.roll}) — Certificate is ready.`
-                    : `Student: ${foundCert.studentName} (Roll: ${foundCert.roll}) — Certificate fee: ${foundCert.feeAmount} BDT.`}
+                    ? `Student: ${englishOnly(foundCert.studentName)} (Roll: ${foundCert.roll}) — Certificate is ready.`
+                    : `Student: ${englishOnly(foundCert.studentName)} (Roll: ${foundCert.roll}) — Certificate fee: ${foundCert.feeAmount} BDT.`}
                 </span>
               </div>
 
@@ -735,7 +735,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     </p>
 
                     <h4 className="text-2xl sm:text-3xl font-extrabold text-blue-950 underline decoration-amber-400 decoration-2 underline-offset-8">
-                      {foundCert.studentName}
+                      {englishOnly(foundCert.studentName)}
                     </h4>
 
                     {/* Parents' Names & Address Box */}
@@ -811,7 +811,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       <div className="w-40 border-t-2 border-slate-900 mt-1 pt-1">
                         <p className="text-sm font-black text-slate-950">{foundCert.founderName || settings.founderName}</p>
                         <p className="text-[11px] text-slate-600 font-semibold">{foundCert.founderTitle || settings.founderTitle}</p>
-                        <p className="text-[10px] text-blue-900 font-bold">{foundCert.institutionName || settings.name}</p>
+                        <p className="text-[10px] text-blue-900 font-bold">{englishOnly(foundCert.institutionName, 'BS E-LEARNING IT ZONE')}</p>
                       </div>
                     </div>
                   </div>
