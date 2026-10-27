@@ -27,6 +27,7 @@ export const EnrollModal: React.FC<EnrollModalProps> = ({
   
   // Required fields
   const [name, setName] = useState('');
+  const [englishName, setEnglishName] = useState('');
   const [phone, setPhone] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   
@@ -61,7 +62,7 @@ export const EnrollModal: React.FC<EnrollModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim() || !phone.trim() || !photoUrl || !trxId.trim()) {
+    if (!name.trim() || !englishName.trim() || !phone.trim() || !photoUrl || !trxId.trim()) {
       alert('অনুগ্রহ করে আবশ্যিক তথ্যগুলো পূরণ করুন (শিক্ষার্থীর ছবি, নাম, মোবাইল নম্বর এবং TrxID)।');
       return;
     }
@@ -72,6 +73,7 @@ export const EnrollModal: React.FC<EnrollModalProps> = ({
       courseId: activeCourse.id,
       academicYear,
       studentName: name.trim(),
+      studentNameEnglish: englishName.trim(),
       phone: phone.trim(),
       photoUrl,
       fatherName: fatherName.trim() || undefined,
@@ -356,22 +358,16 @@ export const EnrollModal: React.FC<EnrollModalProps> = ({
                 </div>
               </div>
 
-              {/* Required Fields: Name & Phone */}
+              {/* Required Fields: Bengali and English names + phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    শিক্ষার্থীর নাম * (আবশ্যিক)
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="পূর্ণ নাম লিখুন"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold bg-white"
-                  />
+                  <label className="block text-xs font-bold text-slate-700 mb-1">বাংলা নাম * (আবশ্যিক)</label>
+                  <input type="text" required placeholder="বাংলায় পূর্ণ নাম লিখুন" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold bg-white" />
                 </div>
-
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">ইংরেজি নাম * (আবশ্যিক)</label>
+                  <input type="text" required placeholder="ইংরেজিতে পূর্ণ নাম লিখুন" value={englishName} onChange={(e) => setEnglishName(e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold bg-white" lang="en" autoComplete="name" />
+                </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     মোবাইল নম্বর * (আবশ্যিক)
