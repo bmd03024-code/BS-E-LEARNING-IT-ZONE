@@ -468,6 +468,7 @@ export default function App() {
         settings={settings}
         onOpenAdminLogin={() => setIsAdminLoginModalOpen(true)}
         onNavigate={handleNavigate}
+        language={language}
       />
 
       <FloatingChatbot />
