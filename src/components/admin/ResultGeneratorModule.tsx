@@ -94,7 +94,7 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
   // Form States
   const [academicYear, setAcademicYear] = useState('2026');
   const [courseId, setCourseId] = useState(courses[0]?.id || '');
-  const [examType, setExamType] = useState('সেমিস্টার ফাইনাল মূল্যায়ন পরীক্ষা ২০২৬');
+  const [examType, setExamType] = useState('Semester Final Assessment Examination 2026');
   const [selectedRoll, setSelectedRoll] = useState('');
   const [studentName, setStudentName] = useState('');
   const [fatherName, setFatherName] = useState('');
@@ -651,8 +651,8 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
                   <th className="py-3 px-4">বিষয়ের নাম (Subject Name)</th>
                   <th className="py-3 px-4 text-center">পূর্ণমান (Total)</th>
                   <th className="py-3 px-4 text-center">প্রাপ্ত নম্বর (Obtained) *</th>
-                  <th className="py-3 px-4 text-center">লেটার গ্রেড</th>
-                  <th className="py-3 px-4 text-center">গ্রেড পয়েন্ট (GPA)</th>
+                  <th className="py-3 px-4 text-center">Letter Grade</th>
+                  <th className="py-3 px-4 text-center">Grade Point (GPA)</th>
                   <th className="py-3 px-4 text-center">মুছুন</th>
                 </tr>
               </thead>
@@ -989,10 +989,10 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
               <div>
                 <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-blue-900" />
-                  <span>অফিশিয়াল একাডেমিক মার্কশিট প্রিভিউ ও প্রিন্ট</span>
+                  <span>Official Academic Marksheet Preview & Print</span>
                 </h4>
                 <p className="text-xs text-slate-500">
-                  প্রিন্ট বাটনে ক্লিক করে সরাসরি প্রিন্ট করুন অথবা পিডিএফ হিসেবে সংরক্ষণ করুন
+                  Click Print to print or save as PDF
                 </p>
               </div>
               <button
@@ -1024,10 +1024,10 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
                     BS E-LEARNING &amp; IT ZONE
                   </h2>
                   <p className="text-xs text-slate-700 font-bold mt-0.5">
-                    {settings.subName || 'দক্ষতা ও সাফল্যের সেরা ডিজিটাল একাডেমি'}
+                    {settings.subName || 'A Center of Excellence for Skills and Success'}
                   </p>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    {settings.address || 'ঢাকা, বাংলাদেশ'} • হটলাইন: {settings.phone || '01612118307'}
+                    {settings.address || 'Dhaka, Bangladesh'} • Hotline: {settings.phone || '01612118307'}
                   </p>
                 </div>
                 <div className="text-right shrink-0 hidden sm:block">
@@ -1040,7 +1040,7 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
               {/* Exam Title */}
               <div className="relative z-10 text-center">
                 <span className="inline-block px-4 py-1 rounded-full bg-blue-950 text-amber-300 font-black text-xs tracking-wider uppercase">
-                  গ্রেডশিট / নম্বরপত্র • MARKSHEET
+                  ACADEMIC MARKSHEET
                 </span>
                 <p className="text-xs font-bold text-slate-800 mt-1">
                   {previewResult.examType}
@@ -1050,30 +1050,30 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
               {/* Student Details Grid */}
               <div className="relative z-10 grid grid-cols-2 gap-x-4 gap-y-2 text-xs border border-slate-300 rounded-xl p-3.5 bg-slate-50/60">
                 <div>
-                  <span className="font-bold text-slate-500">শিক্ষার্থীর নাম:</span>
+                  <span className="font-bold text-slate-500">Student Name:</span>
                   <p className="font-extrabold text-sm text-slate-900">{previewResult.studentName}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">রোল নম্বর:</span>
+                  <span className="font-bold text-slate-500">Roll Number:</span>
                   <p className="font-mono font-black text-sm text-blue-950">{previewResult.roll}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">পিতার নাম:</span>
+                  <span className="font-bold text-slate-500">Father’s Name:</span>
                   <p className="font-semibold text-slate-800">{previewResult.fatherName}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">মাতার নাম:</span>
+                  <span className="font-bold text-slate-500">Mother’s Name:</span>
                   <p className="font-semibold text-slate-800">{previewResult.motherName}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">কোর্সের নাম:</span>
+                  <span className="font-bold text-slate-500">Course Name:</span>
                   <p className="font-bold text-blue-900">
                     {courses.find(c => c.id === previewResult.courseId)?.title || previewResult.courseId}
                   </p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">সেশন / শিক্ষাবর্ষ:</span>
-                  <p className="font-semibold text-slate-800">{previewResult.academicYear} সেশন</p>
+                  <span className="font-bold text-slate-500">Academic Year:</span>
+                  <p className="font-semibold text-slate-800">Session {previewResult.academicYear}</p>
                 </div>
               </div>
 
@@ -1082,19 +1082,19 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
                 <table className="w-full text-xs text-left">
                   <thead className="bg-blue-950 text-white font-bold">
                     <tr>
-                      <th className="py-2 px-3">বিষয়</th>
-                      <th className="py-2 px-3 text-center">পূর্ণমান</th>
-                      <th className="py-2 px-3 text-center">প্রাপ্ত নম্বর</th>
-                      <th className="py-2 px-3 text-center">লেটার গ্রেড</th>
-                      <th className="py-2 px-3 text-center">গ্রেড পয়েন্ট (GPA)</th>
+                      <th className="py-2 px-3">Subject</th>
+                      <th className="py-2 px-3 text-center">Full Marks</th>
+                      <th className="py-2 px-3 text-center">Marks Obtained</th>
+                      <th className="py-2 px-3 text-center">Letter Grade</th>
+                      <th className="py-2 px-3 text-center">Grade Point (GPA)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
                     {previewResult.marks.map((m, i) => (
                       <tr key={i} className="hover:bg-slate-50">
                         <td className="py-2 px-3 font-semibold text-slate-900">{m.subject}</td>
-                        <td className="py-2 px-3 text-center font-mono">{toBengaliNum(m.total || 100)}</td>
-                        <td className="py-2 px-3 text-center font-mono font-black text-blue-950">{toBengaliNum(m.obtained)}</td>
+                        <td className="py-2 px-3 text-center font-mono">{m.total || 100}</td>
+                        <td className="py-2 px-3 text-center font-mono font-black text-blue-950">{m.obtained}</td>
                         <td className="py-2 px-3 text-center font-black">{m.grade}</td>
                         <td className="py-2 px-3 text-center font-mono font-bold">{m.gpa.toFixed(2)}</td>
                       </tr>
@@ -1102,15 +1102,15 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
                   </tbody>
                   <tfoot className="bg-slate-100 font-bold border-t-2 border-blue-950">
                     <tr>
-                      <td className="py-2 px-3 font-black text-slate-900">সর্বমোট প্রাপ্ত ফলাফল:</td>
+                      <td className="py-2 px-3 font-black text-slate-900">Total Marks:</td>
                       <td className="py-2 px-3 text-center font-mono font-black">
-                        {toBengaliNum(previewResult.marks.reduce((acc, m) => acc + (m.total || 100), 0))}
+                        {previewResult.marks.reduce((acc, m) => acc + (m.total || 100), 0)}
                       </td>
                       <td className="py-2 px-3 text-center font-mono font-black text-blue-950 text-sm">
-                        {toBengaliNum(previewResult.totalMarks)}
+                        {previewResult.totalMarks}
                       </td>
                       <td className="py-2 px-3 text-center font-black text-sm text-blue-900">
-                        গ্রেড: {previewResult.grade}
+                        Grade: {previewResult.grade}
                       </td>
                       <td className="py-2 px-3 text-center font-mono font-black text-sm text-emerald-800">
                         GPA: {previewResult.gpa.toFixed(2)}
@@ -1125,22 +1125,15 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
                 <div className="text-center">
                   <img src={settings.institutionSealUrl} alt="" className="h-12 w-auto mx-auto object-contain" />
                   <span className="text-[10px] font-bold text-slate-600 border-t border-slate-400 block mt-1 pt-0.5">
-                    অফিশিয়াল সিল
+                    Official Seal
                   </span>
-                </div>
-
-                <div className="text-center">
-                  <div className="h-10 w-28 border-b border-dashed border-slate-400 mb-1 mx-auto flex items-end justify-center text-[9px] text-slate-400">
-                    পরীক্ষার্থীর স্বাক্ষর
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-600 block">শিক্ষার্থীর স্বাক্ষর</span>
                 </div>
 
                 <div className="text-center">
                   <img src={settings.signatureUrl} alt="" className="h-10 w-auto mx-auto object-contain" />
                   <div className="border-t border-slate-600 pt-0.5 mt-0.5">
                     <p className="text-[10px] font-bold text-slate-900">{settings.founderName}</p>
-                    <p className="text-[9px] text-slate-500 font-semibold">পরীক্ষা নিয়ন্ত্রক ও প্রধান শিক্ষক</p>
+                    <p className="text-[9px] text-slate-500 font-semibold">Head Teacher</p>
                   </div>
                 </div>
               </div>
@@ -1152,14 +1145,14 @@ export const ResultGeneratorModule: React.FC<ResultGeneratorModuleProps> = ({
                 onClick={() => setPreviewResult(null)}
                 className="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl"
               >
-                বন্ধ করুন
+                Close
               </button>
               <button
                 onClick={() => window.print()}
                 className="px-4 py-2 text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 rounded-xl flex items-center gap-1.5 shadow-md"
               >
                 <Printer className="w-3.5 h-3.5 text-amber-400" />
-                <span>মার্কশিট প্রিন্ট / ডাউনলোড করুন</span>
+                <span>Print / Download Marksheet</span>
               </button>
             </div>
           </div>
