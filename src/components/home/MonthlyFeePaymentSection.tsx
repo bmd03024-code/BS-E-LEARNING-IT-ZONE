@@ -91,7 +91,7 @@ export const MonthlyFeePaymentSection: React.FC<MonthlyFeePaymentSectionProps> =
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left: Bangla QR Code & Instructions */}
-          <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 text-center">
+          <div className="qr-slide-in lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 text-center">
             {/* Dynamic Heading controlled from Admin */}
             <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-4 rounded-2xl shadow-md">
               <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider block mb-1">
