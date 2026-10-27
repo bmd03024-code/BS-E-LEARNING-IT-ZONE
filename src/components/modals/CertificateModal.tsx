@@ -71,7 +71,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
 
   const populateEditFields = (cert: CertificateRecord) => {
     setEditTitle(cert.certificateTitle || 'CERTIFICATE OF COMPLETION');
-    setEditStudentName(englishOnly(cert.studentName));
+    setEditStudentName(englishOnly(cert.studentNameEnglish, englishOnly(cert.studentName)));
     setEditFatherName(englishOnly(cert.fatherName));
     setEditMotherName(englishOnly(cert.motherName));
     setEditRoll(cert.roll || '');
@@ -125,9 +125,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
         academicYear,
         courseId,
         roll: stdMatch.roll,
-        studentName: englishOnly((stdMatch as typeof stdMatch & { englishName?: string }).englishName),
-        fatherName: englishOnly(stdMatch.fatherName),
-        motherName: englishOnly(stdMatch.motherName),
+        studentName: englishOnly(stdMatch.englishName, englishOnly(stdMatch.name)),
+        studentNameEnglish: englishOnly(stdMatch.englishName, englishOnly(stdMatch.name)),
+        fatherName: englishOnly(stdMatch.fatherNameEnglish, englishOnly(stdMatch.fatherName)),
+        motherName: englishOnly(stdMatch.motherNameEnglish, englishOnly(stdMatch.motherName)),
         address: englishOnly(stdMatch.address, 'Dhaka, Bangladesh'),
         issueDate: new Date().toISOString().split('T')[0],
         certificateNo: `BS-ZONE-${stdMatch.academicYear}-${stdMatch.roll.padStart(4, '0')}`,
@@ -682,7 +683,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                 </div>
 
                 {/* The Luxury Official Printable Certificate */}
-                <div className="printable-area certificate-print-layout certificate-border relative bg-[#fffdf1] px-5 py-6 sm:px-10 sm:py-8 shadow-xl overflow-hidden text-center my-2 border-[10px] border-double border-[#8a806b] outline outline-1 outline-offset-[-16px] outline-[#b8aa8c] font-serif min-h-[560px]">
+                <div className="printable-area certificate-print-layout certificate-border relative bg-[#fffdf1] px-5 py-6 sm:px-10 sm:py-8 shadow-xl overflow-hidden text-center my-2 border-[10px] border-double border-[#8a806b] outline outline-1 outline-offset-[-16px] outline-[#b8aa8c] font-serif min-h-[560px]" style={{ aspectRatio: '1.414 / 1' }}>
                   
                   {/* Subtle Center Watermark */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] select-none">
@@ -717,7 +718,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       {englishOnly(foundCert.institutionName, 'BS E-LEARNING IT ZONE')}
                     </h3>
                     <p className="text-[10px] sm:text-xs text-slate-700 font-medium">
-                      {foundCert.institutionSubName || settings.subName} • {settings.address}
+                      {englishOnly(foundCert.institutionSubName, englishOnly(settings.subName))}{englishOnly(settings.address) ? ` • ${englishOnly(settings.address)}` : ''}
                     </p>
                     
                     <div className="pt-3">
@@ -741,11 +742,11 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     {/* Parents' Names & Address Box */}
                     <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs sm:text-sm text-slate-700 bg-transparent p-2 border-y border-[#c7bdab]">
                       <div>
-                        Father’s Name: <b className="text-slate-900 font-bold">{foundCert.fatherName || 'N/A'}</b>
+                        Father’s Name: <b className="text-slate-900 font-bold">{englishOnly(foundCert.fatherName, 'N/A')}</b>
                       </div>
                       <span className="hidden sm:inline text-amber-500">•</span>
                       <div>
-                        Mother’s Name: <b className="text-slate-900 font-bold">{foundCert.motherName || 'N/A'}</b>
+                        Mother’s Name: <b className="text-slate-900 font-bold">{englishOnly(foundCert.motherName, 'N/A')}</b>
                       </div>
                       <span className="hidden sm:inline text-amber-500">•</span>
                       <div>
@@ -763,7 +764,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
 
                     {/* Main Certification Statement */}
                     <div className="p-3 bg-transparent text-justify sm:text-center text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
-                      {foundCert.bodyText || (
+                      {englishOnly(foundCert.bodyText) || (
                         <span>
                           has successfully completed the <b>{englishOnly(foundCert.courseTitle, englishOnly(selectedCourse.titleEnglish, ''))}</b> course ({foundCert.duration || selectedCourse.duration}) and achieved <b>"{foundCert.grade}"</b> in the final assessment. We wish the student continued success in future endeavors.
                         </span>
