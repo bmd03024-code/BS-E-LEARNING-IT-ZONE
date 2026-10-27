@@ -13,7 +13,7 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNavigate, language }) => {
   const en = language === 'en';
   const text = (bn: string, english: string) => en ? english : bn;
-  const welcomeText = en ? ({ 'স্বাগতম': 'Welcome', 'আমাদের প্রতিষ্ঠানে স্বাগতম': 'Welcome to our institute' }[settings.welcomeText || ''] || settings.welcomeText) : settings.welcomeText;
+  const welcomeText = en ? ({ 'স্বাগতম': 'Welcome', 'আমাদের প্রতিষ্ঠানে স্বাগতম': 'Welcome to our institute', 'BS E-Learning & IT Zone-এ আপনাকে স্বাগতম! দেশসেরা অনলাইন ও অফলাইন শিখন প্ল্যাটফর্ম।': 'Welcome to BS E-Learning & IT Zone! A leading online and offline learning platform.' }[settings.welcomeText || ''] || settings.welcomeText) : settings.welcomeText;
   const footerText = en ? 'BS E-Learning & IT Zone — A trusted institute for academic education and practical IT skills, supported by experienced instructors and digital learning resources.' : (settings.footerText || 'BS E-Learning & IT Zone — আধুনিক একাডেমিক শিক্ষা ও প্র্যাকটিক্যাল আইটি স্কিল অর্জনের বিশ্বস্ত প্রতিষ্ঠান। অভিজ্ঞ শিক্ষক মণ্ডলী এবং ডিজিটাল ল্যাব সাপোর্ট.');
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-800">
@@ -53,7 +53,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
               <div>{text('অফিশিয়াল হেল্পলাইন:', 'Official Helpline:')} <b className="text-white font-mono">{settings.hotline}</b></div>
               {settings.footerNotice && (
                 <div className="text-[11px] text-amber-300/80 pt-1">
-                  * {en ? ({ 'স্বাগতম': 'Welcome' }[settings.footerNotice] || settings.footerNotice) : settings.footerNotice}
+                  * {en ? ({ 'স্বাগতম': 'Welcome', 'ভর্তি ও পরীক্ষার সকল কার্যক্রম সরাসরি প্রধান শিক্ষক কর্তৃক অনুমোদিত।': 'All admissions and examinations are approved directly by the head teacher.' }[settings.footerNotice] || settings.footerNotice) : settings.footerNotice}
                 </div>
               )}
             </div>
