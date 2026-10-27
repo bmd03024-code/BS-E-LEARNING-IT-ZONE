@@ -5,9 +5,23 @@ import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
 interface HeroSliderProps {
   slides: HeroSlide[];
   onCtaClick: (action: string) => void;
+  language?: 'bn' | 'en';
 }
 
-export const HeroSlider: React.FC<HeroSliderProps> = ({ slides, onCtaClick }) => {
+export const HeroSlider: React.FC<HeroSliderProps> = ({ slides, onCtaClick, language = 'bn' }) => {
+  const en = language === 'en';
+  const translateText = (value?: string) => {
+    if (!value || !en) return value;
+    const phrases: Record<string, string> = {
+      'স্বাগতম': 'Welcome',
+      'আধুনিক ডিজিটাল শিক্ষাসেবা': 'Modern Digital Education Services',
+      'শুরু করুন': 'Get Started',
+      'ক্লাস রুটিন দেখুন': 'View Class Routine',
+      'আমাদের কোর্সসমূহ': 'Our Courses',
+      'ভর্তি চলছে': 'Admissions Open'
+    };
+    return phrases[value.trim()] || value;
+  };
   const activeSlides = slides.filter(s => s.active);
   const [currentIdx, setCurrentIdx] = useState(0);
 
@@ -55,15 +69,15 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ slides, onCtaClick }) =>
           <div className="max-w-2xl lg:max-w-3xl space-y-4 sm:space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs sm:text-sm font-semibold backdrop-blur-xs">
               <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-              <span>BS E-Learning &amp; IT Zone • আধুনিক ডিজিটাল শিক্ষাসেবা</span>
+              <span>BS E-Learning &amp; IT Zone • {en ? 'Modern Digital Education Services' : 'আধুনিক ডিজিটাল শিক্ষাসেবা'}</span>
             </div>
 
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight drop-shadow-md">
-              {current.title}
+              {translateText(current.title)}
             </h1>
 
             <p className="text-sm sm:text-base md:text-lg text-slate-200 font-normal leading-relaxed max-w-2xl drop-shadow-sm">
-              {current.subText}
+              {translateText(current.subText)}
             </p>
 
             <div className="pt-2 sm:pt-4 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -71,7 +85,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ slides, onCtaClick }) =>
                 onClick={() => onCtaClick(current.ctaAction || 'courses')}
                 className="inline-flex items-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-lg hover:shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
-                <span>{current.ctaText || 'শুরু করুন'}</span>
+                <span>{translateText(current.ctaText) || (en ? 'Get Started' : 'শুরু করুন')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -79,7 +93,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ slides, onCtaClick }) =>
                 onClick={() => onCtaClick('routine')}
                 className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm border border-white/20 transition-all"
               >
-                <span>ক্লাস রুটিন দেখুন</span>
+                <span>{en ? 'View Class Routine' : 'ক্লাস রুটিন দেখুন'}</span>
               </button>
             </div>
           </div>
