@@ -40,7 +40,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
   const [viewMode, setViewMode] = useState<'edit' | 'print'>('edit');
 
   // Editable Form Fields State
-  const [editTitle, setEditTitle] = useState('কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
+  const [editTitle, setEditTitle] = useState('CERTIFICATE OF COMPLETION');
   const [editStudentName, setEditStudentName] = useState('');
   const [editFatherName, setEditFatherName] = useState('');
   const [editMotherName, setEditMotherName] = useState('');
@@ -66,7 +66,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
   };
 
   const populateEditFields = (cert: CertificateRecord) => {
-    setEditTitle(cert.certificateTitle || 'কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
+    setEditTitle(cert.certificateTitle || 'CERTIFICATE OF COMPLETION');
     setEditStudentName(cert.studentName || '');
     setEditFatherName(cert.fatherName || '');
     setEditMotherName(cert.motherName || '');
@@ -691,8 +691,8 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
 
                   {/* Top Number & Date Bar */}
                   <div className="relative z-10 flex justify-between items-center text-xs text-slate-600 pb-4 border-b border-amber-300/60 font-mono">
-                    <span>সনদ নং: <b className="text-slate-900 font-bold">{foundCert.certificateNo}</b></span>
-                    <span>ইস্যুর তারিখ: <b className="text-slate-900 font-bold">{foundCert.issueDate}</b></span>
+                    <span>Certificate No.: <b className="text-slate-900 font-bold">{foundCert.certificateNo}</b></span>
+                    <span>Issue Date: <b className="text-slate-900 font-bold">{foundCert.issueDate}</b></span>
                   </div>
 
                   {/* Institution Branding */}
@@ -706,7 +706,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     
                     <div className="pt-3">
                       <span className="inline-block px-6 py-1.5 rounded-full bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 text-amber-300 font-extrabold text-xs sm:text-base tracking-widest uppercase border border-amber-400 shadow-xs">
-                        {foundCert.certificateTitle || 'সনদপত্র • CERTIFICATE OF COMPLETION'}
+                        {foundCert.certificateTitle || 'CERTIFICATE OF COMPLETION'}
                       </span>
                     </div>
                   </div>
@@ -715,7 +715,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                   <div className="relative z-10 mt-8 space-y-5 text-slate-800 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
                     
                     <p className="text-slate-600 font-medium text-xs sm:text-sm">
-                      এই মর্মে অত্যন্ত আনন্দের সাথে প্রত্যয়ন করা যাচ্ছে যে,
+                      This is to certify that
                     </p>
 
                     <h4 className="text-2xl sm:text-3xl font-extrabold text-blue-950 underline decoration-amber-400 decoration-2 underline-offset-8">
@@ -725,21 +725,21 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     {/* Parents' Names & Address Box */}
                     <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 text-xs sm:text-sm text-slate-700 bg-amber-50/70 p-3 rounded-xl border border-amber-200/80">
                       <div>
-                        পিতার নাম: <b className="text-slate-900 font-bold">{foundCert.fatherName || 'প্রযোজ্য নয়'}</b>
+                        Father’s Name: <b className="text-slate-900 font-bold">{foundCert.fatherName || 'N/A'}</b>
                       </div>
                       <span className="hidden sm:inline text-amber-500">•</span>
                       <div>
-                        মাতার নাম: <b className="text-slate-900 font-bold">{foundCert.motherName || 'প্রযোজ্য নয়'}</b>
+                        Mother’s Name: <b className="text-slate-900 font-bold">{foundCert.motherName || 'N/A'}</b>
                       </div>
                       <span className="hidden sm:inline text-amber-500">•</span>
                       <div>
-                        রোল: <b className="text-blue-900 font-bold font-mono">{foundCert.roll}</b>
+                        Roll No.: <b className="text-blue-900 font-bold font-mono">{foundCert.roll}</b>
                       </div>
                       {foundCert.address && (
                         <>
                           <span className="hidden sm:inline text-amber-500">•</span>
                           <div>
-                            ঠিকানা: <b className="text-slate-800 font-medium">{foundCert.address}</b>
+                            Address: <b className="text-slate-800 font-medium">{foundCert.address}</b>
                           </div>
                         </>
                       )}
@@ -749,7 +749,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     <div className="p-4 rounded-2xl bg-white/60 border border-amber-200/60 shadow-xs text-justify sm:text-center text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
                       {foundCert.bodyText || (
                         <span>
-                          সফলতার সাথে আমাদের প্রতিষ্ঠানে <b>{foundCert.courseTitle || selectedCourse.title}</b> কোর্সটি ({foundCert.duration || selectedCourse.duration}) কৃতিত্বের সাথে সম্পন্ন করেছেন এবং চূড়ান্ত মূল্যায়ন পরীক্ষায় <b>"{foundCert.grade}"</b> অর্জন করেছেন। আমরা তার ভবিষ্যৎ জীবনের সর্বাঙ্গীন সাফল্য ও উন্নতি কামনা করি।
+                          has successfully completed the <b>{foundCert.courseTitle || selectedCourse.title}</b> course ({foundCert.duration || selectedCourse.duration}) and achieved <b>"{foundCert.grade}"</b> in the final assessment. We wish the student continued success in future endeavors.
                         </span>
                       )}
                     </div>
@@ -757,7 +757,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     {foundCert.hasGovtCert && (
                       <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300">
                         <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                        <span>অনলাইন সনদের পাশাপাশি সরকারি সার্টিফিকেট (Govt. Approved) তালিকাভুক্ত</span>
+                        <span>Government-approved certificate status is recorded for this student.</span>
                       </div>
                     )}
                   </div>
@@ -769,10 +769,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                     <div className="flex flex-col items-center">
                       <img
                         src={settings.institutionSealUrl}
-                        alt="প্রাতিষ্ঠানিক সিল"
+                        alt="Institutional Seal"
                         className="w-20 h-20 sm:w-24 sm:h-24 object-contain filter drop-shadow-xs"
                       />
-                      <span className="text-[10px] font-bold text-slate-600 mt-1">প্রাতিষ্ঠানিক সিল</span>
+                      <span className="text-[10px] font-bold text-slate-600 mt-1">Institutional Seal</span>
                     </div>
 
                     {/* Verification QR / Signature Seal */}
@@ -780,7 +780,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       <div className="p-1.5 bg-white rounded-xl border border-slate-300 shadow-xs">
                         <QrCode className="w-12 h-12 text-slate-900" />
                       </div>
-                      <span className="text-[9px] font-bold text-slate-600 mt-1">ডিজিটাল ভেরিফিকেশন</span>
+                      <span className="text-[9px] font-bold text-slate-600 mt-1">Digital Verification</span>
                     </div>
 
                     {/* Principal Signature */}
@@ -788,7 +788,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ isOpen, onCl
                       <div className="relative min-h-[48px] flex items-end justify-center">
                         <img
                           src={settings.signatureUrl}
-                          alt="স্বাক্ষর"
+                          alt="Principal's Signature"
                           className="h-12 w-auto object-contain"
                         />
                       </div>
