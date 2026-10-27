@@ -42,7 +42,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
   const [courseId, setCourseId] = useState(courses[0]?.id || 'course-computer-office');
 
   // 3. Exam Type
-  const [examType, setExamType] = useState('মিড-টার্ম অ্যাসেসমেন্ট');
+  const [examType, setExamType] = useState('Mid-Term Assessment');
   const [isCustomExam, setIsCustomExam] = useState(false);
   const [customExamInput, setCustomExamInput] = useState('');
 
@@ -60,7 +60,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
   const settings = storage.getSettings();
   const selectedCourse = courses.find(c => c.id === courseId) || courses[0] || {
     id: courseId,
-    title: 'নির্বাচিত কোর্স',
+    title: 'Selected Course',
     subjects: [],
     exams: []
   };
@@ -86,13 +86,13 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
     const listFromCourse = (selectedCourse.exams || []).map(e => e.trim()).filter(Boolean);
 
     const standardPresets = [
-      'মিড-টার্ম অ্যাসেসমেন্ট',
-      'সেমিস্টার ফাইনাল পরীক্ষা',
-      'মাসিক মূল্যায়ন পরীক্ষা',
-      'মডেল টেস্ট ২০২৬',
-      'চূড়ান্ত মূল্যায়ন পরীক্ষা',
-      'বার্ষিক মূল্যায়ন পরীক্ষা',
-      'সাপ্তাহিক টেস্ট'
+      'Mid-Term Assessment',
+      'Semester Final Examination',
+      'Monthly Assessment',
+      'Model Test 2026',
+      'Final Assessment',
+      'Annual Assessment',
+      'Weekly Test'
     ];
 
     // Merge unique options prioritizing published results first
@@ -163,14 +163,14 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
 
     if (!cleanRoll) {
       setSearchStatus('not_found');
-      setStatusMessage('অনুগ্রহ করে শিক্ষার্থীর রোল নম্বর নির্বাচন বা প্রদান করুন।');
+      setStatusMessage('Please select or enter the student roll number.');
       setFoundResult(null);
       return;
     }
 
     if (!cleanExam) {
       setSearchStatus('not_found');
-      setStatusMessage('অনুগ্রহ করে পরীক্ষার ধরণ নির্বাচন করুন।');
+      setStatusMessage('Please select the exam type.');
       setFoundResult(null);
       return;
     }
@@ -246,19 +246,19 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            title="বন্ধ করুন"
+            title="Close"
           >
             <X className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2 mb-1 text-amber-400 text-xs font-bold uppercase tracking-wider">
             <BarChart3 className="w-4 h-4" />
-            <span>অফিশিয়াল ফলাফল ও একাডেমিক মার্কশিট পোর্টাল</span>
+            <span>Official Results &amp; Academic Marksheet Portal</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white">
-            একাডেমিক ফলাফল ও নম্বরপত্র (Marksheet / Grade Sheet)
+            Academic Results &amp; Marksheet (Grade Sheet)
           </h2>
           <p className="text-xs text-slate-300">
-            শিক্ষাবর্ষ, কোর্স, পরীক্ষার ধরণ ও রোল সিলেক্ট করে সার্চ বাটনে চাপ দিন
+            Select the academic year, course, exam type, and roll number, then click Search.
           </p>
         </div>
 
@@ -269,7 +269,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="sm:col-span-3">
               <label className="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1">
                 <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">১</span>
-                <span>শিক্ষাবর্ষ সিলেক্ট করুন *</span>
+                <span>Select Academic Year *</span>
               </label>
               <div className="relative">
                 <select
@@ -280,10 +280,10 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   }}
                   className="w-full pl-3 pr-8 py-2 rounded-xl border-2 border-slate-300 hover:border-blue-700 text-xs font-bold bg-white focus:ring-2 focus:ring-blue-600 focus:outline-hidden appearance-none cursor-pointer"
                 >
-                  <option value="2026">২০২৬ শিক্ষাবর্ষ</option>
-                  <option value="2025">২০২৫ শিক্ষাবর্ষ</option>
-                  <option value="2024">২০২৪ শিক্ষাবর্ষ</option>
-                  <option value="2023">২০২৩ শিক্ষাবর্ষ</option>
+                  <option value="2026">Academic Year 2026</option>
+                  <option value="2025">Academic Year 2025</option>
+                  <option value="2024">Academic Year 2024</option>
+                  <option value="2023">Academic Year 2023</option>
                 </select>
                 <ChevronDown className="w-4 h-4 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
@@ -293,7 +293,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="sm:col-span-3">
               <label className="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1">
                 <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">২</span>
-                <span>কোর্স সিলেক্ট করুন *</span>
+                <span>Select Course *</span>
               </label>
               <div className="relative">
                 <select
@@ -319,7 +319,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
               <label className="block text-xs font-bold text-blue-950 mb-1 flex items-center justify-between">
                 <span className="flex items-center gap-1">
                   <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">৩</span>
-                  <span>পরীক্ষার ধরণ সিলেক্ট করুন *</span>
+                  <span>Select Exam Type *</span>
                 </span>
               </label>
               {!isCustomExam ? (
@@ -342,7 +342,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                         {ex}
                       </option>
                     ))}
-                    <option value="__custom__">✏️ অন্য পরীক্ষার নাম লিখুন...</option>
+                    <option value="__custom__">✏️ Enter a different exam name...</option>
                   </select>
                   <ChevronDown className="w-4 h-4 text-blue-900 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
@@ -351,7 +351,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   <input
                     type="text"
                     required
-                    placeholder="পরীক্ষার নাম লিখুন..."
+                    placeholder="Enter exam name..."
                     value={customExamInput}
                     onChange={(e) => {
                       setCustomExamInput(e.target.value);
@@ -367,9 +367,9 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                       if (availableExamsForCourse[0]) setExamType(availableExamsForCourse[0]);
                     }}
                     className="px-2 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl text-[10px] font-bold text-slate-700"
-                    title="তালিকা থেকে সিলেক্ট করুন"
+                    title="Select from list"
                   >
-                    তালিকা
+                    List
                   </button>
                 </div>
               )}
@@ -380,7 +380,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
               <label className="block text-xs font-bold text-blue-950 mb-1 flex items-center justify-between">
                 <span className="flex items-center gap-1">
                   <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">৪</span>
-                  <span>রোল সিলেক্ট করুন *</span>
+                  <span>Select Roll Number *</span>
                 </span>
                 {isCustomRoll && (
                   <button
@@ -388,7 +388,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     onClick={() => setIsCustomRoll(false)}
                     className="text-[10px] text-blue-800 underline font-semibold"
                   >
-                    ড্রপডাউন
+                    Dropdown
                   </button>
                 )}
               </label>
@@ -411,7 +411,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     {availableRollsForCourse.length > 0 ? (
                       availableRollsForCourse.map((item) => (
                         <option key={item.roll} value={item.roll}>
-                          রোল {String(item.roll)} - {item.name}
+                          Roll {String(item.roll)} - {item.name}
                         </option>
                       ))
                     ) : (
@@ -439,9 +439,9 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     type="button"
                     onClick={() => setIsCustomRoll(false)}
                     className="px-2 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl text-[10px] font-bold text-slate-700"
-                    title="তালিকা থেকে সিলেক্ট করুন"
+                    title="Select from list"
                   >
-                    তালিকা
+                    List
                   </button>
                 </div>
               )}
@@ -789,7 +789,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                 শিক্ষাবর্ষ, কোর্স, পরীক্ষার ধরণ ও রোল সিলেক্ট করে ফলাফল খুঁজুন
               </h4>
               <p className="text-xs text-slate-600 max-w-md mx-auto">
-                উপরে থাকা ৪টি ড্রপডাউন থেকে তথ্য সিলেক্ট করুন এবং &quot;ফলাফল ও মার্কশিট দেখুন&quot; বাটনে ক্লিক করলেই শিক্ষার্থীর সম্পূর্ণ ফলাফল ও অফিশিয়াল সিলযুক্ত মার্কশিট দেখা যাবে এবং প্রিন্ট করা যাবে।
+                উপরে থাকা ৪টি Dropdown থেকে তথ্য সিলেক্ট করুন এবং &quot;ফলাফল ও মার্কশিট দেখুন&quot; বাটনে ক্লিক করলেই শিক্ষার্থীর সম্পূর্ণ ফলাফল ও অফিশিয়াল সিলযুক্ত মার্কশিট দেখা যাবে এবং প্রিন্ট করা যাবে।
               </p>
 
               {/* Quick try presets */}
@@ -804,10 +804,10 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                       setAcademicYear('2026');
                       setCourseId('course-computer-office');
                       setIsCustomExam(false);
-                      setExamType('মিড-টার্ম অ্যাসেসমেন্ট');
+                      setExamType('Mid-Term Assessment');
                       setIsCustomRoll(false);
                       setRoll('101');
-                      executeSearch('2026', 'course-computer-office', 'মিড-টার্ম অ্যাসেসমেন্ট', '101');
+                      executeSearch('2026', 'course-computer-office', 'Mid-Term Assessment', '101');
                     }}
                     className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 font-bold hover:bg-blue-100 transition-colors cursor-pointer"
                   >
@@ -819,10 +819,10 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                       setAcademicYear('2026');
                       setCourseId('course-computer-office');
                       setIsCustomExam(false);
-                      setExamType('সেমিস্টার ফাইনাল পরীক্ষা');
+                      setExamType('Semester Final Examination');
                       setIsCustomRoll(false);
                       setRoll('101');
-                      executeSearch('2026', 'course-computer-office', 'সেমিস্টার ফাইনাল পরীক্ষা', '101');
+                      executeSearch('2026', 'course-computer-office', 'Semester Final Examination', '101');
                     }}
                     className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 font-bold hover:bg-blue-100 transition-colors cursor-pointer"
                   >
@@ -834,10 +834,10 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                       setAcademicYear('2026');
                       setCourseId('course-ssc-acc');
                       setIsCustomExam(false);
-                      setExamType('মডেল টেস্ট ২০২৬');
+                      setExamType('Model Test 2026');
                       setIsCustomRoll(false);
                       setRoll('102');
-                      executeSearch('2026', 'course-ssc-acc', 'মডেল টেস্ট ২০২৬', '102');
+                      executeSearch('2026', 'course-ssc-acc', 'Model Test 2026', '102');
                     }}
                     className="px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-bold hover:bg-amber-100 transition-colors cursor-pointer"
                   >
