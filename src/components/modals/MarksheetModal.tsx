@@ -15,7 +15,7 @@ import {
   ChevronDown,
   UserCheck
 } from 'lucide-react';
-import { toBengaliNum } from '../home/CoursesSection';
+
 
 interface MarksheetModalProps {
   isOpen: boolean;
@@ -110,7 +110,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
       .forEach(r => {
         const engRoll = toEnglishNum(r.roll);
         if (engRoll && !map.has(engRoll)) {
-          map.set(engRoll, r.studentName || `শিক্ষার্থী রোল ${toBengaliNum(engRoll)}`);
+          map.set(engRoll, r.studentName || `শিক্ষার্থী রোল ${String(engRoll)}`);
         }
       });
 
@@ -120,7 +120,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
       .forEach(s => {
         const engRoll = toEnglishNum(s.roll);
         if (engRoll && !map.has(engRoll)) {
-          map.set(engRoll, s.name || `শিক্ষার্থী রোল ${toBengaliNum(engRoll)}`);
+          map.set(engRoll, s.name || `শিক্ষার্থী রোল ${String(engRoll)}`);
         }
       });
 
@@ -200,7 +200,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
         setFoundResult(null);
         setSearchStatus('unpublished');
         setStatusMessage(
-          `রোল ${toBengaliNum(cleanRoll)}-এর "${matchedRecord.examType}" পরীক্ষার ফলাফল ডাটাবেজে সংরক্ষিত রয়েছে, কিন্তু এডমিন প্যানেল থেকে এখনও এটি পাবলিশ করা হয়নি।`
+          `রোল ${String(cleanRoll)}-এর "${matchedRecord.examType}" পরীক্ষার ফলাফল ডাটাবেজে সংরক্ষিত রয়েছে, কিন্তু এডমিন প্যানেল থেকে এখনও এটি পাবলিশ করা হয়নি।`
         );
       }
     } else {
@@ -214,11 +214,11 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
 
       if (otherExams.length > 0) {
         setStatusMessage(
-          `রোল ${toBengaliNum(cleanRoll)}-এর "${cleanExam}" পরীক্ষার ফলাফল পাওয়া যায়নি। তবে এই শিক্ষার্থীর "${otherExams.join(', ')}" পরীক্ষার ফলাফল প্রকাশিত আছে। পরীক্ষার ধরণ পরিবর্তন করে সার্চ করুন।`
+          `রোল ${String(cleanRoll)}-এর "${cleanExam}" পরীক্ষার ফলাফল পাওয়া যায়নি। তবে এই শিক্ষার্থীর "${otherExams.join(', ')}" পরীক্ষার ফলাফল প্রকাশিত আছে। পরীক্ষার ধরণ পরিবর্তন করে সার্চ করুন।`
         );
       } else {
         setStatusMessage(
-          `প্রদত্ত শিক্ষাবর্ষ (${toBengaliNum(targetYear)}), কোর্স, পরীক্ষার ধরণ ("${cleanExam}") ও রোল নম্বরের (${toBengaliNum(cleanRoll)}) কোনো ফলাফল পাওয়া যায়নি।`
+          `প্রদত্ত শিক্ষাবর্ষ (${String(targetYear)}), কোর্স, পরীক্ষার ধরণ ("${cleanExam}") ও রোল নম্বরের (${String(cleanRoll)}) কোনো ফলাফল পাওয়া যায়নি।`
         );
       }
     }
@@ -411,7 +411,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     {availableRollsForCourse.length > 0 ? (
                       availableRollsForCourse.map((item) => (
                         <option key={item.roll} value={item.roll}>
-                          রোল {toBengaliNum(item.roll)} - {item.name}
+                          রোল {String(item.roll)} - {item.name}
                         </option>
                       ))
                     ) : (
@@ -453,7 +453,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <span className="text-[11px] font-bold text-slate-500 mr-1 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-blue-700" />
-                <span>জনপ্রিয় পরীক্ষার ধরণ:</span>
+                <span>জনপ্রিয় Exam Type:</span>
               </span>
               {availableExamsForCourse.slice(0, 3).map((presetExam, idx) => (
                 <button
@@ -515,7 +515,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                       <img
                         src={settings.logoUrl}
                         alt="Logo"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                     <div className="grow text-center">
@@ -523,10 +523,10 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                         {settings.name}
                       </h3>
                       <p className="text-xs text-slate-700 font-bold">
-                        {settings.subName || 'দক্ষতা ও সাফল্যের সেরা ডিজিটাল একাডেমি'}
+                        {settings.subName || 'A Digital Academy for Skills and Success'}
                       </p>
                       <p className="text-[11px] text-slate-600 font-medium">
-                        {settings.address} | হটলাইন: {settings.hotline} | ইমেইল: {settings.email}
+                        {settings.address} | Hotline: {settings.hotline} | ইমেইল: {settings.email}
                       </p>
                     </div>
                     <div className="text-right shrink-0 hidden sm:block">
@@ -539,7 +539,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   {/* Document Title & Prominent Exam Type Banner */}
                   <div className="pt-2 text-center space-y-1">
                     <div className="inline-block px-5 py-1 rounded-full bg-blue-950 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase">
-                      অফিশিয়াল একাডেমিক মার্কশিট (MARKSHEET / GRADE REPORT)
+                      OFFICIAL ACADEMIC MARKSHEET (MARKSHEET / GRADE REPORT)
                     </div>
 
                     <div className="mt-1 flex items-center justify-center">
@@ -549,7 +549,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                           Exam Type: <span className="text-rose-900 underline underline-offset-2">{foundResult.examType}</span>
                         </span>
                         <span className="text-[11px] font-bold text-slate-600 ml-1">
-                          (শিক্ষাবর্ষ: {toBengaliNum(foundResult.academicYear)})
+                          (Academic Year: {String(foundResult.academicYear)})
                         </span>
                       </div>
                     </div>
@@ -564,7 +564,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   </div>
 
                   <div className="flex">
-                    <span className="w-32 text-slate-600 font-bold shrink-0">রোল নম্বর:</span>
+                    <span className="w-32 text-slate-600 font-bold shrink-0">Roll Number:</span>
                     <span className="font-black text-blue-950 font-mono text-base">{foundResult.roll}</span>
                   </div>
 
@@ -579,29 +579,29 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   </div>
 
                   <div className="flex">
-                    <span className="w-32 text-slate-600 font-bold shrink-0">কোর্সের নাম:</span>
+                    <span className="w-32 text-slate-600 font-bold shrink-0">Course Name:</span>
                     <span className="font-extrabold text-blue-900">
                       {courses.find(c => c.id === foundResult.courseId)?.title || selectedCourse.title}
                     </span>
                   </div>
 
                   <div className="flex">
-                    <span className="w-32 text-blue-900 font-bold shrink-0">পরীক্ষার ধরণ:</span>
+                    <span className="w-32 text-blue-900 font-bold shrink-0">Exam Type:</span>
                     <span className="font-extrabold text-blue-950 bg-blue-100/70 px-2 py-0.5 rounded-md">
                       {foundResult.examType}
                     </span>
                   </div>
 
                   <div className="flex">
-                    <span className="w-32 text-slate-600 font-bold shrink-0">শিক্ষাবর্ষ / সেশন:</span>
-                    <span className="font-semibold text-slate-800">{toBengaliNum(foundResult.academicYear)} সেশন</span>
+                    <span className="w-32 text-slate-600 font-bold shrink-0">Academic Year / Session:</span>
+                    <span className="font-semibold text-slate-800">{String(foundResult.academicYear)} Session</span>
                   </div>
 
                   <div className="flex">
-                    <span className="w-32 text-slate-600 font-bold shrink-0">অনুমোদন স্ট্যাটাস:</span>
+                    <span className="w-32 text-slate-600 font-bold shrink-0">Approval Status:</span>
                     <span className="font-bold text-emerald-800 flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>এডমিন প্যানেল কর্তৃক অনুমোদিত ও প্রকাশিত</span>
+                      <span>Approved and published by the Admin Panel</span>
                     </span>
                   </div>
                 </div>
@@ -611,28 +611,28 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   <table className="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead>
                       <tr className="bg-blue-950 text-white border border-blue-950">
-                        <th className="py-2.5 px-3 border border-slate-700 font-bold text-center w-12">ক্রম</th>
-                        <th className="py-2.5 px-3 border border-slate-700 font-bold">বিষয় / মডিউলের নাম</th>
-                        <th className="py-2.5 px-3 border border-slate-700 text-center font-bold">পূর্ণমান</th>
-                        <th className="py-2.5 px-3 border border-slate-700 text-center font-bold">প্রাপ্ত নম্বর</th>
-                        <th className="py-2.5 px-3 border border-slate-700 text-center font-bold">লেটার গ্রেড</th>
-                        <th className="py-2.5 px-3 border border-slate-700 text-center font-bold">গ্রেড পয়েন্ট (GPA)</th>
+                        <th className="py-2.5 px-3 border border-slate-700 font-bold text-center w-12">No.</th>
+                        <th className="py-2.5 px-3 border border-slate-700 font-bold">Subject / Module</th>
+                        <th className="py-2.5 px-3 border border-slate-700 text-center font-bold">Full Marks</th>
+                        <th className="py-2.5 px-3 border border-slate-700 text-center font-bold">Marks Obtained</th>
+                        <th className="py-2.5 px-3 border border-slate-700 text-center font-bold">Letter Grade</th>
+                        <th className="py-2.5 px-3 border border-slate-700 text-center font-bold">Grade Point (GPA)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {foundResult.marks.map((m, idx) => (
                         <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
                           <td className="py-2 px-3 border border-slate-300 text-center font-mono font-bold text-slate-500">
-                            {toBengaliNum(idx + 1)}
+                            {String(idx + 1)}
                           </td>
                           <td className="py-2 px-3 border border-slate-300 font-bold text-slate-900">
                             {m.subject}
                           </td>
                           <td className="py-2 px-3 border border-slate-300 text-center font-mono">
-                            {toBengaliNum(m.total)}
+                            {String(m.total)}
                           </td>
                           <td className="py-2 px-3 border border-slate-300 text-center font-mono font-black text-blue-950 text-sm">
-                            {toBengaliNum(m.obtained)}
+                            {String(m.obtained)}
                           </td>
                           <td className="py-2 px-3 border border-slate-300 text-center font-black">
                             <span className={m.grade === 'A+' ? 'text-emerald-700' : 'text-slate-900'}>
@@ -648,13 +648,13 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     <tfoot>
                       <tr className="bg-slate-100 font-bold border-t-2 border-blue-950 text-xs sm:text-sm">
                         <td colSpan={2} className="py-2.5 px-3 border border-slate-300 font-extrabold text-blue-950">
-                          সর্বমোট প্রাপ্ত নম্বর ও ফলাফল
+                          সর্বমোট Marks Obtained ও ফলাফল
                         </td>
                         <td className="py-2.5 px-3 border border-slate-300 text-center font-mono font-bold">
-                          {toBengaliNum(foundResult.marks.reduce((acc, cur) => acc + cur.total, 0))}
+                          {String(foundResult.marks.reduce((acc, cur) => acc + cur.total, 0))}
                         </td>
                         <td className="py-2.5 px-3 border border-slate-300 text-center font-mono font-black text-emerald-800 text-sm sm:text-base">
-                          {toBengaliNum(foundResult.totalMarks)}
+                          {String(foundResult.totalMarks)}
                         </td>
                         <td className="py-2.5 px-3 border border-slate-300 text-center text-emerald-800 font-black text-sm">
                           {foundResult.grade}
