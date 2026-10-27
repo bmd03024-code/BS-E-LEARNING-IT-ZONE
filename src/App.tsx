@@ -146,7 +146,25 @@ export default function App() {
       'কোর্সের বিস্তারিত': 'Course Details',
       'ভর্তি চলছে': 'Admissions Open',
       'যোগাযোগ': 'Contact',
-      'হোম': 'Home'
+      'হোম': 'Home',
+      'গ্যালারি': 'Gallery',
+      'গ্যালারি স্লাইড': 'Gallery Slides',
+      'মার্কশিট': 'Marksheet',
+      'বোর্ড': 'Board',
+      'ফেসবুক': 'Facebook',
+      'মাদ্রাসা': 'Madrasa',
+      'শিক্ষার্থী': 'Student',
+      'শিক্ষার্থীরা': 'Students',
+      'স্টুডেন্ট': 'Student',
+      'স্টুডেন্টস': 'Students',
+      'কোর্স': 'Course',
+      'সেমিনার': 'Seminar',
+      'সেমিনারের নাম': 'Seminar Name',
+      'ক্লাসের রুটিন': 'Class Routine',
+      'শিক্ষক': 'Teacher',
+      'শিক্ষকের': 'Teacher’s',
+      'প্রতিষ্ঠাতার': 'Founder’s',
+      'বোর্ডের': 'Board’s'
     };
     const enToBn = Object.fromEntries(Object.entries(bnToEn).map(([bn, en]) => [en, bn]));
     const dictionary = language === 'en' ? bnToEn : enToBn;
