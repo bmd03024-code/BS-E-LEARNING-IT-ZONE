@@ -7,16 +7,21 @@ interface FooterProps {
   settings: InstituteSettings;
   onOpenAdminLogin: () => void;
   onNavigate: (section: string) => void;
+  language: 'bn' | 'en';
 }
 
-export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNavigate, language }) => {
+  const en = language === 'en';
+  const text = (bn: string, english: string) => en ? english : bn;
+  const welcomeText = en ? ({ 'স্বাগতম': 'Welcome', 'আমাদের প্রতিষ্ঠানে স্বাগতম': 'Welcome to our institute' }[settings.welcomeText || ''] || settings.welcomeText) : settings.welcomeText;
+  const footerText = en ? 'BS E-Learning & IT Zone — A trusted institute for academic education and practical IT skills, supported by experienced instructors and digital learning resources.' : (settings.footerText || 'BS E-Learning & IT Zone — আধুনিক একাডেমিক শিক্ষা ও প্র্যাকটিক্যাল আইটি স্কিল অর্জনের বিশ্বস্ত প্রতিষ্ঠান। অভিজ্ঞ শিক্ষক মণ্ডলী এবং ডিজিটাল ল্যাব সাপোর্ট.');
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-800">
       {/* Top Welcome Banner */}
       <div className="bg-gradient-to-r from-blue-900 via-indigo-950 to-slate-950 py-4 px-4 sm:px-6 border-b border-slate-800 text-center text-xs sm:text-sm text-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2">
           <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-          <span className="font-semibold">{settings.welcomeText}</span>
+          <span className="font-semibold">{welcomeText}</span>
         </div>
       </div>
 
@@ -33,6 +38,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                 instituteName={settings.name}
                 subName={settings.subName}
                 founderName={settings.founderName}
+                language={language}
               />
             </div>
 
@@ -42,12 +48,12 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
 
             <div className="pt-2 text-xs text-slate-400 space-y-1">
               <div>
-                প্রতিষ্ঠাতা ও প্রধান শিক্ষক: <b className="text-amber-400">{settings.founderName}</b>
+                {text('প্রতিষ্ঠাতা ও প্রধান শিক্ষক:', 'Founder & Head Teacher:')} <b className="text-amber-400">{settings.founderName}</b>
               </div>
-              <div>অফিশিয়াল হেল্পলাইন: <b className="text-white font-mono">{settings.hotline}</b></div>
+              <div>{text('অফিশিয়াল হেল্পলাইন:', 'Official Helpline:')} <b className="text-white font-mono">{settings.hotline}</b></div>
               {settings.footerNotice && (
                 <div className="text-[11px] text-amber-300/80 pt-1">
-                  * {settings.footerNotice}
+                  * {en ? ({ 'স্বাগতম': 'Welcome' }[settings.footerNotice] || settings.footerNotice) : settings.footerNotice}
                 </div>
               )}
             </div>
@@ -93,7 +99,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
           {/* Col 2: Quick Links */}
           <div className="lg:col-span-2 space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">
-              প্রয়োজনীয় লিংক
+              {text('প্রয়োজনীয় লিংক', 'Quick Links')}
             </h4>
             <ul className="space-y-2 text-xs sm:text-sm">
               <li>
@@ -101,7 +107,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                   onClick={() => onNavigate('courses')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  সকল কোর্সসমূহ
+                  {text('সকল কোর্সসমূহ', 'All Courses')}
                 </button>
               </li>
               <li>
@@ -109,7 +115,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                   onClick={() => onNavigate('founder')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  প্রতিষ্ঠাতা ও ম্যানেজমেন্ট
+                  {text('প্রতিষ্ঠাতা ও ম্যানেজমেন্ট', 'Founder & Management')}
                 </button>
               </li>
               <li>
@@ -117,7 +123,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                   onClick={() => onNavigate('routine')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  লাইভ ক্লাস রুটিন
+                  {text('লাইভ ক্লাস রুটিন', 'Class Routine')}
                 </button>
               </li>
               <li>
@@ -125,7 +131,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                   onClick={() => onNavigate('fee')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  মাসিক ফি পেমেন্ট
+                  {text('মাসিক ফি পেমেন্ট', 'Monthly Fee Payment')}
                 </button>
               </li>
               <li>
@@ -133,7 +139,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                   onClick={() => onNavigate('admit')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  এডমিট কার্ড ডাউনলোড
+                  {text('এডমিট কার্ড ডাউনলোড', 'Download Admit Card')}
                 </button>
               </li>
               <li>
@@ -141,7 +147,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                   onClick={() => onNavigate('marksheet')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  ফলাফল ও মার্কশিট
+                  {text('ফলাফল ও মার্কশিট', 'Results & Marksheet')}
                 </button>
               </li>
               <li>
@@ -149,7 +155,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
                   onClick={() => onNavigate('certificate')}
                   className="hover:text-amber-400 transition-colors"
                 >
-                  সনদপত্র উত্তোলন
+                  {text('সনদপত্র উত্তোলন', 'Get Certificate')}
                 </button>
               </li>
             </ul>
@@ -158,7 +164,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
           {/* Col 3: Contact Details */}
           <div className="lg:col-span-3 space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">
-              যোগাযোগ ও ঠিকানা
+              {text('যোগাযোগ ও ঠিকানা', 'Contact & Address')}
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm text-slate-400">
               <li className="flex items-start gap-2.5">
@@ -175,7 +181,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
               </li>
               <li className="flex items-center gap-2.5">
                 <Globe className="w-4 h-4 text-indigo-400 shrink-0" />
-                <span>অনলাইন প্ল্যাটফর্ম: ২৪/৭ সক্রিয়</span>
+                <span>{text('অনলাইন প্ল্যাটফর্ম: ২৪/৭ সক্রিয়', 'Online Platform: Available 24/7')}</span>
               </li>
             </ul>
           </div>
@@ -183,7 +189,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
           {/* Col 4: Google Map Embed */}
           <div className="lg:col-span-3 space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">
-              আমাদের অবস্থান
+              {text('আমাদের অবস্থান', 'Our Location')}
             </h4>
             <div className="w-full aspect-4/3 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 shadow-inner">
               <iframe
@@ -200,7 +206,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
         {/* Bottom Sub-bar */}
         <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <div>
-            {settings.footerCopyright || `© ${new Date().getFullYear()} ${settings.name}. সর্বস্বত্ব সংরক্ষিত।`}
+            {settings.footerCopyright || `© ${new Date().getFullYear()} ${settings.name}. {text('সর্বস্বত্ব সংরক্ষিত।', 'All rights reserved.')}`}
           </div>
 
           <div className="flex items-center gap-4">
@@ -208,7 +214,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdminLogin, onNa
               onClick={onOpenAdminLogin}
               className="text-slate-400 hover:text-amber-400 font-semibold transition-colors"
             >
-              🔒 অ্যাডমিন পোর্টাল লগইন
+              {text('🔒 অ্যাডমিন পোর্টাল লগইন', '🔒 Admin Portal Login')}
             </button>
           </div>
         </div>
