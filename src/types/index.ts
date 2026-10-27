@@ -331,6 +331,7 @@ export interface CertificateRecord {
   courseId: string;
   roll: string;
   studentName: string;
+  studentNameEnglish?: string;
   fatherName?: string;
   motherName?: string;
   address?: string;
