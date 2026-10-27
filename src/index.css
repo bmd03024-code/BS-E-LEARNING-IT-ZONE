@@ -80,16 +80,37 @@
   transform: translate3d(0, 0, 0);
 }
 
-/* Slide the monthly payment QR card in from the right when it enters view */
+/* Slower slide-in for the monthly payment QR card */
 .scroll-reveal.qr-slide-in {
   transform: translate3d(48px, 0, 0);
+  transition: opacity 850ms ease-out, transform 850ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .scroll-reveal.qr-slide-in.is-visible {
   transform: translate3d(0, 0, 0);
 }
 
+/* Circular reveal for every course banner image */
+@keyframes courseCircularReveal {
+  from {
+    clip-path: circle(0% at 50% 50%);
+    opacity: 0.65;
+  }
+  to {
+    clip-path: circle(150% at 50% 50%);
+    opacity: 1;
+  }
+}
+
+.course-banner-reveal {
+  animation: courseCircularReveal 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .course-banner-reveal {
+    animation: none;
+  }
+
   .page-enter {
     animation: none;
   }
