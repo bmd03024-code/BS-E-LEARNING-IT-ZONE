@@ -51,11 +51,31 @@
   background-image: radial-gradient(circle at center, rgba(15, 23, 42, 0.04) 0%, transparent 70%);
 }
 
+/* Formal landscape certificate canvas, scoped to certificates only. */
+.certificate-print-layout {
+  page: bs-certificate;
+  min-height: 185mm;
+  border-radius: 0;
+  background: linear-gradient(135deg, #fffdf6 0%, #ffffff 48%, #f8fbff 100%) !important;
+}
+@page bs-certificate {
+  size: A4 landscape;
+  margin: 8mm;
+}
+
 /* Certificate border */
 .certificate-border {
-  border: 12px double #1e3a8a;
-  outline: 3px solid #d97706;
-  outline-offset: -8px;
+  border: 8px double #173b67;
+  outline: 2px solid #c69a3a;
+  outline-offset: -7px;
+}
+@media print {
+  .certificate-print-layout {
+    width: 100%;
+    min-height: 185mm;
+    padding: 9mm !important;
+    border-radius: 0 !important;
+  }
 }
 
 /* Faster, subtle entrance and repeatable scroll-reveal animations */
