@@ -124,7 +124,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .course-banner-reveal {
+  .course-banner-reveal img {
+    clip-path: none;
+    opacity: 1;
     animation: none;
   }
 
