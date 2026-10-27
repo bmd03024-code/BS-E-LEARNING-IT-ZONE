@@ -268,7 +268,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             {/* 1. Academic Year Select */}
             <div className="sm:col-span-3">
               <label className="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1">
-                <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">১</span>
+                <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">1</span>
                 <span>Select Academic Year *</span>
               </label>
               <div className="relative">
@@ -292,7 +292,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             {/* 2. Course Select */}
             <div className="sm:col-span-3">
               <label className="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1">
-                <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">২</span>
+                <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">2</span>
                 <span>Select Course *</span>
               </label>
               <div className="relative">
@@ -318,7 +318,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="sm:col-span-3">
               <label className="block text-xs font-bold text-blue-950 mb-1 flex items-center justify-between">
                 <span className="flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">৩</span>
+                  <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">3</span>
                   <span>Select Exam Type *</span>
                 </span>
               </label>
@@ -379,7 +379,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="sm:col-span-3">
               <label className="block text-xs font-bold text-blue-950 mb-1 flex items-center justify-between">
                 <span className="flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">৪</span>
+                  <span className="w-4 h-4 rounded-full bg-blue-900 text-white text-[10px] inline-flex items-center justify-center">4</span>
                   <span>Select Roll Number *</span>
                 </span>
                 {isCustomRoll && (
@@ -415,9 +415,9 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                         </option>
                       ))
                     ) : (
-                      <option value="101">রোল ১০১ (ডেমো রেকর্ড)</option>
+                      <option value="101">Roll 101 (Demo Record)</option>
                     )}
-                    <option value="__custom__">✏️ অন্য রোল নম্বর লিখুন...</option>
+                    <option value="__custom__">✏️ Enter a different roll number...</option>
                   </select>
                   <ChevronDown className="w-4 h-4 text-blue-900 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
@@ -426,7 +426,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   <input
                     type="text"
                     required
-                    placeholder="রোল নম্বর (যেমন: 101)"
+                    placeholder="Roll number (e.g. 101)"
                     value={customRollInput}
                     onChange={(e) => {
                       setCustomRollInput(e.target.value);
@@ -453,7 +453,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="flex flex-wrap items-center gap-1.5 text-xs">
               <span className="text-[11px] font-bold text-slate-500 mr-1 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-blue-700" />
-                <span>জনপ্রিয় Exam Type:</span>
+                <span>Popular Exam Types:</span>
               </span>
               {availableExamsForCourse.slice(0, 3).map((presetExam, idx) => (
                 <button
@@ -481,7 +481,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
               className="py-2.5 px-6 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 hover:from-blue-800 hover:to-indigo-800 text-white transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-900/30 active:scale-95 cursor-pointer shrink-0 border border-amber-400/30"
             >
               <Search className="w-4 h-4 text-amber-400" />
-              <span>ফলাফল ও মার্কশিট দেখুন</span>
+              <span>View Results & Marksheet</span>
             </button>
           </div>
         </div>
@@ -526,7 +526,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                         {settings.subName || 'A Digital Academy for Skills and Success'}
                       </p>
                       <p className="text-[11px] text-slate-600 font-medium">
-                        {settings.address} | Hotline: {settings.hotline} | ইমেইল: {settings.email}
+                        {settings.address} | Hotline: {settings.hotline} | Email: {settings.email}
                       </p>
                     </div>
                     <div className="text-right shrink-0 hidden sm:block">
@@ -648,7 +648,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                     <tfoot>
                       <tr className="bg-slate-100 font-bold border-t-2 border-blue-950 text-xs sm:text-sm">
                         <td colSpan={2} className="py-2.5 px-3 border border-slate-300 font-extrabold text-blue-950">
-                          সর্বমোট Marks Obtained ও ফলাফল
+                          Total Marks Obtained and Result
                         </td>
                         <td className="py-2.5 px-3 border border-slate-300 text-center font-mono font-bold">
                           {String(foundResult.marks.reduce((acc, cur) => acc + cur.total, 0))}
@@ -747,7 +747,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-blue-900 hover:bg-blue-800 text-white transition-colors shadow-lg cursor-pointer"
                 >
                   <Printer className="w-4 h-4 text-amber-300" />
-                  <span>মার্কশিট প্রিন্ট / ডাউনলোড করুন</span>
+                  <span>Print / Download Marksheet</span>
                 </button>
               </div>
             </div>
@@ -756,14 +756,14 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="text-center py-10 px-4 bg-amber-50/80 rounded-2xl border border-amber-300 space-y-3">
               <AlertCircle className="w-12 h-12 text-amber-600 mx-auto" />
               <h4 className="text-base font-extrabold text-amber-950">
-                ফলাফল এখনও প্রকাশিত হয়নি (Result Unpublished)
+                Result has not been published yet (Result Unpublished)
               </h4>
               <p className="text-xs sm:text-sm text-amber-900 max-w-lg mx-auto leading-relaxed">
                 {statusMessage}
               </p>
               <div className="pt-2">
                 <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-200 text-amber-900">
-                  অপেক্ষার অনুরোধ: এডমিন প্যানেল থেকে পাবলিশ করার পর সরাসরি এই পেজ থেকে মার্কশিট ডাউনলোড করা যাবে।
+                  Please wait. After the result is published from the Admin Panel, you can download the marksheet directly from this page.
                 </span>
               </div>
             </div>
@@ -772,13 +772,13 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
             <div className="text-center py-10 px-4 bg-rose-50/70 rounded-2xl border border-rose-200 space-y-3">
               <AlertCircle className="w-12 h-12 text-rose-500 mx-auto" />
               <h4 className="text-base font-bold text-rose-950">
-                কোনো প্রকাশিত ফলাফল পাওয়া যায়নি
+                No published results found
               </h4>
               <p className="text-xs sm:text-sm text-rose-800 max-w-lg mx-auto leading-relaxed">
                 {statusMessage}
               </p>
               <div className="text-[11px] text-slate-600 pt-1">
-                পরামর্শ: উপরে শিক্ষাবর্ষ, কোর্স, পরীক্ষার ধরণ ও রোল নম্বর সঠিক আছে কিনা দেখে পুনরায় &quot;ফলাফল ও মার্কশিট দেখুন&quot; চাপুন।
+                পরামর্শ: উপরে শিক্ষাবর্ষ, কোর্স, পরীক্ষার ধরণ ও রোল নম্বর সঠিক আছে কিনা দেখে পুনরায় &quot;View Results & Marksheet&quot; চাপুন।
               </div>
             </div>
           ) : (
@@ -789,7 +789,7 @@ export const MarksheetModal: React.FC<MarksheetModalProps> = ({ isOpen, onClose,
                 শিক্ষাবর্ষ, কোর্স, পরীক্ষার ধরণ ও রোল সিলেক্ট করে ফলাফল খুঁজুন
               </h4>
               <p className="text-xs text-slate-600 max-w-md mx-auto">
-                উপরে থাকা ৪টি Dropdown থেকে তথ্য সিলেক্ট করুন এবং &quot;ফলাফল ও মার্কশিট দেখুন&quot; বাটনে ক্লিক করলেই শিক্ষার্থীর সম্পূর্ণ ফলাফল ও অফিশিয়াল সিলযুক্ত মার্কশিট দেখা যাবে এবং প্রিন্ট করা যাবে।
+                উপরে থাকা ৪টি Dropdown থেকে তথ্য সিলেক্ট করুন এবং &quot;View Results & Marksheet&quot; বাটনে ক্লিক করলেই শিক্ষার্থীর সম্পূর্ণ ফলাফল ও অফিশিয়াল সিলযুক্ত মার্কশিট দেখা যাবে এবং প্রিন্ট করা যাবে।
               </p>
 
               {/* Quick try presets */}
