@@ -57,3 +57,40 @@
   outline: 3px solid #d97706;
   outline-offset: -8px;
 }
+
+
+/* Subtle entrance and repeatable scroll-reveal animations */
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.page-enter {
+  animation: pageFadeIn 650ms ease-out both;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition: opacity 650ms ease, transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+
+  .scroll-reveal,
+  .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+}
