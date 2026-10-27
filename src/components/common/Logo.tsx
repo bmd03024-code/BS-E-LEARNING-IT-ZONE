@@ -47,7 +47,7 @@ export const Logo: React.FC<LogoProps> = ({
           <img
             src={customLogoUrl}
             alt="BS Zone Logo"
-            className="w-full h-full rounded-full object-cover bg-white"
+            className="w-full h-full rounded-full object-contain bg-white"
             onError={(e) => {
               // fallback if broken
               (e.target as HTMLImageElement).style.display = 'none';
@@ -78,7 +78,7 @@ export const Logo: React.FC<LogoProps> = ({
           <p className="brand-sub font-medium text-slate-600 tracking-normal whitespace-nowrap hidden sm:block">
             {(language === 'en' ? ({ 'স্বাগতম': 'Welcome', 'দক্ষতা ও সাফল্যের সেরা ডিজিটাল একাডেমি': 'A Digital Academy for Skills & Success', 'প্রতিষ্ঠাতা ও প্রধান শিক্ষক': 'Founder & Head Teacher' }[subName || ''] || subName) : subName) || (
               <>
-                {language === 'en' ? 'Founder & Head Teacher: ' : 'প্রতিষ্ঠাতা ও প্রধান শিক্ষক: '}<span className="text-blue-900 font-semibold">{founderName || (language === 'en' ? 'Borhan Uddin Mahim' : 'বোরহানউদ্দিন মহিম')}</span>
+                {language === 'en' ? 'Founder & Head Teacher: ' : 'প্রতিষ্ঠাতা ও প্রধান শিক্ষক: '}<span className="text-blue-900 font-semibold">{language === 'en' ? ({ 'বোরহানউদ্দিন মহিম': 'Borhan Uddin Mahim' }[founderName || ''] || founderName || 'Borhan Uddin Mahim') : (founderName || 'বোরহানউদ্দিন মহিম')}</span>
               </>
             )}
           </p>
