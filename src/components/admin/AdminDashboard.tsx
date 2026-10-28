@@ -124,6 +124,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
   // New Teacher Entry Form State
   const [newTeacherName, setNewTeacherName] = useState('');
+  const [newTeacherNameEnglish, setNewTeacherNameEnglish] = useState('');
+  const [newTeacherDesignationEnglish, setNewTeacherDesignationEnglish] = useState('');
+  const [newTeacherBioEnglish, setNewTeacherBioEnglish] = useState('');
   const [newTeacherDesignation, setNewTeacherDesignation] = useState('প্রশিক্ষক ও মেন্টর');
   const [newTeacherQualifications, setNewTeacherQualifications] = useState('');
   const [newTeacherSpecialist, setNewTeacherSpecialist] = useState('');
@@ -139,6 +142,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [newStdRoll, setNewStdRoll] = useState('');
   const [newStdName, setNewStdName] = useState('');
   const [newStdNameEnglish, setNewStdNameEnglish] = useState('');
+   const [newStdFatherEnglish, setNewStdFatherEnglish] = useState('');
+   const [newStdMotherEnglish, setNewStdMotherEnglish] = useState('');
   const [newStdFather, setNewStdFather] = useState('');
   const [newStdMother, setNewStdMother] = useState('');
   const [newStdPhone, setNewStdPhone] = useState('');
@@ -148,6 +153,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   // New Notice Entry Form State with File Uploads
   const [newNoticeTitle, setNewNoticeTitle] = useState('');
   const [newNoticeContent, setNewNoticeContent] = useState('');
+  const [newNoticeTitleEnglish, setNewNoticeTitleEnglish] = useState('');
+  const [newNoticeContentEnglish, setNewNoticeContentEnglish] = useState('');
   const [newNoticeImage, setNewNoticeImage] = useState<string | null>(null);
   const [newNoticePdf, setNewNoticePdf] = useState<string | null>(null);
   const [newNoticePdfName, setNewNoticePdfName] = useState<string>('');
@@ -155,6 +162,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
   // New Gallery Entry Form State with File Uploads
   const [newGalleryTitle, setNewGalleryTitle] = useState('');
+  const [newGalleryTitleEnglish, setNewGalleryTitleEnglish] = useState('');
   const [newGalleryCategory, setNewGalleryCategory] = useState('ক্লাস ও ল্যাব অ্যাক্টিভিটি');
   const [newGalleryType, setNewGalleryType] = useState<'image' | 'video'>('image');
   const [newGalleryMediaUrl, setNewGalleryMediaUrl] = useState('');
@@ -3597,6 +3605,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               onChange={(e) => setNewNoticeTitle(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm font-bold text-slate-900"
             />
+              <input type="text" value={newNoticeTitleEnglish} onChange={(e) => setNewNoticeTitleEnglish(e.target.value)} placeholder="Enter notice title in English" aria-label="English notice title" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
           </div>
 
           <div>
@@ -3608,6 +3617,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               onChange={(e) => setNewNoticeContent(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs leading-relaxed"
             />
+              <textarea rows={3} type="text" value={newNoticeContentEnglish} onChange={(e) => setNewNoticeContentEnglish(e.target.value)} placeholder="Enter notice details in English" aria-label="English notice details" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
@@ -3692,8 +3702,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 const newN: NoticeItem = {
                   id: `not-${Date.now()}`,
                   title: newNoticeTitle.trim(),
+                   titleEnglish: newNoticeTitleEnglish.trim(),
                   date: new Date().toLocaleDateString('bn-BD'),
                   content: newNoticeContent.trim(),
+                   contentEnglish: newNoticeContentEnglish.trim(),
                   images: newNoticeImage ? [newNoticeImage] : [],
                   pdfUrl: newNoticePdf || undefined,
                   pinned: newNoticePinned
@@ -3931,6 +3943,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               onChange={(e) => setNewGalleryTitle(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white"
             />
+              <input type="text" value={newGalleryTitleEnglish} onChange={(e) => setNewGalleryTitleEnglish(e.target.value)} placeholder="Enter title in English" aria-label="English gallery title" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
           </div>
 
           <div>
@@ -4007,6 +4020,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   type: newGalleryType,
                   url: finalUrl,
                   title: newGalleryTitle.trim(),
+                   titleEnglish: newGalleryTitleEnglish.trim(),
+                   captionEnglish: newGalleryTitleEnglish.trim(),
                   category: newGalleryCategory,
                   caption: newGalleryTitle.trim(),
                   date: new Date().toISOString().split('T')[0]
@@ -6567,6 +6582,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 const newM: Mentor = {
                   id: `mentor-${Date.now()}`,
                   name: newTeacherName.trim(),
+                   nameEnglish: newTeacherNameEnglish.trim(),
                   designation: newTeacherDesignation.trim() || 'প্রশিক্ষক',
                   experience: '৩+ বছর',
                   qualifications: newTeacherQualifications ? newTeacherQualifications.split(',').map(s => s.trim()).filter(Boolean) : ['স্নাতক', 'আইটি ডিপ্লোমা'],
@@ -6637,6 +6653,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     onChange={(e) => setNewTeacherName(e.target.value)}
                     className="w-full px-3 py-2 border rounded-xl font-bold text-slate-900"
                   />
+              <input type="text" value={newTeacherNameEnglish} onChange={(e) => setNewTeacherNameEnglish(e.target.value)} placeholder="Enter teacher name in English" aria-label="English teacher name" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">পদবি *</label>
@@ -6648,6 +6665,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     onChange={(e) => setNewTeacherDesignation(e.target.value)}
                     className="w-full px-3 py-2 border rounded-xl font-medium"
                   />
+              <input type="text" value={newTeacherDesignationEnglish} onChange={(e) => setNewTeacherDesignationEnglish(e.target.value)} placeholder="Enter designation in English" aria-label="English teacher designation" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
                 </div>
               </div>
 
@@ -6705,6 +6723,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setNewTeacherBio(e.target.value)}
                   className="w-full px-3 py-2 border rounded-xl"
                 />
+              <textarea rows={3} type="text" value={newTeacherBioEnglish} onChange={(e) => setNewTeacherBioEnglish(e.target.value)} placeholder="Enter biography in English" aria-label="English teacher biography" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t">
@@ -6758,7 +6777,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   name: newStdName.trim(),
                    englishName: newStdNameEnglish.trim(),
                   fatherName: newStdFather.trim(),
+                   fatherNameEnglish: newStdFatherEnglish.trim(),
                   motherName: newStdMother.trim(),
+                   motherNameEnglish: newStdMotherEnglish.trim(),
                   phone: newStdPhone.trim() || '01700000000',
                   address: newStdAddress.trim() || 'ঢাকা, বাংলাদেশ',
                   photoUrl: newStdPhoto,
@@ -6934,6 +6955,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     onChange={(e) => setNewStdFather(e.target.value)}
                     className="w-full px-3 py-2 border rounded-xl font-medium"
                   />
+              <input type="text" value={newStdFatherEnglish} onChange={(e) => setNewStdFatherEnglish(e.target.value)} placeholder="Enter father's name in English" aria-label="English father name" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
                 </div>
 
                 <div>
@@ -6946,6 +6968,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     onChange={(e) => setNewStdMother(e.target.value)}
                     className="w-full px-3 py-2 border rounded-xl font-medium"
                   />
+              <input type="text" value={newStdMotherEnglish} onChange={(e) => setNewStdMotherEnglish(e.target.value)} placeholder="Enter mother's name in English" aria-label="English mother name" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
                 </div>
               </div>
 
