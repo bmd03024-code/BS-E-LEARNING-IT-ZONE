@@ -114,6 +114,14 @@ export interface Mentor {
   bio: string;
   address?: string;
   comments?: string;
+  nameEnglish?: string;
+  designationEnglish?: string;
+  qualificationsEnglish?: string[];
+  experienceEnglish?: string;
+  specialistEnglish?: string[];
+  bioEnglish?: string;
+  addressEnglish?: string;
+  commentsEnglish?: string;
 }
 
 export interface Student {
@@ -157,6 +165,10 @@ export interface EnrollmentApplication {
   status: 'pending' | 'accepted' | 'rejected';
   appliedDate: string;
   rejectionReason?: string;
+  fatherNameEnglish?: string;
+  motherNameEnglish?: string;
+  addressEnglish?: string;
+  rejectionReasonEnglish?: string;
 }
 
 export interface PaymentRecord {
@@ -184,6 +196,10 @@ export interface RoutineItem {
   subject: string;
   teacherName: string;
   room: string;
+  dayEnglish?: string;
+  subjectEnglish?: string;
+  teacherNameEnglish?: string;
+  roomEnglish?: string;
 }
 
 export interface ExamSetup {
@@ -218,6 +234,12 @@ export interface ResultRecord {
   totalMarks: number;
   gpa: number;
   grade: string;
+  studentNameEnglish?: string;
+  fatherNameEnglish?: string;
+  motherNameEnglish?: string;
+  addressEnglish?: string;
+  examTypeEnglish?: string;
+  marksEnglish?: SubjectMark[];
 }
 
 export interface AdmitCardRecord {
@@ -239,6 +261,13 @@ export interface AdmitCardRecord {
   feeCleared?: boolean;
   isBlocked?: boolean;
   blockedReason?: string;
+  studentNameEnglish?: string;
+  fatherNameEnglish?: string;
+  motherNameEnglish?: string;
+  examTypeEnglish?: string;
+  examCenterEnglish?: string;
+  instructionsEnglish?: string[];
+  blockedReasonEnglish?: string;
 }
 
 export interface LedgerItem {
@@ -250,6 +279,9 @@ export interface LedgerItem {
   amount: number;
   date: string;
   academicYear: string;
+  categoryEnglish?: string;
+  descriptionEnglish?: string;
+  titleEnglish?: string;
 }
 
 export interface NoticeItem {
@@ -261,6 +293,8 @@ export interface NoticeItem {
   pdfUrl?: string;
   videoUrl?: string;
   pinned?: boolean;
+  titleEnglish?: string;
+  contentEnglish?: string;
 }
 
 export interface GalleryItem {
@@ -271,6 +305,9 @@ export interface GalleryItem {
   url: string;
   category: string;
   date: string;
+  titleEnglish?: string;
+  captionEnglish?: string;
+  categoryEnglish?: string;
 }
 
 export interface FreeNoteItem {
@@ -285,6 +322,10 @@ export interface FreeNoteItem {
   images?: string[];
   fileSize?: string;
   date: string;
+  titleEnglish?: string;
+  subjectEnglish?: string;
+  classOrCourseEnglish?: string;
+  descriptionEnglish?: string;
 }
 
 export interface DemoClassItem {
@@ -296,6 +337,10 @@ export interface DemoClassItem {
   videoUrl: string;
   thumbnail?: string;
   description: string;
+  titleEnglish?: string;
+  instructorEnglish?: string;
+  durationEnglish?: string;
+  descriptionEnglish?: string;
 }
 
 export interface ChatbotInfoBlock {
