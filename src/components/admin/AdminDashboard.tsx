@@ -476,6 +476,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               onChange={(e) => setSettings({ ...settings, founderName: e.target.value })}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold text-blue-900"
             />
+                <input type="text" value={settings.founderNameEnglish || ''} onChange={(e) => setSettings({ ...settings, founderNameEnglish: e.target.value })} placeholder="English translation..." aria-label="English founderName" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">পদবি</label>
@@ -485,6 +486,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               onChange={(e) => setSettings({ ...settings, founderTitle: e.target.value })}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm"
             />
+                <input type="text" value={settings.founderTitleEnglish || ''} onChange={(e) => setSettings({ ...settings, founderTitleEnglish: e.target.value })} placeholder="English translation..." aria-label="English founderTitle" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
           </div>
 
           {/* Founder Photo Upload & URL */}
@@ -627,6 +629,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               onChange={(e) => setSettings({ ...settings, founderSpeech: e.target.value })}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm leading-relaxed"
             />
+                <input type="text" value={settings.founderSpeechEnglish || ''} onChange={(e) => setSettings({ ...settings, founderSpeechEnglish: e.target.value })} placeholder="English translation..." aria-label="English founderSpeech" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
           </div>
         </div>
       </div>
@@ -662,6 +665,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 onChange={(e) => setSettings({ ...settings, banglaQrHeading: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold"
               />
+                <input type="text" value={settings.banglaQrHeadingEnglish || ''} onChange={(e) => setSettings({ ...settings, banglaQrHeadingEnglish: e.target.value })} placeholder="English translation..." aria-label="English banglaQrHeading" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
               <p className="text-[11px] text-slate-500 mt-1">
                 এখানে কোনো নির্দিষ্ট মোবাইল নম্বর শো করবে না; শুধু ব্যাংকিং বা এমএফএস অ্যাপ দিয়ে স্ক্যান করার নির্দেশনা থাকবে।
               </p>
