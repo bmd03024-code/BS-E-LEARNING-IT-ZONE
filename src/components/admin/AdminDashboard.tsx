@@ -689,6 +689,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 onChange={(e) => setSettings({ ...settings, welcomeText: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs"
               />
+                <input type="text" value={settings.welcomeTextEnglish || ''} onChange={(e) => { setSettings({ ...settings, welcomeTextEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for settings.welcomeText || ''" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">ফুটার বিশেষ নোটিশ</label>
@@ -698,6 +699,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 onChange={(e) => setSettings({ ...settings, footerNotice: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs"
               />
+                <input type="text" value={settings.footerNoticeEnglish || ''} onChange={(e) => { setSettings({ ...settings, footerNoticeEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for settings.footerNotice || ''" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
             </div>
           </div>
 
@@ -709,6 +711,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               onChange={(e) => setSettings({ ...settings, footerText: e.target.value })}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs"
             />
+                <input type="text" value={settings.footerTextEnglish || ''} onChange={(e) => { setSettings({ ...settings, footerTextEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for settings.footerText || ''" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -720,6 +723,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 onChange={(e) => setSettings({ ...settings, address: e.target.value })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs"
               />
+                <input type="text" value={settings.addressEnglish || ''} onChange={(e) => { setSettings({ ...settings, addressEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for settings.address || ''" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">কপিরাইট টেক্সট</label>
@@ -3849,6 +3853,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setNotes(notes.map(item => item.id === fn.id ? { ...item, title: e.target.value } : item))}
                   className="w-full px-2.5 py-1.5 rounded-lg border text-xs font-bold text-blue-900 bg-white mr-2"
                 />
+                <input type="text" value={fn.titleEnglish || ''} onChange={(e) => { setNotes(notes.map(item => item.id === fn.id ? { ...item, titleEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for fn.title" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
                 <button
                   onClick={() => setNotes(notes.filter(item => item.id !== fn.id))}
                   className="text-red-500 hover:text-red-700 p-1"
@@ -4093,6 +4098,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setDemoClasses(demoClasses.map(item => item.id === dc.id ? { ...item, title: e.target.value } : item))}
                   className="w-full px-2.5 py-1.5 rounded-lg border text-xs font-bold text-slate-900 bg-white mr-2"
                 />
+                <input type="text" value={dc.titleEnglish || ''} onChange={(e) => { setDemoClasses(demoClasses.map(item => item.id === dc.id ? { ...item, titleEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for dc.title" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-slate-900" />
                 <button
                   onClick={() => setDemoClasses(demoClasses.filter(item => item.id !== dc.id))}
                   className="text-red-500 hover:text-red-700 p-1"
