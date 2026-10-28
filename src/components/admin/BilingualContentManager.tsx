@@ -548,7 +548,7 @@ function translateValue(value: unknown): unknown {
 }
 
 function hasBengaliText(value: unknown): boolean {
-  return /[\\u0980-\\u09FF]/.test(toText(value));
+  return /[\u0980-\u09FF]/.test(toText(value));
 }
 
 function hasSuggestedTranslation(value: unknown): boolean {
