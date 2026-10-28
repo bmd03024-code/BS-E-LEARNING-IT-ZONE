@@ -43,6 +43,64 @@ export default function App() {
   const [notes, setNotes] = useState(() => storage.getNotes());
   const [demoClasses, setDemoClasses] = useState(() => storage.getDemoClasses());
 
+  // Use saved English companion fields in public sections when English is selected.
+  const displaySettings = language === 'en' ? {
+    ...settings,
+    subName: settings.subNameEnglish || settings.subName,
+    founderName: settings.founderNameEnglish || settings.founderName,
+    founderTitle: settings.founderTitleEnglish || settings.founderTitle,
+    founderSpeech: settings.founderSpeechEnglish || settings.founderSpeech,
+    welcomeText: settings.welcomeTextEnglish || settings.welcomeText,
+    address: settings.addressEnglish || settings.address,
+    banglaQrHeading: settings.banglaQrHeadingEnglish || settings.banglaQrHeading,
+    footerText: settings.footerTextEnglish || settings.footerText,
+    footerNotice: settings.footerNoticeEnglish || settings.footerNotice
+  } : settings;
+  const displaySlides = language === 'en' ? slides.map(item => ({
+    ...item, title: item.titleEnglish || item.title,
+    subText: item.subTextEnglish || item.subText,
+    ctaText: item.ctaTextEnglish || item.ctaText
+  })) : slides;
+  const displayShortcuts = language === 'en' ? shortcuts.map(item => ({ ...item, title: item.titleEnglish || item.title })) : shortcuts;
+  const displayCourses = language === 'en' ? courses.map(item => ({
+    ...item,
+    title: item.titleEnglish || item.title,
+    description: item.descriptionEnglish || item.description,
+    category: item.categoryEnglish || item.category,
+    duration: item.durationEnglish || item.duration,
+    features: item.featuresEnglish || item.features,
+    subjects: item.subjectsEnglish || item.subjects,
+    exams: item.examsEnglish || item.exams,
+    paymentDetails: item.paymentDetailsEnglish || item.paymentDetails
+  })) : courses;
+  const displayMentors = language === 'en' ? mentors.map(item => ({
+    ...item,
+    name: item.nameEnglish || item.name,
+    designation: item.designationEnglish || item.designation,
+    qualifications: item.qualificationsEnglish || item.qualifications,
+    experience: item.experienceEnglish || item.experience,
+    specialist: item.specialistEnglish || item.specialist,
+    bio: item.bioEnglish || item.bio,
+    address: item.addressEnglish || item.address,
+    comments: item.commentsEnglish || item.comments
+  })) : mentors;
+  const displayNotices = language === 'en' ? notices.map(item => ({
+    ...item, title: item.titleEnglish || item.title, content: item.contentEnglish || item.content
+  })) : notices;
+  const displayGallery = language === 'en' ? gallery.map(item => ({
+    ...item, title: item.titleEnglish || item.title, caption: item.captionEnglish || item.caption,
+    category: item.categoryEnglish || item.category
+  })) : gallery;
+  const displayNotes = language === 'en' ? notes.map(item => ({
+    ...item, title: item.titleEnglish || item.title, subject: item.subjectEnglish || item.subject,
+    classOrCourse: item.classOrCourseEnglish || item.classOrCourse,
+    description: item.descriptionEnglish || item.description
+  })) : notes;
+  const displayDemoClasses = language === 'en' ? demoClasses.map(item => ({
+    ...item, title: item.titleEnglish || item.title, instructor: item.instructorEnglish || item.instructor,
+    duration: item.durationEnglish || item.duration, description: item.descriptionEnglish || item.description
+  })) : demoClasses;
+
   // Modals state
   const [enrollModalOpen, setEnrollModalOpen] = useState(false);
   const [selectedCourseForEnroll, setSelectedCourseForEnroll] = useState<Course | null>(null);
@@ -501,7 +559,7 @@ export default function App() {
         setIdCardModalOpen(true);
         break;
       case 'enroll':
-        setSelectedCourseForEnroll(courses[0] || null);
+        setSelectedCourseForEnroll(displayCourses[0] || null);
         setEnrollModalOpen(true);
         break;
       case 'admit':
@@ -589,51 +647,51 @@ export default function App() {
 
       <main className="grow">
         <HeroSlider
-          slides={slides}
+          slides={displaySlides}
           onCtaClick={handleNavigate}
           language={language}
         />
 
         <QuickActionGrid
-          shortcuts={shortcuts}
+          shortcuts={displayShortcuts}
           onActionClick={handleNavigate}
         />
 
         <FounderMessage
-          settings={settings}
+          settings={displaySettings}
           onExploreCourses={() => handleNavigate('courses')}
         />
 
         <CoursesSection
-          courses={courses}
+          courses={displayCourses}
           onEnrollCourse={handleEnrollCourse}
         />
 
         <MonthlyFeePaymentSection
-          courses={courses}
-          settings={settings}
+          courses={displayCourses}
+          settings={displaySettings}
         />
 
         <MentorsSection
-          mentors={mentors}
+          mentors={displayMentors}
         />
 
         <NoticeSection
-          notices={notices}
+          notices={displayNotices}
         />
 
         <FreeResourcesSection
-          notes={notes}
-          demoClasses={demoClasses}
+          notes={displayNotes}
+          demoClasses={displayDemoClasses}
         />
 
         <GallerySection
-          gallery={gallery}
+          gallery={displayGallery}
         />
       </main>
 
       <Footer
-        settings={settings}
+        settings={displaySettings}
         onOpenAdminLogin={() => setIsAdminLoginModalOpen(true)}
         onNavigate={handleNavigate}
         language={language}
@@ -646,8 +704,8 @@ export default function App() {
       <EnrollModal
         isOpen={enrollModalOpen}
         course={selectedCourseForEnroll}
-        courses={courses}
-        settings={settings}
+        courses={displayCourses}
+        settings={displaySettings}
         onClose={() => setEnrollModalOpen(false)}
         onSuccess={() => {}}
       />
@@ -655,37 +713,37 @@ export default function App() {
       <AdmitCardModal
         isOpen={admitModalOpen}
         onClose={() => setAdmitModalOpen(false)}
-        courses={courses}
+        courses={displayCourses}
       />
 
       <MarksheetModal
         isOpen={marksheetModalOpen}
         onClose={() => setMarksheetModalOpen(false)}
-        courses={courses}
+        courses={displayCourses}
       />
 
       <CertificateModal
         isOpen={certificateModalOpen}
         onClose={() => setCertificateModalOpen(false)}
-        courses={courses}
+        courses={displayCourses}
       />
 
       <RoutineModal
         isOpen={routineModalOpen}
         onClose={() => setRoutineModalOpen(false)}
-        courses={courses}
+        courses={displayCourses}
       />
 
       <ContactModal
         isOpen={contactModalOpen}
         onClose={() => setContactModalOpen(false)}
-        settings={settings}
+        settings={displaySettings}
       />
 
       <StudentIdCardModal
         isOpen={idCardModalOpen}
         onClose={() => setIdCardModalOpen(false)}
-        courses={courses}
+        courses={displayCourses}
       />
 
       <AdminLoginModal
