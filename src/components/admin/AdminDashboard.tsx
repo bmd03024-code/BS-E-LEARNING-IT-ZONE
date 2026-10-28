@@ -1129,6 +1129,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       }}
                       className="text-xs text-slate-700 border rounded-lg px-2 py-1 w-full"
                     />
+<input type="text" value={m.experienceEnglish || ''} onChange={(e) => setMentors(mentors.map(item => item.id === m.id ? { ...item, experienceEnglish: e.target.value } : item))} placeholder="Experience in English" aria-label="English mentor experience" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                   </div>
                 </div>
               </div>
@@ -1148,6 +1149,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   }}
                   className="text-xs border rounded-lg px-2.5 py-1 w-full font-medium"
                 />
+<input type="text" value={m.qualificationsEnglish?.join(', ') || ''} onChange={(e) => setMentors(mentors.map(item => item.id === m.id ? { ...item, qualificationsEnglish: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } : item))} placeholder="Qualifications in English (comma-separated)" aria-label="English mentor qualifications" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
 
               <div>
@@ -1162,6 +1164,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   }}
                   className="text-xs border rounded-lg px-2.5 py-1 w-full font-medium"
                 />
+<input type="text" value={m.specialistEnglish?.join(', ') || ''} onChange={(e) => setMentors(mentors.map(item => item.id === m.id ? { ...item, specialistEnglish: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } : item))} placeholder="Specializations in English (comma-separated)" aria-label="English mentor specialization" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -6584,12 +6587,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   name: newTeacherName.trim(),
                    nameEnglish: newTeacherNameEnglish.trim(),
                   designation: newTeacherDesignation.trim() || 'প্রশিক্ষক',
+                  designationEnglish: newTeacherDesignationEnglish.trim(),
                   experience: '৩+ বছর',
                   qualifications: newTeacherQualifications ? newTeacherQualifications.split(',').map(s => s.trim()).filter(Boolean) : ['স্নাতক', 'আইটি ডিপ্লোমা'],
                   specialist: newTeacherSpecialist ? newTeacherSpecialist.split(',').map(s => s.trim()).filter(Boolean) : ['কম্পিউটার অ্যাপ্লিকেশন'],
                   phone: newTeacherPhone.trim() || '01700000000',
                   email: newTeacherEmail.trim() || 'teacher@bsit.com',
                   bio: newTeacherBio.trim() || 'দক্ষ ও অভিজ্ঞ শিক্ষক।',
+                  bioEnglish: newTeacherBioEnglish.trim(),
                   photoUrl: newTeacherPhoto
                 };
                 const updated = [newM, ...mentors];
