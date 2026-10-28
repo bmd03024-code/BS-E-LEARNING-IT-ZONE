@@ -53,14 +53,17 @@ export const DEFAULT_ASSETS = {
 const initialSettings: InstituteSettings = {
   name: "BS E-Learning & IT Zone",
   subName: "দক্ষতা ও সাফল্যের সেরা ডিজিটাল একাডেমি",
+  subNameEnglish: "A Digital Academy for Skills and Success",
   logoUrl: DEFAULT_ASSETS.logo,
   headerTextSize: 'normal',
   phone: "01612118307",
   hotline: "01612118307",
   email: "onlinetutionbyborhansir@gmail.com",
   address: "বাগানবাড়ি রোড, উত্তরা / মিরপুর শাখা, ঢাকা-১২৩০, বাংলাদেশ",
+  addressEnglish: "Baganbari Road, Uttara / Mirpur Branch, Dhaka-1230, Bangladesh",
   founderName: "বোরহানউদ্দিন মহিম",
   founderTitle: "প্রতিষ্ঠাতা ও প্রধান শিক্ষক",
+  founderTitleEnglish: "Founder and Head Teacher",
   founderSpeech: "আসসালামু আলাইকুম। প্রিয় শিক্ষার্থী ও অভিভাবকবৃন্দ, আধুনিক বিশ্বের চ্যালেঞ্জ মোকাবেলায় গুণগত শিক্ষা এবং প্র্যাকটিক্যাল আইটি দক্ষতার কোনো বিকল্প নেই। BS E-Learning & IT Zone-এ আমরা প্রতিটি শিক্ষার্থীকে পরম স্নেহে ও নিখুঁত পাঠদান কৌশলে বেসিক থেকে অ্যাডভান্সড লেভেল পর্যন্ত তৈরি করি। সহীহ কুরআন শিক্ষা থেকে শুরু করে মাধ্যমিক-উচ্চমাধ্যমিক অ্যাকাউন্টিং, গণিত, ইংরেজি এবং সরকারি মানসম্পন্ন কম্পিউটার অফিস অ্যাপ্লিকেশন—আমাদের প্রতিটি কোর্সে রয়েছে শতভাগ সাফল্যের নিশ্চয়তা। সততা, নৈতিকতা ও আধুনিক প্রযুক্তির সমন্বয়ে প্রতিটি শিক্ষার্থীর ভবিষ্যৎ উজ্জ্বল করাই আমাদের মূল লক্ষ্য।",
   founderPhotoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80",
   signatureUrl: DEFAULT_ASSETS.signature,
@@ -69,6 +72,7 @@ const initialSettings: InstituteSettings = {
   primaryColor: "#1e3a8a",
   secondaryColor: "#d97706",
   welcomeText: "BS E-Learning & IT Zone-এ আপনাকে স্বাগতম! দেশসেরা অনলাইন ও অফলাইন শিখন প্ল্যাটফর্ম।",
+  welcomeTextEnglish: "Welcome to BS E-Learning & IT Zone! A leading online and offline learning platform.",
   facebookUrl: "https://facebook.com",
   youtubeUrl: "https://youtube.com",
   tiktokUrl: "https://tiktok.com",
@@ -76,12 +80,15 @@ const initialSettings: InstituteSettings = {
   watermarkUrl: DEFAULT_ASSETS.logo,
   banglaQrUrl: DEFAULT_ASSETS.banglaQr,
   banglaQrHeading: "বিকাশ, নগদ বা যেকোনো ব্যাংকিং অ্যাপের মাধ্যমে এই বাংলা কিউআর (Bangla QR) কোড স্ক্যান করে পেমেন্ট করুন",
+  banglaQrHeadingEnglish: "Scan this Bangla QR code using bKash, Nagad, or any banking app to make a payment.",
   bkashNumber: "01612118307 (পার্সোনাল / মার্চেন্ট)",
   nagadNumber: "01612118307 (পার্সোনাল)",
   rocketNumber: "01612118307-7 (পার্সোনাল)",
   footerText: "BS E-Learning & IT Zone — আধুনিক একাডেমিক শিক্ষা ও প্র্যাকটিক্যাল আইটি স্কিল অর্জনের বিশ্বস্ত প্রতিষ্ঠান। অভিজ্ঞ শিক্ষক মণ্ডলী এবং ডিজিটাল ল্যাব সাপোর্ট।",
+  footerTextEnglish: "BS E-Learning & IT Zone is a trusted institution for modern academic education and practical IT skills, supported by experienced teachers and digital lab facilities.",
   footerCopyright: `© ${new Date().getFullYear()} BS E-Learning & IT Zone. সর্বস্বত্ব সংরক্ষিত।`,
   footerNotice: "ভর্তি ও পরীক্ষার সকল কার্যক্রম সরাসরি প্রধান শিক্ষক কর্তৃক অনুমোদিত।",
+  footerNoticeEnglish: "All admission and examination activities are approved directly by the Head Teacher.",
   githubRepo: "bmd03024-code/BS-E-LEARNING-IT-ZONE",
   githubBranch: "main",
   githubToken: "",
@@ -93,27 +100,36 @@ const initialSlides: HeroSlide[] = [
   {
     id: "slide-1",
     title: "BS E-Learning & IT Zone এ স্বাগতম",
+    titleEnglish: "Welcome to BS E-Learning & IT Zone",
     subText: "অভিজ্ঞ শিক্ষক মণ্ডলীর তত্ত্বাবধানে বেসিক টু অ্যাডভান্সড একাডেমিক ও স্কিল ডেভেলপমেন্ট কোর্স। গড়ে তুলুন আপনার সফল ভবিষ্যৎ।",
+    subTextEnglish: "Basic-to-advanced academic and skill development courses guided by experienced teachers. Build a successful future.",
     image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80",
     ctaText: "কোর্সসমূহ দেখুন",
+    ctaTextEnglish: "Explore Courses",
     ctaAction: "courses",
     active: true
   },
   {
     id: "slide-2",
     title: "কম্পিউটার অফিস অ্যাপ্লিকেশন কোর্স (৬ মাস)",
+    titleEnglish: "Computer Office Applications Course (6 Months)",
     subText: "প্র্যাকটিক্যাল ল্যাব ও অনলাইন সাপোর্টে সরকারি সার্টিফিকেট অর্জনের অনন্য সুযোগ! সীমিত আসনে স্পেশাল অফার মূল্যে ভর্তি চলছে।",
+    subTextEnglish: "A unique opportunity to earn a government certificate with practical lab training and online support. Limited seats are available at a special offer price.",
     image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80",
     ctaText: "এখনই এনরোল করুন",
+    ctaTextEnglish: "Enroll Now",
     ctaAction: "enroll",
     active: true
   },
   {
     id: "slide-3",
     title: "সহীহ কুরআন ও স্পোকেন ইংলিশ স্পেশাল ব্যাচ",
+    titleEnglish: "Authentic Quran and Spoken English Special Batch",
     subText: "সহজ ও প্রাঞ্জল পদ্ধতিতে তাজবীদ সহ কুরআন তিলাওয়াত এবং ফ্লুয়েন্ট স্পোকেন ইংলিশ দক্ষতা অর্জন করুন ঘরে বসেই।",
+    subTextEnglish: "Learn Quran recitation with Tajweed and develop fluent spoken English from home through a simple, clear approach.",
     image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1600&q=80",
     ctaText: "মাসিক ফি ও রুটিন",
+    ctaTextEnglish: "Monthly Fees & Routine",
     ctaAction: "fee",
     active: true
   }
@@ -121,20 +137,20 @@ const initialSlides: HeroSlide[] = [
 
 // 13 Quick Action Shortcuts
 const initialShortcuts: ShortcutItem[] = [
-  { id: "sc-1", title: "কোর্সসমূহ", iconName: "BookOpen", badge: "১০টি কোর্স", color: "from-blue-600 to-indigo-700", target: "courses", enabled: true },
-  { id: "sc-2", title: "নোটিস বোর্ড", iconName: "Bell", badge: "নতুন নোটিস", color: "from-amber-500 to-orange-600", target: "notice", enabled: true },
-  { id: "sc-3", title: "ক্লাস রুটিন", iconName: "Calendar", badge: "লাইভ", color: "from-emerald-600 to-teal-700", target: "routine", enabled: true },
-  { id: "sc-4", title: "গ্যালারি", iconName: "Image", badge: "ভিডিও ও ছবি", color: "from-purple-600 to-violet-700", target: "gallery", enabled: true },
-  { id: "sc-5", title: "চ্যাটবট / হেল্প", iconName: "MessageSquare", badge: "২৪/৭ এআই", color: "from-cyan-600 to-blue-700", target: "chatbot", enabled: true },
-  { id: "sc-6", title: "এডমিট কার্ড", iconName: "Ticket", badge: "পরীক্ষা", color: "from-rose-600 to-red-700", target: "admit", enabled: true },
-  { id: "sc-7", title: "মাসিক ফি / পেমেন্ট", iconName: "CreditCard", badge: "বাংলা QR", color: "from-green-600 to-emerald-700", target: "fee", enabled: true },
-  { id: "sc-8", title: "ফলাফল ও মার্কশিট", iconName: "BarChart3", badge: "অনলাইন রেজাল্ট", color: "from-indigo-600 to-blue-800", target: "marksheet", enabled: true },
-  { id: "sc-9", title: "সার্টিফিকেট ডাউনলোড", iconName: "Award", badge: "অফিশিয়াল", color: "from-amber-600 to-yellow-600", target: "certificate", enabled: true },
-  { id: "sc-10", title: "ফ্রি নোট ও সাজেশন", iconName: "FileText", badge: "পিডিএফ", color: "from-teal-600 to-cyan-700", target: "notes", enabled: true },
-  { id: "sc-11", title: "ফ্রি ভিডিও ক্লাস", iconName: "PlayCircle", badge: "ডেমো লেকচার", color: "from-red-600 to-rose-700", target: "democlasses", enabled: true },
-  { id: "sc-12", title: "আমাদের শিক্ষক", iconName: "Users", badge: "অভিজ্ঞ মেন্টর", color: "from-sky-600 to-blue-700", target: "mentors", enabled: true },
-  { id: "sc-13", title: "প্রতিষ্ঠাতা ও ম্যানেজমেন্ট", iconName: "Award", badge: "পরিচালনা পরিষদ", color: "from-violet-600 to-purple-800", target: "founder", enabled: true },
-  { id: "sc-14", title: "স্টুডেন্ট আইডি", iconName: "GraduationCap", badge: "আইডি কার্ড", color: "from-blue-700 to-indigo-800", target: "idcard", enabled: true },
+  { id: "sc-1", title: "কোর্সসমূহ", titleEnglish: "Courses", iconName: "BookOpen", badge: "১০টি কোর্স", color: "from-blue-600 to-indigo-700", target: "courses", enabled: true },
+  { id: "sc-2", title: "নোটিস বোর্ড", titleEnglish: "Notice Board", iconName: "Bell", badge: "নতুন নোটিস", color: "from-amber-500 to-orange-600", target: "notice", enabled: true },
+  { id: "sc-3", title: "ক্লাস রুটিন", titleEnglish: "Class Routine", iconName: "Calendar", badge: "লাইভ", color: "from-emerald-600 to-teal-700", target: "routine", enabled: true },
+  { id: "sc-4", title: "গ্যালারি", titleEnglish: "Gallery", iconName: "Image", badge: "ভিডিও ও ছবি", color: "from-purple-600 to-violet-700", target: "gallery", enabled: true },
+  { id: "sc-5", title: "চ্যাটবট / হেল্প", titleEnglish: "Chatbot / Help", iconName: "MessageSquare", badge: "২৪/৭ এআই", color: "from-cyan-600 to-blue-700", target: "chatbot", enabled: true },
+  { id: "sc-6", title: "এডমিট কার্ড", titleEnglish: "Admit Card", iconName: "Ticket", badge: "পরীক্ষা", color: "from-rose-600 to-red-700", target: "admit", enabled: true },
+  { id: "sc-7", title: "মাসিক ফি / পেমেন্ট", titleEnglish: "Monthly Fee / Payment", iconName: "CreditCard", badge: "বাংলা QR", color: "from-green-600 to-emerald-700", target: "fee", enabled: true },
+  { id: "sc-8", title: "ফলাফল ও মার্কশিট", titleEnglish: "Results & Marksheet", iconName: "BarChart3", badge: "অনলাইন রেজাল্ট", color: "from-indigo-600 to-blue-800", target: "marksheet", enabled: true },
+  { id: "sc-9", title: "সার্টিফিকেট ডাউনলোড", titleEnglish: "Download Certificate", iconName: "Award", badge: "অফিশিয়াল", color: "from-amber-600 to-yellow-600", target: "certificate", enabled: true },
+  { id: "sc-10", title: "ফ্রি নোট ও সাজেশন", titleEnglish: "Free Notes & Suggestions", iconName: "FileText", badge: "পিডিএফ", color: "from-teal-600 to-cyan-700", target: "notes", enabled: true },
+  { id: "sc-11", title: "ফ্রি ভিডিও ক্লাস", titleEnglish: "Free Video Classes", iconName: "PlayCircle", badge: "ডেমো লেকচার", color: "from-red-600 to-rose-700", target: "democlasses", enabled: true },
+  { id: "sc-12", title: "আমাদের শিক্ষক", titleEnglish: "Our Teachers", iconName: "Users", badge: "অভিজ্ঞ মেন্টর", color: "from-sky-600 to-blue-700", target: "mentors", enabled: true },
+  { id: "sc-13", title: "প্রতিষ্ঠাতা ও ম্যানেজমেন্ট", titleEnglish: "Founder & Management", iconName: "Award", badge: "পরিচালনা পরিষদ", color: "from-violet-600 to-purple-800", target: "founder", enabled: true },
+  { id: "sc-14", title: "স্টুডেন্ট আইডি", titleEnglish: "Student ID", iconName: "GraduationCap", badge: "আইডি কার্ড", color: "from-blue-700 to-indigo-800", target: "idcard", enabled: true },
 ];
 
 const futureDate = new Date();
@@ -146,6 +162,7 @@ const initialCourses: Course[] = [
   {
     id: "course-quran",
     title: "সহীহ কুরআন শিক্ষা",
+    titleEnglish: "Authentic Quran Education",
     logoUrl: DEFAULT_ASSETS.courseLogos.quran,
     duration: "ধারাবাহিক ব্যাচ",
     description: "সহজ পদ্ধতিতে তাজবীদ সহ সহীহ কুরআন তিলাওয়াত, মাখরাজ ও প্র্যাকটিক্যাল সূরা মুখস্থকরণ।",
@@ -167,6 +184,7 @@ const initialCourses: Course[] = [
   {
     id: "course-ssc-acc",
     title: "এসএসসি হিসাববিজ্ঞান",
+    titleEnglish: "SSC Accounting",
     logoUrl: DEFAULT_ASSETS.courseLogos.accounting,
     duration: "একাডেমিক পূর্ণাঙ্গ সেশন",
     description: "এসএসসি পরীক্ষার্থীদের হিসাববিজ্ঞানের সমস্ত অধ্যায় বেসিক থেকে সৃজনশীল ও নৈর্ব্যক্তিক সমাধান।",
@@ -189,6 +207,7 @@ const initialCourses: Course[] = [
   {
     id: "course-hsc-acc",
     title: "এইচএসসি হিসাববিজ্ঞান",
+    titleEnglish: "HSC Accounting",
     logoUrl: DEFAULT_ASSETS.courseLogos.accounting,
     duration: "এইচএসসি প্রথম ও দ্বিতীয় পত্র",
     description: "এইচএসসি হিসাববিজ্ঞান ১ম ও ২য় পত্রের কাঠিন্য দূর করে জিপিএ-৫ নিশ্চিতকরণ বিশেষ প্রোগ্রাম।",
@@ -211,6 +230,7 @@ const initialCourses: Course[] = [
   {
     id: "course-class8-10-eng",
     title: "অষ্টম থেকে দশম শ্রেণি ইংরেজি",
+    titleEnglish: "English for Grades 8–10",
     logoUrl: DEFAULT_ASSETS.courseLogos.english,
     duration: "ফুল একাডেমি সেশন",
     description: "ইংলিশ গ্রামার, রাইটিং এবং টেক্সটবুকের সমন্বয়ে দুর্বলতা দূরীকরণ ও বেসিক স্ট্রং করার কোর্স।",
@@ -233,6 +253,7 @@ const initialCourses: Course[] = [
   {
     id: "course-class8-10-math",
     title: "অষ্টম থেকে দশম শ্রেণি গণিত",
+    titleEnglish: "Mathematics for Grades 8–10",
     logoUrl: DEFAULT_ASSETS.courseLogos.math,
     duration: "ফুল একাডেমিক সেশন",
     description: "গণিতের ভয় দূর করে প্রতিটি সূত্রের ব্যবহার ও জ্যামিতি-বীজগণিত-ত্রিকোণমিতিতে পূর্ণাঙ্গ দক্ষতা।",
@@ -255,6 +276,7 @@ const initialCourses: Course[] = [
   {
     id: "course-math-eng-combo",
     title: "কম্বাইন অফার (গণিত + ইংরেজি একসাথে)",
+    titleEnglish: "Combined Offer (Mathematics + English)",
     logoUrl: DEFAULT_ASSETS.courseLogos.general,
     duration: "সমন্বিত কম্বো কোর্স",
     description: "অষ্টম থেকে দশম শ্রেণির গণিত এবং ইংরেজি একসাথে সেরা ছাড়ে পড়ার সুবর্ণ সুযোগ।",
@@ -275,6 +297,7 @@ const initialCourses: Course[] = [
   {
     id: "course-class1-7-all",
     title: "প্রথম থেকে সপ্তম শ্রেণির সকল বিষয়",
+    titleEnglish: "All Subjects for Grades 1–7",
     logoUrl: DEFAULT_ASSETS.courseLogos.general,
     duration: "বছরব্যাপী ব্যাচ",
     description: "ছোট সোনামণিদের জন্য প্রতিটি বিষয়ের হাতেখড়ি, বাড়ির কাজ তদারকি ও নিয়মিত পরীক্ষা।",
@@ -295,6 +318,7 @@ const initialCourses: Course[] = [
   {
     id: "course-computer-office",
     title: "কম্পিউটার অফিস অ্যাপ্লিকেশন (৬ মাস মেয়াদি)",
+    titleEnglish: "Computer Office Applications (6-Month Course)",
     logoUrl: DEFAULT_ASSETS.courseLogos.computer,
     duration: "৬ মাস (সরকারি মান)",
     description: "MS Word, Excel, PowerPoint, Access, Internet ও টাইপিংয়ে শতভাগ প্র্যাকটিক্যাল ট্রেনিং।",
@@ -319,6 +343,7 @@ const initialCourses: Course[] = [
   {
     id: "course-spoken-english",
     title: "Spoken English (৪ মাস মেয়াদি)",
+    titleEnglish: "Spoken English (4-Month Course)",
     logoUrl: DEFAULT_ASSETS.courseLogos.english,
     duration: "৪ মাস",
     description: "সহজ ভাষায় ফ্লুয়েন্ট স্পোকেন ইংলিশ, ব্রিটিশ প্রোনাউন্সিয়েশন এবং পাবলিক স্পিকিং প্র্যাকটিস।",
@@ -340,6 +365,7 @@ const initialCourses: Course[] = [
   {
     id: "course-basic-bangla-math-eng",
     title: "বাংলা, গণিত, ইংরেজি বেসিক কোর্স (৩ মাস মেয়াদি)",
+    titleEnglish: "Bangla, Mathematics & English Basics (3-Month Course)",
     logoUrl: DEFAULT_ASSETS.courseLogos.general,
     duration: "৩ মাস মেয়াদি ফাউন্ডেশন",
     description: "যেকোনো বয়সের শিক্ষার্থীদের জন্য বাংলা উচ্চারণ-বানান, গণিতের নামতা-হিসাব ও ইংরেজির প্রাথমিক ভিত গড়ার কোর্স।",
