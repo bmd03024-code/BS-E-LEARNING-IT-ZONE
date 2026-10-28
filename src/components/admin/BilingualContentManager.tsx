@@ -153,7 +153,7 @@ const AUTO_TRANSLATIONS: Record<string, string> = {
 };
 
 function translateValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(item => typeof item === 'string' ? (AUTO_TRANSLATIONS[item] || '') : '');
+  if (Array.isArray(value)) { const translated = value.map(item => typeof item === 'string' ? (AUTO_TRANSLATIONS[item] || '') : ''); return translated.every(Boolean) ? translated : []; }
   return typeof value === 'string' ? (AUTO_TRANSLATIONS[value] || '') : '';
 }
 
