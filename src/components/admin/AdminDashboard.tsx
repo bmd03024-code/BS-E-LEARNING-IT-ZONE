@@ -949,6 +949,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => updateSlideHelper(slide.id, { title: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold"
                 />
+                  <input type="text" value={slide.titleEnglish || ''} onChange={(e) => { updateSlideHelper(slide.id, { titleEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for slide.title" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -960,6 +961,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     onChange={(e) => updateSlideHelper(slide.id, { ctaText: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-blue-900"
                   />
+                  <input type="text" value={slide.ctaTextEnglish || ''} onChange={(e) => { updateSlideHelper(slide.id, { ctaTextEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for slide.ctaText" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">বাটন অ্যাকশন</label>
@@ -986,6 +988,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => updateSlideHelper(slide.id, { subText: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs leading-relaxed"
                 />
+                  <input type="text" value={slide.subTextEnglish || ''} onChange={(e) => { updateSlideHelper(slide.id, { subTextEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for slide.subText" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
             </div>
           </div>
@@ -1083,6 +1086,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     }}
                     className="font-bold text-xs sm:text-sm text-slate-900 border rounded-lg px-2.5 py-1 w-full"
                   />
+                  <input type="text" value={m.nameEnglish || ''} onChange={(e) => { setMentors(mentors.map(item => item.id === m.id ? { ...item, nameEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for m.name" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
@@ -1096,6 +1100,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       }}
                       className="text-xs font-semibold text-blue-900 border rounded-lg px-2 py-1 w-full"
                     />
+                  <input type="text" value={m.designationEnglish || ''} onChange={(e) => { setMentors(mentors.map(item => item.id === m.id ? { ...item, designationEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for m.designation" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-slate-500">অভিজ্ঞতা:</label>
@@ -3038,6 +3043,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     }}
                     className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-semibold"
                   />
+                  <input type="text" value={c.durationEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, durationEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for c.duration" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-slate-600 mb-1">ক্যাটাগরি</label>
@@ -3050,6 +3056,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     }}
                     className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-semibold"
                   />
+                  <input type="text" value={c.categoryEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, categoryEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for c.category" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 </div>
                 <div className="sm:col-span-3">
                   <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্সের বিস্তারিত বর্ণনা (Description)</label>
@@ -3062,6 +3069,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     }}
                     className="w-full px-3 py-1.5 border rounded-lg text-xs leading-relaxed"
                   />
+                  <input type="text" value={c.descriptionEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, descriptionEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for c.description" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 </div>
               </div>
 
@@ -3321,6 +3329,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 onChange={(e) => setRoutines(routines.map(item => item.id === r.id ? { ...item, day: e.target.value } : item))}
                 className="border rounded-lg px-2 py-1 text-xs font-bold"
               />
+                  <input type="text" value={r.dayEnglish || ''} onChange={(e) => { setRoutines(routines.map(item => item.id === r.id ? { ...item, dayEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for r.day" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               <input
                 type="text"
                 value={r.time}
@@ -3333,12 +3342,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 onChange={(e) => setRoutines(routines.map(item => item.id === r.id ? { ...item, subject: e.target.value } : item))}
                 className="border rounded-lg px-2 py-1 text-xs font-bold text-blue-900"
               />
+                  <input type="text" value={r.subjectEnglish || ''} onChange={(e) => { setRoutines(routines.map(item => item.id === r.id ? { ...item, subjectEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for r.subject" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               <input
                 type="text"
                 value={r.teacherName}
                 onChange={(e) => setRoutines(routines.map(item => item.id === r.id ? { ...item, teacherName: e.target.value } : item))}
                 className="border rounded-lg px-2 py-1 text-xs"
               />
+                  <input type="text" value={r.teacherNameEnglish || ''} onChange={(e) => { setRoutines(routines.map(item => item.id === r.id ? { ...item, teacherNameEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for r.teacherName" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
             </div>
             <button
               onClick={() => setRoutines(routines.filter(item => item.id !== r.id))}
@@ -3712,6 +3723,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setNotices(notices.map(item => item.id === n.id ? { ...item, title: e.target.value } : item))}
                   className="w-full px-2.5 py-1.5 rounded-lg border text-xs font-bold text-slate-900 bg-white mr-3"
                 />
+                  <input type="text" value={n.titleEnglish || ''} onChange={(e) => { setNotices(notices.map(item => item.id === n.id ? { ...item, titleEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for n.title" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 <button
                   onClick={() => {
                     if (confirm(`"${n.title}" নোটিশটি মুছে ফেলতে চান?`)) {
@@ -3733,6 +3745,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 onChange={(e) => setNotices(notices.map(item => item.id === n.id ? { ...item, content: e.target.value } : item))}
                 className="w-full px-2.5 py-1.5 rounded-lg border text-xs leading-relaxed bg-white"
               />
+                  <input type="text" value={n.contentEnglish || ''} onChange={(e) => { setNotices(notices.map(item => item.id === n.id ? { ...item, contentEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for n.content" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                 {/* Notice Image input */}
