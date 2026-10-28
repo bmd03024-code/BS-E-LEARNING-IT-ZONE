@@ -217,8 +217,8 @@ const AUTO_TRANSLATIONS: Record<string, string> = {
 };
 
 function translateValue(value: unknown): unknown {
-  if (Array.isArray(value)) { const translated = value.map(item => typeof item === 'string' ? (AUTO_TRANSLATIONS[item] || '') : ''); return translated.every(Boolean) ? translated : []; }
-  return typeof value === 'string' ? (AUTO_TRANSLATIONS[value] || '') : '';
+  if (Array.isArray(value)) { const translated = value.map(item => typeof item === 'string' ? (AUTO_TRANSLATIONS[item] || (/^[A-Za-z0-9\s&.,()+:/-]+$/.test(item) ? item : '')) : ''); return translated.every(Boolean) ? translated : []; }
+  return typeof value === 'string' ? (AUTO_TRANSLATIONS[value] || (/^[A-Za-z0-9\s&.,()+:/-]+$/.test(value) ? value : '')) : '';
 }
 
 export const BilingualContentManager: React.FC<BilingualContentManagerProps> = ({ sections, onSave }) => {
