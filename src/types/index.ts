@@ -1,15 +1,19 @@
 export interface InstituteSettings {
   name: string;
   subName: string;
+  subNameEnglish?: string;
   logoUrl?: string;
   headerTextSize?: 'normal' | 'large' | 'extra-large';
   phone: string;
   hotline: string;
   email: string;
   address: string;
+  addressEnglish?: string;
   founderName: string;
   founderTitle: string;
+  founderTitleEnglish?: string;
   founderSpeech: string;
+  founderSpeechEnglish?: string;
   founderPhotoUrl: string;
   signatureUrl: string;
   signatureSealUrl: string;
@@ -17,6 +21,7 @@ export interface InstituteSettings {
   primaryColor: string;
   secondaryColor: string;
   welcomeText: string;
+  welcomeTextEnglish?: string;
   facebookUrl: string;
   youtubeUrl: string;
   tiktokUrl: string;
@@ -26,14 +31,17 @@ export interface InstituteSettings {
   // Bangla QR Payment System
   banglaQrUrl: string;
   banglaQrHeading: string;
+  banglaQrHeadingEnglish?: string;
   // Direct MFS Payment Numbers
   bkashNumber?: string;
   nagadNumber?: string;
   rocketNumber?: string;
   // Footer Customizations
   footerText?: string;
+  footerTextEnglish?: string;
   footerCopyright?: string;
   footerNotice?: string;
+  footerNoticeEnglish?: string;
   // GitHub Single Source of Truth & Vercel Auto-Deployment
   githubRepo?: string;
   githubBranch?: string;
@@ -46,9 +54,12 @@ export interface InstituteSettings {
 export interface HeroSlide {
   id: string;
   title: string;
+  titleEnglish?: string;
   subText: string;
+  subTextEnglish?: string;
   image: string;
   ctaText: string;
+  ctaTextEnglish?: string;
   ctaAction: string;
   active: boolean;
 }
@@ -56,6 +67,7 @@ export interface HeroSlide {
 export interface ShortcutItem {
   id: string;
   title: string;
+  titleEnglish?: string;
   iconName: string;
   badge?: string;
   color: string;
