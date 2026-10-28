@@ -141,6 +141,7 @@ export interface Student {
   motherNameEnglish?: string;
   phone: string;
   address?: string;
+  addressEnglish?: string;
   trxId: string;
   enrollmentDate: string;
   photoUrl?: string;
@@ -182,6 +183,7 @@ export interface PaymentRecord {
   academicYear: string;
   courseId: string;
   studentName?: string;
+  studentNameEnglish?: string;
   amount: number;
   trxId: string;
   paymentType: 'admission' | 'monthly' | 'certificate';
@@ -201,6 +203,7 @@ export interface RoutineItem {
   teacherName: string;
   room: string;
   dayEnglish?: string;
+  timeEnglish?: string;
   subjectEnglish?: string;
   teacherNameEnglish?: string;
   roomEnglish?: string;
