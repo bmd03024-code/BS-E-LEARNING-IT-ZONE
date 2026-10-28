@@ -530,13 +530,13 @@ const AUTO_TRANSLATIONS: Record<string, string> = {
 };
 
 function translateOne(value: string): string {
-  if (/^[A-Za-z0-9\\s&.,()+:/-]+$/.test(value)) return value;
+  if (/^[A-Za-z0-9\s&.,()+:/-]+$/.test(value)) return value;
   let translated = value;
   Object.keys(AUTO_TRANSLATIONS).sort((a, b) => b.length - a.length).forEach(source => {
     if (source && translated.includes(source)) translated = translated.split(source).join(AUTO_TRANSLATIONS[source]);
   });
   // Do not pretend a partial translation is complete. Leave unknown Bengali text for review.
-  return /[\\u0980-\\u09FF]/.test(translated) ? '' : translated.trim();
+  return /[\u0980-\u09FF]/.test(translated) ? '' : translated.trim();
 }
 
 function translateValue(value: unknown): unknown {
