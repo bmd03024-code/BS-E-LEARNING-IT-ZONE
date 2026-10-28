@@ -640,7 +640,7 @@ export default function App() {
         hotline={settings.hotline}
         logoUrl={settings.logoUrl}
         headerTextSize={settings.headerTextSize}
-        settings={settings}
+        settings={displaySettings}
         language={language}
         onLanguageChange={setLanguage}
       />
