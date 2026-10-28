@@ -65,6 +65,7 @@ const initialSettings: InstituteSettings = {
   founderTitle: "প্রতিষ্ঠাতা ও প্রধান শিক্ষক",
   founderTitleEnglish: "Founder and Head Teacher",
   founderSpeech: "আসসালামু আলাইকুম। প্রিয় শিক্ষার্থী ও অভিভাবকবৃন্দ, আধুনিক বিশ্বের চ্যালেঞ্জ মোকাবেলায় গুণগত শিক্ষা এবং প্র্যাকটিক্যাল আইটি দক্ষতার কোনো বিকল্প নেই। BS E-Learning & IT Zone-এ আমরা প্রতিটি শিক্ষার্থীকে পরম স্নেহে ও নিখুঁত পাঠদান কৌশলে বেসিক থেকে অ্যাডভান্সড লেভেল পর্যন্ত তৈরি করি। সহীহ কুরআন শিক্ষা থেকে শুরু করে মাধ্যমিক-উচ্চমাধ্যমিক অ্যাকাউন্টিং, গণিত, ইংরেজি এবং সরকারি মানসম্পন্ন কম্পিউটার অফিস অ্যাপ্লিকেশন—আমাদের প্রতিটি কোর্সে রয়েছে শতভাগ সাফল্যের নিশ্চয়তা। সততা, নৈতিকতা ও আধুনিক প্রযুক্তির সমন্বয়ে প্রতিটি শিক্ষার্থীর ভবিষ্যৎ উজ্জ্বল করাই আমাদের মূল লক্ষ্য।",
+  founderSpeechEnglish: "Assalamu Alaikum. Dear students and guardians, quality education and practical IT skills are essential to meeting the challenges of the modern world. At BS E-Learning & IT Zone, we guide every learner from basic to advanced levels with care and effective teaching methods. Our courses range from authentic Quran education to secondary and higher-secondary accounting, mathematics, English, and government-standard computer office applications. Our goal is to brighten every learner’s future through honesty, ethics, and modern technology.",
   founderPhotoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80",
   signatureUrl: DEFAULT_ASSETS.signature,
   signatureSealUrl: DEFAULT_ASSETS.signatureSeal,
