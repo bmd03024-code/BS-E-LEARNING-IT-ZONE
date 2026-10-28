@@ -4364,11 +4364,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   // Self-Learning Q&A Pairs (Teacher-Verified Dynamic Learning)
   const [qaList, setQaList] = useState<QAItem[]>(aiKnowledgeStore.getKnowledgeBase());
   const [newQAQuestion, setNewQAQuestion] = useState('');
+  const [newQAQuestionEnglish, setNewQAQuestionEnglish] = useState('');
+  const [newQAAnswerEnglish, setNewQAAnswerEnglish] = useState('');
   const [newQAAnswer, setNewQAAnswer] = useState('');
   const [newQATeacher, setNewQATeacher] = useState('বোরহানউদ্দিন মহিম');
 
   // New Info Block Form State
   const [newBlockTitle, setNewBlockTitle] = useState('');
+  const [newBlockTitleEnglish, setNewBlockTitleEnglish] = useState('');
+  const [newBlockContentEnglish, setNewBlockContentEnglish] = useState('');
   const [newBlockCategory, setNewBlockCategory] = useState('কোর্স তথ্য');
   const [newBlockContent, setNewBlockContent] = useState('');
   const [newBlockKeywords, setNewBlockKeywords] = useState('');
@@ -4531,8 +4535,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     const newBlock: ChatbotInfoBlock = {
       id: `block-${Date.now()}`,
       title: newBlockTitle.trim(),
+      titleEnglish: newBlockTitleEnglish.trim(),
       category: newBlockCategory.trim() || 'সাধারণ',
       content: newBlockContent.trim(),
+      contentEnglish: newBlockContentEnglish.trim(),
       keywords: newBlockKeywords.split(',').map(k => k.trim()).filter(Boolean),
       isActive: true,
       updatedAt: new Date().toLocaleDateString('bn-BD')
@@ -5127,6 +5133,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     onChange={(e) => setNewQAQuestion(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-emerald-600 focus:outline-hidden"
                   />
+<input type="text" value={newQAQuestionEnglish} onChange={(e) => setNewQAQuestionEnglish(e.target.value)} placeholder="Student question in English" aria-label="English student question" className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-xs sm:text-sm" />
                 </div>
 
                 <div>
@@ -5159,6 +5166,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setNewQAAnswer(e.target.value)}
                   className="w-full p-3.5 rounded-xl border border-slate-300 text-xs sm:text-sm leading-relaxed focus:ring-2 focus:ring-emerald-600 focus:outline-hidden"
                 />
+<textarea rows={4} value={newQAAnswerEnglish} onChange={(e) => setNewQAAnswerEnglish(e.target.value)} placeholder="Teacher's verified answer in English" aria-label="English teacher answer" className="mt-1 w-full p-3.5 rounded-xl border border-blue-200 bg-blue-50 text-xs sm:text-sm leading-relaxed" />
               </div>
 
               <div className="flex justify-end pt-1">
@@ -5255,6 +5263,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     onChange={(e) => setNewBlockTitle(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                   />
+<input type="text" value={newBlockTitleEnglish} onChange={(e) => setNewBlockTitleEnglish(e.target.value)} placeholder="Enter topic title in English" aria-label="English info block title" className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-xs sm:text-sm" />
                 </div>
 
                 <div>
@@ -5289,6 +5298,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setNewBlockContent(e.target.value)}
                   className="w-full p-3.5 rounded-xl border border-slate-300 text-xs sm:text-sm leading-relaxed focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                 />
+<textarea rows={4} value={newBlockContentEnglish} onChange={(e) => setNewBlockContentEnglish(e.target.value)} placeholder="Enter full information in English" aria-label="English info block content" className="mt-1 w-full p-3.5 rounded-xl border border-blue-200 bg-blue-50 text-xs sm:text-sm leading-relaxed" />
               </div>
 
               <div>
