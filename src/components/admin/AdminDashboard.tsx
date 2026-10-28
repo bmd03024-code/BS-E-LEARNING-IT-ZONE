@@ -5394,6 +5394,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       onChange={(e) => handleUpdateInfoBlock(block.id, { content: e.target.value })}
                       className="w-full p-2.5 rounded-xl border border-slate-200 text-xs leading-relaxed font-sans bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600"
                     />
+                <textarea rows={4} value={block.contentEnglish || ''} onChange={(e) => handleUpdateInfoBlock(block.id, { contentEnglish: e.target.value })} placeholder="English translation..." aria-label="English block.content" className="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-slate-900" />
 
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100 text-[11px] text-slate-500">
                       <div className="truncate max-w-[220px]">
