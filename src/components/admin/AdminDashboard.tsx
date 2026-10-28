@@ -82,6 +82,7 @@ import { masterGateway, GatewayStatus } from '../../services/masterGateway';
 import { toBengaliNum } from '../home/CoursesSection';
 import { ResultGeneratorModule } from './ResultGeneratorModule';
 import { GitHubSyncModal } from './GitHubSyncModal';
+import { BilingualContentManager } from './BilingualContentManager';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -290,6 +291,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     { id: 15, title: 'চ্যাটবট ও নলেজবেস কন্ট্রোল (৫,০০,০০০ শব্দ)', desc: 'ওয়েবসাইটের চ্যাটবক্স এডিট, বিশালাকার নলেজবেস (৫,০০,০০০ শব্দ পর্যন্ত), ১,০০০ শব্দের একাধিক ট্রেনিং বক্স যুক্ত ও এডিট করা, ক্যালকুলেটর ও ডিকশনারি কন্ট্রোল', icon: Bot, color: 'from-blue-600 via-indigo-600 to-purple-700' },
     { id: 16, title: 'ফলাফল ও মার্কশিট জেনারেটর', desc: 'শিক্ষাবর্ষ, কোর্স ও রোল অনুযায়ী শিক্ষার্থীর অটো ডাটা লোড, বিষয়ভিত্তিক নম্বর এন্ট্রি, অটো জিপিএ ক্যালকুলেশন ও এক ক্লিকে পাবলিশ কন্ট্রোল', icon: BarChart3, color: 'from-emerald-600 via-teal-600 to-cyan-700' },
     { id: 17, title: 'GitHub অটো পুশ ও লাইভ Vercel সিঙ্ক', desc: 'GitHub Personal Access Token দিয়ে মূল রিপোজিটরি (BS-E-LEARNING-IT-ZONE)-তে ডাটা অটো-পুশ ও Vercel লাইভ সিঙ্ক কন্ট্রোল', icon: Github, color: 'from-slate-900 via-purple-950 to-blue-950' },
+    { id: 18, title: 'সব সেকশনে বাংলা + English কনটেন্ট', desc: 'প্রতিষ্ঠানের তথ্য, কোর্স, শিক্ষক, শিক্ষার্থী, নোটিশ, রুটিন, ফলাফলসহ সব কনটেন্টের বাংলা ও ইংরেজি পাশাপাশি সম্পাদনা', icon: Globe, color: 'from-cyan-600 via-blue-700 to-indigo-800' },
   ];
 
   /* ---------------- MODULE 1: GENERAL SETTINGS, LOGO, FOOTER & SEALS ---------------- */
@@ -6195,6 +6197,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             {activeModule === 15 && renderModule15()}
             {activeModule === 16 && renderModule16()}
             {activeModule === 17 && renderModule17()}
+            {activeModule === 18 && (
+              <BilingualContentManager
+                onSave={handleSaveAll}
+                sections={[
+                  { id: 'settings', label: 'প্রতিষ্ঠানের তথ্য / Institute settings', items: [settings] as any[], onChange: items => setSettings(items[0] as InstituteSettings) },
+                  { id: 'slides', label: 'হোম স্লাইডার / Hero slides', items: slides as any[], onChange: items => setSlides(items as HeroSlide[]) },
+                  { id: 'shortcuts', label: 'শর্টকাট / Quick links', items: shortcuts as any[], onChange: items => setShortcuts(items as ShortcutItem[]) },
+                  { id: 'courses', label: 'কোর্স / Courses', items: courses as any[], onChange: items => setCourses(items as Course[]) },
+                  { id: 'mentors', label: 'শিক্ষক / Mentors', items: mentors as any[], onChange: items => setMentors(items as Mentor[]) },
+                  { id: 'students', label: 'শিক্ষার্থী / Students', items: students as any[], onChange: items => setStudents(items as Student[]) },
+                  { id: 'applications', label: 'ভর্তি আবেদন / Applications', items: applications as any[], onChange: items => setApplications(items as EnrollmentApplication[]) },
+                  { id: 'routines', label: 'ক্লাস রুটিন / Routines', items: routines as any[], onChange: items => setRoutines(items as RoutineItem[]) },
+                  { id: 'results', label: 'ফলাফল / Results', items: results as any[], onChange: items => setResults(items as ResultRecord[]) },
+                  { id: 'admitCards', label: 'এডমিট কার্ড / Admit cards', items: admitCards as any[], onChange: items => setAdmitCards(items as AdmitCardRecord[]) },
+                  { id: 'certificates', label: 'সার্টিফিকেট / Certificates', items: certificates as any[], onChange: items => setCertificates(items as CertificateRecord[]) },
+                  { id: 'ledger', label: 'আয়-ব্যয় / Ledger', items: ledger as any[], onChange: items => setLedger(items as LedgerItem[]) },
+                  { id: 'notices', label: 'নোটিশ / Notices', items: notices as any[], onChange: items => setNotices(items as NoticeItem[]) },
+                  { id: 'gallery', label: 'গ্যালারি / Gallery', items: gallery as any[], onChange: items => setGallery(items as GalleryItem[]) },
+                  { id: 'notes', label: 'ফ্রি নোটস / Study notes', items: notes as any[], onChange: items => setNotes(items as FreeNoteItem[]) },
+                  { id: 'demoClasses', label: 'ডেমো ক্লাস / Demo classes', items: demoClasses as any[], onChange: items => setDemoClasses(items as DemoClassItem[]) },
+                  { id: 'chatbot', label: 'চ্যাটবট / Chatbot settings', items: [chatbot] as any[], onChange: items => setChatbot(items[0] as ChatbotSettings) },
+                  { id: 'chatbotInfo', label: 'চ্যাটবট নলেজ ব্লক / Knowledge blocks', items: (chatbot.infoBlocks || []) as any[], onChange: items => setChatbot(prev => ({ ...prev, infoBlocks: items as ChatbotInfoBlock[] })) },
+                  { id: 'chatbotFaqs', label: 'চ্যাটবট FAQ / FAQs', items: (chatbot.faqs || []) as any[], onChange: items => setChatbot(prev => ({ ...prev, faqs: items as any })) },
+                ]}
+              />
+            )}
           </div>
         )}
       </main>
