@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 type ContentRecord = Record<string, any>;
 
@@ -94,11 +94,99 @@ function toText(value: unknown): string {
   return Array.isArray(value) ? value.join(', ') : typeof value === 'string' ? value : '';
 }
 
+const AUTO_TRANSLATIONS: Record<string, string> = {
+  'দক্ষতা ও সাফল্যের সেরা ডিজিটাল একাডেমি': 'A Digital Academy for Skills and Success',
+  'বাগানবাড়ি রোড, উত্তরা / মিরপুর শাখা, ঢাকা-১২৩০, বাংলাদেশ': 'Baganbari Road, Uttara / Mirpur Branch, Dhaka-1230, Bangladesh',
+  'প্রতিষ্ঠাতা ও প্রধান শিক্ষক': 'Founder and Head Teacher',
+  'BS E-Learning & IT Zone-এ আপনাকে স্বাগতম! দেশসেরা অনলাইন ও অফলাইন শিখন প্ল্যাটফর্ম।': 'Welcome to BS E-Learning & IT Zone! A leading online and offline learning platform.',
+  'বিকাশ, নগদ বা যেকোনো ব্যাংকিং অ্যাপের মাধ্যমে এই বাংলা কিউআর (Bangla QR) কোড স্ক্যান করে পেমেন্ট করুন': 'Scan this Bangla QR code using bKash, Nagad, or any banking app to make a payment.',
+  'BS E-Learning & IT Zone — আধুনিক একাডেমিক শিক্ষা ও প্র্যাকটিক্যাল আইটি স্কিল অর্জনের বিশ্বস্ত প্রতিষ্ঠান। অভিজ্ঞ শিক্ষক মণ্ডলী এবং ডিজিটাল ল্যাব সাপোর্ট।': 'BS E-Learning & IT Zone is a trusted institution for modern academic education and practical IT skills, supported by experienced teachers and digital lab facilities.',
+  'ভর্তি ও পরীক্ষার সকল কার্যক্রম সরাসরি প্রধান শিক্ষক কর্তৃক অনুমোদিত।': 'All admission and examination activities are approved directly by the Head Teacher.',
+  'BS E-Learning & IT Zone এ স্বাগতম': 'Welcome to BS E-Learning & IT Zone',
+  'অভিজ্ঞ শিক্ষক মণ্ডলীর তত্ত্বাবধানে বেসিক টু অ্যাডভান্সড একাডেমিক ও স্কিল ডেভেলপমেন্ট কোর্স। গড়ে তুলুন আপনার সফল ভবিষ্যৎ।': 'Basic-to-advanced academic and skill development courses guided by experienced teachers. Build a successful future.',
+  'কোর্সসমূহ দেখুন': 'Explore Courses',
+  'কম্পিউটার অফিস অ্যাপ্লিকেশন কোর্স (৬ মাস)': 'Computer Office Applications Course (6 Months)',
+  'প্র্যাকটিক্যাল ল্যাব ও অনলাইন সাপোর্টে সরকারি সার্টিফিকেট অর্জনের অনন্য সুযোগ! সীমিত আসনে স্পেশাল অফার মূল্যে ভর্তি চলছে।': 'A unique opportunity to earn a government certificate with practical lab training and online support. Limited seats are available at a special offer price.',
+  'এখনই এনরোল করুন': 'Enroll Now',
+  'সহীহ কুরআন ও স্পোকেন ইংলিশ স্পেশাল ব্যাচ': 'Authentic Quran and Spoken English Special Batch',
+  'সহজ ও প্রাঞ্জল পদ্ধতিতে তাজবীদ সহ কুরআন তিলাওয়াত এবং ফ্লুয়েন্ট স্পোকেন ইংলিশ দক্ষতা অর্জন করুন ঘরে বসেই।': 'Learn Quran recitation with Tajweed and develop fluent spoken English from home through a simple, clear approach.',
+  'মাসিক ফি ও রুটিন': 'Monthly Fees & Routine',
+  'কোর্সসমূহ': 'Courses', 'নোটিস বোর্ড': 'Notice Board', 'ক্লাস রুটিন': 'Class Routine',
+  'গ্যালারি': 'Gallery', 'চ্যাটবট / হেল্প': 'Chatbot / Help', 'এডমিট কার্ড': 'Admit Card',
+  'মাসিক ফি / পেমেন্ট': 'Monthly Fee / Payment', 'ফলাফল ও মার্কশিট': 'Results & Marksheet',
+  'সার্টিফিকেট ডাউনলোড': 'Download Certificate', 'ফ্রি নোট ও সাজেশন': 'Free Notes & Suggestions',
+  'ফ্রি ভিডিও ক্লাস': 'Free Video Classes', 'আমাদের শিক্ষক': 'Our Teachers',
+  'প্রতিষ্ঠাতা ও ম্যানেজমেন্ট': 'Founder & Management', 'স্টুডেন্ট আইডি': 'Student ID',
+  'সহীহ কুরআন শিক্ষা': 'Authentic Quran Education', 'এসএসসি হিসাববিজ্ঞান': 'SSC Accounting',
+  'এইচএসসি হিসাববিজ্ঞান': 'HSC Accounting', 'অষ্টম থেকে দশম শ্রেণি ইংরেজি': 'English for Grades 8–10',
+  'অষ্টম থেকে দশম শ্রেণি গণিত': 'Mathematics for Grades 8–10',
+  'কম্বাইন অফার (গণিত + ইংরেজি একসাথে)': 'Combined Offer (Mathematics + English)',
+  'প্রথম থেকে সপ্তম শ্রেণির সকল বিষয়': 'All Subjects for Grades 1–7',
+  'কম্পিউটার অফিস অ্যাপ্লিকেশন (৬ মাস মেয়াদি)': 'Computer Office Applications (6-Month Course)',
+  'Spoken English (৪ মাস মেয়াদি)': 'Spoken English (4-Month Course)',
+  'বাংলা, গণিত, ইংরেজি বেসিক কোর্স (৩ মাস মেয়াদি)': 'Bangla, Mathematics & English Basics (3-Month Course)',
+  'ধারাবাহিক ব্যাচ': 'Ongoing Batch', 'ধর্মীয় ও নৈতিক শিক্ষা': 'Religious and Moral Education',
+  'একাডেমিক পূর্ণাঙ্গ সেশন': 'Full Academic Session', 'একাডেমিক কোর্স': 'Academic Course',
+  'ফুল একাডেমি সেশন': 'Full Academic Session', 'ফুল একাডেমিক সেশন': 'Full Academic Session',
+  'সমন্বিত কম্বো কোর্স': 'Combined Course Package', 'স্পেশাল কম্বো অফার': 'Special Combo Offer',
+  'বছরব্যাপী ব্যাচ': 'Year-Round Batch', 'প্রাথমিক ও জুনিয়র': 'Primary and Junior',
+  '৬ মাস (সরকারি মান)': '6 Months (Government Standard)', '৪ মাস': '4 Months',
+  'ভাষা ও যোগাযোগ': 'Language and Communication', 'ফাউন্ডেশন কোর্স': 'Foundation Course',
+  'হরফ ও মাখরাজ': 'Arabic Letters and Makharij', 'তাজবীদ রুলস': 'Tajweed Rules',
+  'মাদ্দ ও গুন্নাহ': 'Madd and Ghunnah', 'সূরা হিফজ ও তিলাওয়াত': 'Surah Memorization and Recitation',
+  'মাখরাজ মূল্যায়ন': 'Makharij Assessment', 'তাজবীদ টেস্ট': 'Tajweed Test',
+  'চূড়ান্ত তিলাওয়াত পরীক্ষা': 'Final Recitation Exam', 'লেনদেন ও হিসাব সমীকরণ': 'Transactions and Accounting Equation',
+  'জাবেদা ও খতিয়ান': 'Journal and Ledger', 'রেওয়ামিল': 'Trial Balance',
+  'আর্থিক বিবরণী': 'Financial Statements', 'হিসাববিজ্ঞান ১ম পত্র': 'Accounting Paper I',
+  'অংশীদারি কারবার': 'Partnership Business', 'কোম্পানির মূলধন': 'Company Capital',
+  'উৎপাদন ব্যয় হিসাব': 'Manufacturing Cost Accounting', 'বীজগণিতীয় রাশি': 'Algebraic Expressions',
+  'জ্যামিতি ও সম্পাদ্য': 'Geometry and Constructions', 'ত্রিকোণমিতি ও পরিমিতি': 'Trigonometry and Mensuration',
+  'পরিসংখ্যান': 'Statistics', 'বাংলা ও বানান': 'Bangla and Spelling',
+  'প্রাথমিক গণিত': 'Elementary Mathematics', 'ইংরেজি রিডিং ও রাইটিং': 'English Reading and Writing',
+  'সাধারণ বিজ্ঞান': 'General Science', 'শুদ্ধ বাংলা উচ্চারণ ও বর্ণমালা': 'Correct Bangla Pronunciation and Alphabet',
+  'সহজ গণিত ও নামতা': 'Basic Mathematics and Multiplication Tables',
+  'ইংরেজি বেসিক শব্দ ও বাক্য': 'Basic English Words and Sentences',
+  'প্রতিষ্ঠাতা ও প্রধান শিক্ষক': 'Founder and Head Teacher',
+  'সিনিয়র ইংলিশ ফ্যাকাল্টি': 'Senior English Faculty',
+  'আইসিটি ও কম্পিউটার ট্রেইনার': 'ICT and Computer Trainer',
+  'গণিত ও প্রাইমারি বিভাগীয় প্রধান': 'Head of Mathematics and Primary Division'
+};
+
+function translateValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(item => typeof item === 'string' ? (AUTO_TRANSLATIONS[item] || '') : '');
+  return typeof value === 'string' ? (AUTO_TRANSLATIONS[value] || '') : '';
+}
+
 export const BilingualContentManager: React.FC<BilingualContentManagerProps> = ({ sections, onSave }) => {
   const [activeSectionId, setActiveSectionId] = useState(sections[0]?.id || 'settings');
   const [activeItemIndex, setActiveItemIndex] = useState(0);
   const activeSection = sections.find(section => section.id === activeSectionId) || sections[0];
   const activeItem = activeSection?.items?.[activeItemIndex] || activeSection?.items?.[0];
+
+  // Migrate known legacy Bangla defaults to English fields the first time this panel opens.
+  useEffect(() => {
+    sections.forEach(section => {
+      let changed = false;
+      const migrated = section.items.map(item => {
+        const next = { ...item };
+        Object.entries(item).forEach(([field, value]) => {
+          if (!isEditableTextField(field, value)) return;
+          const targetKey = englishKey(section.id, field);
+          if (next[targetKey] !== undefined && next[targetKey] !== '') return;
+          const translated = translateValue(value);
+          if (Array.isArray(translated) && translated.some(Boolean)) {
+            next[targetKey] = translated;
+            changed = true;
+          } else if (typeof translated === 'string' && translated) {
+            next[targetKey] = translated;
+            changed = true;
+          }
+        });
+        return next;
+      });
+      if (changed) section.onChange(migrated);
+    });
+  }, [sections]);
 
   const fields = useMemo(() => activeItem
     ? Object.entries(activeItem).filter(([key, value]) => isEditableTextField(key, value))
@@ -120,7 +208,7 @@ export const BilingualContentManager: React.FC<BilingualContentManagerProps> = (
     <div className="space-y-5">
       <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
         <h3 className="font-extrabold text-blue-950">বাংলা + English Content Manager</h3>
-        <p className="mt-1 text-sm text-blue-900">প্রতিটি সেকশনের বর্তমান বাংলা কনটেন্টের পাশে ইংরেজি অনুবাদ লিখুন। এখানে পরিবর্তনগুলো মূল সেকশনের ডেটাতেই সংরক্ষিত হবে। পুরোনো বাংলা লেখা স্বয়ংক্রিয়ভাবে অনুবাদ করা হয়নি—অর্থ ঠিক রাখতে ইংরেজি অনুবাদ যাচাই করে পূরণ করুন।</p>
+        <p className="mt-1 text-sm text-blue-900">প্রতিটি সেকশনের বর্তমান বাংলা কনটেন্টের পাশে ইংরেজি অনুবাদ লিখুন। এখানে পরিবর্তনগুলো মূল সেকশনের ডেটাতেই সংরক্ষিত হবে। পুরোনো পরিচিত বাংলা কনটেন্টের ইংরেজি অনুবাদ স্বয়ংক্রিয়ভাবে বসানো হবে; নতুন বা অচেনা লেখা থাকলে ইংরেজি ঘরটি যাচাই করে পূরণ করুন।</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -166,7 +254,7 @@ export const BilingualContentManager: React.FC<BilingualContentManagerProps> = (
             <p className="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500">এই রেকর্ডে অনুবাদযোগ্য টেক্সট ফিল্ড পাওয়া যায়নি।</p>
           ) : fields.map(([field, value]) => {
             const translatedKey = englishKey(activeSection.id, field);
-            const englishValue = activeItem[translatedKey];
+            const englishValue = activeItem[translatedKey] ?? translateValue(value);
             const label = FIELD_LABELS[field] || field.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
             const isLong = /speech|description|content|bio|answer|question|prompt|knowledge|bodyText|footerText|notice|comments/i.test(field);
             const inputClass = 'w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100';
