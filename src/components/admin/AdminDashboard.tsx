@@ -1211,6 +1211,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   }}
                   className="text-xs border rounded-lg px-2.5 py-1 w-full leading-relaxed"
                 />
+                  <input type="text" value={m.bioEnglish || ''} onChange={(e) => { setMentors(mentors.map(item => item.id === m.id ? { ...item, bioEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for m.bio || ''" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
             </div>
 
@@ -1517,6 +1518,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setEditingStudent({ ...editingStudent, name: e.target.value })}
                   className="w-full px-2.5 py-1.5 border rounded-lg font-bold text-slate-900"
                 />
+                  <input type="text" value={editingStudent.englishName || ''} onChange={(e) => { setEditingStudent({ ...editingStudent, englishName: e.target.value }); }} placeholder="English translation..." aria-label="English translation for editingStudent.name" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
               <div>
                 <label className="font-bold text-slate-600">রোল নম্বর:</label>
@@ -1535,6 +1537,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setEditingStudent({ ...editingStudent, fatherName: e.target.value })}
                   className="w-full px-2.5 py-1.5 border rounded-lg font-medium"
                 />
+                  <input type="text" value={editingStudent.fatherNameEnglish || ''} onChange={(e) => { setEditingStudent({ ...editingStudent, fatherNameEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for editingStudent.fatherName || ''" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
               <div>
                 <label className="font-bold text-slate-600">মাতার নাম (বাধ্যতামূলক):</label>
@@ -1544,6 +1547,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   onChange={(e) => setEditingStudent({ ...editingStudent, motherName: e.target.value })}
                   className="w-full px-2.5 py-1.5 border rounded-lg font-medium"
                 />
+                  <input type="text" value={editingStudent.motherNameEnglish || ''} onChange={(e) => { setEditingStudent({ ...editingStudent, motherNameEnglish: e.target.value }); }} placeholder="English translation..." aria-label="English translation for editingStudent.motherName || ''" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
               <div>
                 <label className="font-bold text-slate-600">মোবাইল নম্বর:</label>
