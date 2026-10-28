@@ -547,11 +547,25 @@ function translateValue(value: unknown): unknown {
   return typeof value === 'string' ? translateOne(value) : '';
 }
 
+function hasBengaliText(value: unknown): boolean {
+  return /[\\u0980-\\u09FF]/.test(toText(value));
+}
+
+function hasSuggestedTranslation(value: unknown): boolean {
+  const translated = translateValue(value);
+  return typeof translated === 'string' ? Boolean(translated) : Array.isArray(translated) && translated.length > 0;
+}
+
 export const BilingualContentManager: React.FC<BilingualContentManagerProps> = ({ sections, onSave }) => {
   const [activeSectionId, setActiveSectionId] = useState(sections[0]?.id || 'settings');
   const [activeItemIndex, setActiveItemIndex] = useState(0);
   const activeSection = sections.find(section => section.id === activeSectionId) || sections[0];
   const activeItem = activeSection?.items?.[activeItemIndex] || activeSection?.items?.[0];
+  const untranslatedCount = sections.reduce((sectionTotal, section) => sectionTotal + section.items.reduce((itemTotal, item) => itemTotal + Object.entries(item).filter(([field, value]) => {
+    if (!isEditableTextField(field, value) || !hasBengaliText(value)) return false;
+    const target = item[englishKey(section.id, field)];
+    return !toText(target).trim() && !hasSuggestedTranslation(value);
+  }).length, 0), 0);
 
   // Migrate known legacy Bangla defaults to English fields the first time this panel opens.
   useEffect(() => {
@@ -600,6 +614,9 @@ export const BilingualContentManager: React.FC<BilingualContentManagerProps> = (
         <h3 className="font-extrabold text-blue-950">বাংলা + English Content Manager</h3>
         <p className="mt-1 text-sm text-blue-900">সব কনটেন্ট সেকশন এখানে যাচাই করুন। পরিচিত পুরোনো বাংলা লেখার অনুবাদ স্বয়ংক্রিয়ভাবে বসানো হবে; অচেনা বাংলা লেখা ফাঁকা English ঘর হিসেবে থাকবে, যাতে ভুল অনুবাদকে সঠিক বলে দেখানো না হয়। English ঘর পূরণ করে Save All করুন।</p>
         <p className="mt-2 text-xs font-bold text-blue-950">প্রতিটি রেকর্ডে বাংলা ও English পাশাপাশি সম্পাদনা করা যাবে। অজানা/কাস্টম বাংলা লেখার জন্য ইংরেজি অনুবাদ হাতে যাচাই করে লিখতে হবে।</p>
+        <p className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-extrabold ${untranslatedCount ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'}`}>
+          {untranslatedCount ? `ম্যানুয়াল English অনুবাদ বাকি: ${untranslatedCount}টি ফিল্ড` : 'পরিচিত বাংলা কনটেন্টের অনুবাদ সম্পন্ন'}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
