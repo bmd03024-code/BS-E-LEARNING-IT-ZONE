@@ -10,6 +10,7 @@ export interface InstituteSettings {
   address: string;
   addressEnglish?: string;
   founderName: string;
+  founderNameEnglish?: string;
   founderTitle: string;
   founderTitleEnglish?: string;
   founderSpeech: string;
@@ -85,8 +86,10 @@ export interface Course {
   examsEnglish?: string[];
   logoUrl?: string; // Course-specific logo / thumbnail
   duration: string;
+  durationEnglish?: string;
   description: string;
   features: string[];
+  featuresEnglish?: string[];
   admissionFee: number;
   originalAdmissionFee?: number;
   monthlyFee: number;
@@ -95,6 +98,7 @@ export interface Course {
   certificateFeeSecondTime: number;
   hasGovtCert?: boolean;
   paymentDetails: string;
+  paymentDetailsEnglish?: string;
   category: string;
   subjects?: string[];
   exams?: string[];
@@ -351,6 +355,10 @@ export interface ChatbotInfoBlock {
   keywords?: string[];
   isActive: boolean;
   updatedAt?: string;
+  titleEnglish?: string;
+  categoryEnglish?: string;
+  contentEnglish?: string;
+  keywordsEnglish?: string[];
 }
 
 export interface ChatbotFAQ {
@@ -358,6 +366,9 @@ export interface ChatbotFAQ {
   question: string;
   answer: string;
   keywords: string[];
+  questionEnglish?: string;
+  answerEnglish?: string;
+  keywordsEnglish?: string[];
 }
 
 export type AIProviderType = 'gemini' | 'groq' | 'openrouter' | 'local_only';
@@ -376,14 +387,19 @@ export interface AISettings {
 
 export interface ChatbotSettings {
   botName?: string;
+  botNameEnglish?: string;
   welcomeMessage?: string;
+  welcomeMessageEnglish?: string;
   basePrompt: string;
+  basePromptEnglish?: string;
   // Large comprehensive knowledge base text (capacity ~50,000 words)
   knowledgeBaseText?: string;
+  knowledgeBaseTextEnglish?: string;
   // Multiple distinct information blocks added by admin
   infoBlocks?: ChatbotInfoBlock[];
   faqs: ChatbotFAQ[];
   quickChips?: string[];
+  quickChipsEnglish?: string[];
   // Dynamic Multi-AI API switching settings (Gemini, Groq, OpenRouter)
   aiSettings?: AISettings;
 }
@@ -409,13 +425,21 @@ export interface CertificateRecord {
   hasEverPaid: boolean; // Once paid, re-downloads are free unlimited times
   hasGovtCert: boolean;
   certificateTitle?: string;
+  certificateTitleEnglish?: string;
   bodyText?: string;
+  bodyTextEnglish?: string;
   institutionName?: string;
+  institutionNameEnglish?: string;
   institutionSubName?: string;
+  institutionSubNameEnglish?: string;
   founderName?: string;
+  founderNameEnglish?: string;
   founderTitle?: string;
+  founderTitleEnglish?: string;
   duration?: string;
+  durationEnglish?: string;
   courseTitle?: string;
+  courseTitleEnglish?: string;
   published?: boolean;
 }
 
