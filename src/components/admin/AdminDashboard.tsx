@@ -6097,7 +6097,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950">
-                  শর্টকাট ড্যাশবোর্ড (১৭টি মডিউল)
+                  শর্টকাট ড্যাশবোর্ড (১৮টি মডিউল)
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-600 mt-1">
                   যেকোনো একটি মডিউলে ক্লিক করে সংশ্লিষ্ট ডাটাবেজ এডিট ও প্রিন্ট করুন
@@ -6160,7 +6160,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 transition-colors shadow-xs"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>১৭টি শর্টকাট মেনুতে ফিরে যান</span>
+                <span>১৮টি শর্টকাট মেনুতে ফিরে যান</span>
               </button>
 
               <div className="text-right flex items-center gap-3">
