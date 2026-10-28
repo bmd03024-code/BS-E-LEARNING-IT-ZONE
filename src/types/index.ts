@@ -416,8 +416,11 @@ export interface CertificateRecord {
   studentName: string;
   studentNameEnglish?: string;
   fatherName?: string;
+  fatherNameEnglish?: string;
   motherName?: string;
+  motherNameEnglish?: string;
   address?: string;
+  addressEnglish?: string;
   issueDate: string;
   certificateNo: string;
   grade: string;
