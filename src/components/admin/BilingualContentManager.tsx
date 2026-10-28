@@ -14,7 +14,7 @@ interface BilingualContentManagerProps {
   onSave: () => void | Promise<void>;
 }
 
-const EXCLUDED_KEYS = /(^(id|courseId|studentId|academicYear|roll|phone|hotline|email|trxId|transactionId|date|issueDate|enrollmentDate|appliedDate|examDate|examTime|time|year|amount|fee|gpa|totalMarks|obtained|total|published|active|enabled|isActive|isFree|feePaid|hasEverPaid|hasGovtCert|pinned|type|status|paymentMethod|primaryColor|secondaryColor|headerTextSize|target|iconName|url|videoUrl|fileUrl|pdfUrl|photoUrl|previewImage|thumbnail|image|images|logoUrl|watermarkUrl|signatureUrl|signatureSealUrl|institutionSealUrl|founderPhotoUrl|banglaQrUrl|mapEmbedUrl|facebookUrl|youtubeUrl|tiktokUrl|githubToken|password|masterPin|keywords|marks)$/i)|url|token|password|pin|secret|photo|image|logo|signature|seal|icon|color|trx/i;
+const EXCLUDED_KEYS = /(^(id|courseId|studentId|academicYear|roll|phone|hotline|email|trxId|transactionId|date|issueDate|enrollmentDate|appliedDate|examDate|examTime|time|year|amount|fee|gpa|totalMarks|obtained|total|published|active|enabled|isActive|isFree|feePaid|hasEverPaid|hasGovtCert|pinned|type|status|paymentMethod|primaryColor|secondaryColor|headerTextSize|target|iconName|url|videoUrl|fileUrl|pdfUrl|photoUrl|previewImage|thumbnail|image|images|logoUrl|watermarkUrl|signatureUrl|signatureSealUrl|institutionSealUrl|founderPhotoUrl|banglaQrUrl|mapEmbedUrl|facebookUrl|youtubeUrl|tiktokUrl|githubToken|password|masterPin|keywords|marks|englishName)$/i)|url|token|password|pin|secret|photo|image|logo|signature|seal|icon|color|trx/i;
 
 const FIELD_LABELS: Record<string, string> = {
   name: 'Name',
