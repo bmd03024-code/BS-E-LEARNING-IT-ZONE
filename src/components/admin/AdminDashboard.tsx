@@ -6501,6 +6501,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
             {/* A4 landscape certificate closely matching the supplied reference; English-only content */}
             <div className="printable-area certificate-print-layout relative mx-auto aspect-[1122/794] w-full max-w-[1122px] overflow-hidden bg-white p-[2.2%] text-slate-900 shadow-xl" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+              {settings.logoUrl && <img src={settings.logoUrl} alt="" aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[48%] w-[48%] -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.09] print:opacity-[0.09]" />}
               <div className="h-full w-full border-2 border-[#222] p-[0.45%]">
                 <div className="flex h-full w-full flex-col justify-between border border-[#444] px-[4.2%] py-[2.8%]">
                   <div>
@@ -6530,13 +6531,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <div className="space-y-[0.55%] text-[clamp(8px,1.42vw,16px)] leading-[2.3] text-black">
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 whitespace-nowrap text-[clamp(7px,1.33vw,15px)]">This is to Certify that</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.studentNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.englishName || 'Student Name'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.studentNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.englishName || 'Rahim Ahmed'}</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 whitespace-nowrap text-[clamp(7px,1.33vw,15px)]">Son / Daughter of</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.fatherNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.fatherNameEnglish || 'Father Name'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.fatherNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.fatherNameEnglish || 'Karim Ahmed'}</span>
                       <span className="mx-[1%] shrink-0 text-[clamp(7px,1.33vw,15px)]">and</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.motherNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.motherNameEnglish || 'Mother Name'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.motherNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.motherNameEnglish || 'Ayesha Begum'}</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.33vw,15px)]">of</span>
@@ -6554,7 +6555,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">duly completed the course in</span>
-                      <span className="min-w-0 flex-[0.4] border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.courseTitleEnglish || courses.find(c => c.id === selectedCertForPrint.courseId)?.titleEnglish || courses.find(c => c.id === selectedCertForPrint.courseId)?.title || 'Course Name'}</span>
+                      <span className="min-w-0 flex-[0.4] border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.courseTitleEnglish || courses.find(c => c.id === selectedCertForPrint.courseId)?.titleEnglish || 'Course Name'}</span>
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">and achieved</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
@@ -6580,7 +6581,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       </div>
                     </div>
                     <div className="mt-[1%] border-t border-slate-200 pt-[0.5%] text-center text-[clamp(6px,0.98vw,11px)] tracking-wide text-[#444]">
-                      Note : This certificate is issued by the institution named above and is not an official government education board certificate.
                     </div>
                   </div>
                 </div>
