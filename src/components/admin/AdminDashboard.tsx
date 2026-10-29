@@ -2363,13 +2363,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       duration: certDuration || courseObj?.duration,
       durationEnglish: courseObj?.durationEnglish || '',
       courseTitle: certCourseTitle || courseObj?.title,
-      courseTitleEnglish: certCourseTitleEnglish || courseObj?.titleEnglish || '',
+      courseTitleEnglish: courseObj?.titleEnglish || toEnglishName(courseObj?.title) || certCourseTitleEnglish || '',
       institutionName: settings.name,
       institutionSubName: settings.subName,
       founderName: certFounderName || settings.founderName,
       founderTitle: certFounderTitle || settings.founderTitle,
       published: true
     };
+
+    // Backfill English transliterations into the matching student record so future certificates reuse that student's own data.
+    const updatedStudents = students.map(st => {
+      if (st.roll !== trimmedRoll || st.academicYear !== certYearInput || st.courseId !== certCourseInput) return st;
+      return {
+        ...st,
+        englishName: st.englishName || newCert.studentNameEnglish || toEnglishName(st.name),
+        fatherNameEnglish: st.fatherNameEnglish || newCert.fatherNameEnglish || toEnglishName(st.fatherName),
+        motherNameEnglish: st.motherNameEnglish || newCert.motherNameEnglish || toEnglishName(st.motherName),
+      };
+    });
+    setStudents(updatedStudents);
+    storage.saveStudents(updatedStudents);
+    masterGateway.publish('students', updatedStudents);
 
     const updated = [
       newCert,
