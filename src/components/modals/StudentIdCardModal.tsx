@@ -157,7 +157,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
           html, body { margin:0!important; padding:0!important; background:#fff!important; }
           body * { visibility:hidden!important; }
           .student-id-modal, .student-id-modal * { visibility:visible!important; }
-          .student-id-modal { position:static!important; display:block!important; width:auto!important; height:auto!important; min-height:0!important; overflow:visible!important; padding:0!important; margin:0!important; background:#fff!important; }
+          .student-id-modal { position:static!important; display:block!important; width:auto!important; height:auto!important; min-height:0!important; overflow:visible!important; padding:0!important; margin:0!important; background:#fff!important; }\n          .student-id-modal > div { width:auto!important; max-width:none!important; min-height:0!important; overflow:visible!important; margin:0!important; padding:0!important; border:0!important; border-radius:0!important; box-shadow:none!important; background:#fff!important; }
           .no-print { display:none!important; }
           .id-card { box-shadow:none!important; }
           .print-mode-single .id-card { position:fixed!important; left:0!important; top:0!important; margin:0!important; }
@@ -170,8 +170,8 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
         }
       `}</style>
 
-      <div className="no-print relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 my-8">
-        <div className="bg-gradient-to-r from-blue-950 via-slate-900 to-blue-900 text-white px-6 py-4 flex items-center justify-between border-b border-amber-400/30">
+      <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 my-8">
+        <div className="no-print bg-gradient-to-r from-blue-950 via-slate-900 to-blue-900 text-white px-6 py-4 flex items-center justify-between border-b border-amber-400/30">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-amber-400/20 text-amber-300"><UserCheck className="w-5 h-5" /></div>
             <div><h3 className="font-bold text-base sm:text-lg">Student ID Card Download &amp; Print</h3><p className="text-xs text-slate-300">CR80 size: 85.6 × 53.98 mm</p></div>
@@ -179,7 +179,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
           <button onClick={onClose} aria-label="Close" className="p-1.5 rounded-full hover:bg-white/10 text-slate-300"><X className="w-5 h-5" /></button>
         </div>
 
-        <div className="p-5 bg-slate-50 border-b border-slate-200 space-y-4">
+        <div className="no-print p-5 bg-slate-50 border-b border-slate-200 space-y-4">
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => { setPrintMode('single'); setErrorMsg(''); }} className={`px-4 py-2 rounded-xl text-xs font-bold ${printMode === 'single' ? 'bg-blue-900 text-white' : 'bg-white border text-slate-700'}`}>Single Student Card</button>
             <button type="button" onClick={() => { setPrintMode('bulk'); setErrorMsg(''); }} className={`px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-2 ${printMode === 'bulk' ? 'bg-blue-900 text-white' : 'bg-white border text-slate-700'}`}><Layers className="w-4 h-4" /> Bulk Print Cards</button>
