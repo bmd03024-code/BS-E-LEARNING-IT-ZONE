@@ -2942,7 +2942,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               subjects: ['মৌলিক বিষয়', 'অ্যাডভান্সড মডিউল'],
               exams: ['মাসিক মূল্যায়ন', 'চূড়ান্ত পরীক্ষা']
             };
-            setCourses([...courses, newC]);
+            const updatedCourses = [...courses, newC];
+            setCourses(updatedCourses);
+            storage.saveCourses(updatedCourses);
+            void masterGateway.publish('courses', updatedCourses);
           }}
           className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm shrink-0"
         >
