@@ -2198,6 +2198,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
   // Auto-populated and editable certificate text fields
   const [certStudentName, setCertStudentName] = useState('');
+  const [certStudentNameEnglish, setCertStudentNameEnglish] = useState('');
+  const [certFatherNameEnglish, setCertFatherNameEnglish] = useState('');
+  const [certMotherNameEnglish, setCertMotherNameEnglish] = useState('');
+  const [certAddressEnglish, setCertAddressEnglish] = useState('');
+  const [certCourseTitleEnglish, setCertCourseTitleEnglish] = useState('');
   const [certFatherName, setCertFatherName] = useState('');
   const [certMotherName, setCertMotherName] = useState('');
   const [certAddress, setCertAddress] = useState('ঢাকা, বাংলাদেশ');
@@ -6502,7 +6507,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             {/* A4 landscape certificate closely matching the supplied reference; English-only content */}
             <div className="printable-area certificate-print-layout relative mx-auto aspect-[1122/794] w-full max-w-[1122px] overflow-hidden bg-white p-[2.2%] text-slate-900 shadow-xl" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
               {settings.logoUrl && <img src={settings.logoUrl} alt="" aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[48%] w-[48%] -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.09] print:opacity-[0.09]" />}
-              <div className="h-full w-full border-2 border-[#222] p-[0.45%]">
+              <div className="relative z-10 h-full w-full border-2 border-[#222] p-[0.45%]">
                 <div className="flex h-full w-full flex-col justify-between border border-[#444] px-[4.2%] py-[2.8%]">
                   <div>
                     <div className="mb-1 text-center">
