@@ -51,30 +51,61 @@
   background-image: radial-gradient(circle at center, rgba(15, 23, 42, 0.04) 0%, transparent 70%);
 }
 
-/* Formal landscape certificate canvas, scoped to certificates only. */
+/* Certificate print canvas: fill F4 landscape paper with a narrow safe margin. */
 .certificate-print-layout {
   page: bs-certificate;
-  min-height: 185mm;
+  box-sizing: border-box;
+  min-height: 0;
   border-radius: 0;
-  background: linear-gradient(135deg, #fffdf6 0%, #ffffff 48%, #f8fbff 100%) !important;
+  background: #fffdf6 !important;
 }
 @page bs-certificate {
-  size: A4 landscape;
-  margin: 8mm;
+  size: 13in 8.5in landscape;
+  margin: 4mm;
 }
 
-/* Certificate border */
+/* Decorative double-frame inspired by the reference certificate border. */
+.certificate-print-layout::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 5px double #77736b;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 4px, rgba(95, 91, 83, .13) 4px 5px),
+    repeating-linear-gradient(-45deg, transparent 0 4px, rgba(95, 91, 83, .13) 4px 5px);
+  background-size: 100% 10px, 100% 10px;
+  background-repeat: repeat-x;
+  background-position: top, bottom;
+  pointer-events: none;
+}
 .certificate-border {
-  border: 8px double #173b67;
+  border: 8px double #77736b;
   outline: 2px solid #c69a3a;
   outline-offset: -7px;
 }
 @media print {
-  .certificate-print-layout {
+  html, body {
     width: 100%;
-    min-height: 185mm;
-    padding: 9mm !important;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .certificate-print-layout {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    padding: 3mm !important;
     border-radius: 0 !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    page: bs-certificate;
   }
 }
 
