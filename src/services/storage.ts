@@ -521,7 +521,7 @@ const initialStudents: Student[] = [
     photoUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80",
     status: "active",
     hasPaidDues: true,
-    admitCardBlocked: false
+    admitCardBlocked: false,
     registrationNo: "BSIT-2026-0001",
     englishName: "Mohammad Abdullah",
     fatherNameEnglish: "Rafiqul Islam",
@@ -543,7 +543,7 @@ const initialStudents: Student[] = [
     photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80",
     status: "active",
     hasPaidDues: true,
-    admitCardBlocked: false
+    admitCardBlocked: false,
     registrationNo: "BSIT-2026-0002",
     englishName: "Fatema Tuz Zohra",
     fatherNameEnglish: "Abul Kalam",
@@ -565,7 +565,7 @@ const initialStudents: Student[] = [
     photoUrl: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=300&q=80",
     status: "active",
     hasPaidDues: true,
-    admitCardBlocked: false
+    admitCardBlocked: false,
     registrationNo: "BSIT-2026-0003",
     englishName: "Tanvir Hasan",
     fatherNameEnglish: "Kamrul Hasan",
@@ -588,7 +588,7 @@ const initialStudents: Student[] = [
     status: "active",
     hasPaidDues: false,
     admitCardBlocked: true,
-    blockedReason: "মাসিক ফি বকেয়া থাকায় এডমিট কার্ড স্থগিত রয়েছে।"
+    blockedReason: "মাসিক ফি বকেয়া থাকায় এডমিট কার্ড স্থগিত রয়েছে।",
     registrationNo: "BSIT-2026-0010",
     englishName: "Nusrat Jahan",
     fatherNameEnglish: "Zahirul Haque",
