@@ -2683,13 +2683,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <input type="text" value={courses.find(c => c.id === certCourseInput)?.durationEnglish || ''} readOnly placeholder="Auto-filled from selected course" className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-blue-50 text-xs text-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">গ্রেড / ফলাফল</label>
-                  <input
-                    type="text"
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Final Grade (from final result)</label>
+                  <select
                     value={certGrade}
                     onChange={(e) => setCertGrade(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-emerald-800 bg-white"
-                  />
+                  >
+                    <option value="A+">A+ (5.00)</option>
+                    <option value="A">A (4.00)</option>
+                    <option value="A-">A- (3.50)</option>
+                    <option value="B">B (3.00)</option>
+                    <option value="C">C (2.00)</option>
+                    <option value="D">D (1.00)</option>
+                    <option value="F">F (0.00)</option>
+                  </select>
                 </div>
               </div>
 
@@ -6903,39 +6910,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   isBlocked: false
                 };
 
-                // Also auto-create Certificate Record for Module 7
-                const newCert: CertificateRecord = {
-                  id: `cert-${Date.now()}`,
-                  academicYear: newStd.academicYear,
-                  courseId: newStd.courseId,
-                  roll: newStd.roll,
-                  studentName: newStd.name,
-                  fatherName: newStd.fatherName,
-                  motherName: newStd.motherName,
-                  address: newStd.address,
-                  issueDate: new Date().toISOString().split('T')[0],
-                  registrationNo: newStd.registrationNo,
-                  certificateNo: `BS-ZONE-${newStd.academicYear}-${newStd.roll.padStart(4, '0')}`,
-                  grade: 'A+ (প্রথম শ্রেণি)',
-                  isFirstIssue: true,
-                  feePaid: true,
-                  isFree: true,
-                  feeAmount: 0,
-                  hasEverPaid: true,
-                  hasGovtCert: false
-                };
-
-                const updatedStudents = [newStd, ...students];
+                // Certificates are issued only after an administrator enters and saves the student's final result.
+                                const updatedStudents = [newStd, ...students];
                 const updatedAdmits = [newAdmit, ...admitCards.filter(a => a.roll !== newStd.roll)];
-                const updatedCerts = [newCert, ...certificates.filter(c => c.roll !== newStd.roll)];
 
                 setStudents(updatedStudents);
                 setAdmitCards(updatedAdmits);
-                setCertificates(updatedCerts);
 
                 storage.saveStudents(updatedStudents);
                 storage.saveAdmitCards(updatedAdmits);
-                storage.saveCertificates(updatedCerts);
 
                 setIsAddStudentModalOpen(false);
                 setNewStdName('');
@@ -6944,7 +6927,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 setNewStdPhone('');
                 setNewStdAddress('');
                 triggerSaveNotification('শিক্ষার্থী সফলভাবে ডাটাবেজে যুক্ত হয়েছে!');
-                alert(`রোল ${newStd.roll} (${newStd.name})-কে সফলভাবে ডাটাবেজ, এডমিট কার্ড ও সনদ তালিকায় যুক্ত করা হয়েছে!`);
+                alert(`রোল ${newStd.roll} (${newStd.name})-কে সফলভাবে ডাটাবেজ ও এডমিট কার্ডে যুক্ত করা হয়েছে। সার্টিফিকেটের জন্য আগে Final Result সংরক্ষণ করতে হবে।`);
               }}
               className="space-y-3 text-xs"
             >
