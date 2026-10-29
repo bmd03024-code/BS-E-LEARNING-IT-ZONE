@@ -66,6 +66,42 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({
   const selectedCourse = courses.find(c => c.id === (foundStudent?.courseId || courseId)) || courses[0];
 
   return (
+    <>
+      <style>{`
+        @page { size: 85.6mm 53.98mm; margin: 0; }
+        @media print {
+          html, body { width: 85.6mm !important; height: 53.98mm !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: #fff !important; }
+          body * { visibility: hidden !important; }
+          .printable-area, .printable-area * { visibility: visible !important; }
+          .no-print { display: none !important; }
+          .printable-area {
+            position: fixed !important; left: 0 !important; top: 0 !important;
+            width: 85.6mm !important; height: 53.98mm !important;
+            min-width: 85.6mm !important; max-width: 85.6mm !important;
+            min-height: 53.98mm !important; max-height: 53.98mm !important;
+            margin: 0 !important; padding: 2.5mm !important; box-sizing: border-box !important;
+            overflow: hidden !important; border-radius: 2mm !important; box-shadow: none !important;
+            break-inside: avoid !important; page-break-inside: avoid !important;
+            print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important;
+          }
+          .printable-area .absolute.inset-0 { display: none !important; }
+          .printable-area h3 { font-size: 8pt !important; line-height: 1.1 !important; }
+          .printable-area h4 { font-size: 9pt !important; line-height: 1.1 !important; margin-top: 1mm !important; }
+          .printable-area p, .printable-area span { line-height: 1.1 !important; }
+          .printable-area .w-24.h-24 { width: 15mm !important; height: 15mm !important; border-radius: 2mm !important; }
+          .printable-area .mt-4 { margin-top: 1.5mm !important; }
+          .printable-area .pb-3 { padding-bottom: 1mm !important; }
+          .printable-area .p-3\\.5 { padding: 1.5mm !important; }
+          .printable-area .space-y-1\\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 1mm !important; }
+          .printable-area .w-11.h-11 { width: 7mm !important; height: 7mm !important; }
+          .printable-area .w-10.h-10 { width: 6mm !important; height: 6mm !important; }
+          .printable-area .h-7 { height: 4mm !important; }
+          .printable-area .mt-4.pt-3 { margin-top: 1mm !important; padding-top: 1mm !important; }
+          .printable-area .text-xs { font-size: 5.5pt !important; }
+          .printable-area .text-\\[10px\\] { font-size: 5pt !important; }
+          .printable-area .text-\\[8px\\] { font-size: 4pt !important; }
+        }
+      `}</style>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-xs overflow-y-auto">
       <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 my-8">
         {/* Top Header */}
@@ -304,5 +340,6 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
