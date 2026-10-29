@@ -1424,7 +1424,29 @@ class StorageService {
   }
 
   getCourses(): Course[] {
-    return this.get<Course[]>('courses', initialCourses);
+    // Backfill bilingual fields for courses already saved in older browser storage.
+    // Keep existing course edits, but use the official English course data when a
+    // saved course has no English title or supporting English content.
+    const savedCourses = this.get<Course[]>('courses', initialCourses);
+    return savedCourses.map((course) => {
+      const defaults = initialCourses.find((item) => item.id === course.id);
+      if (!defaults) return course;
+      const isMissingText = (value: unknown) =>
+        typeof value !== 'string' || value.trim() === '' ||
+        value.trim().toLowerCase() === 'english translation';
+      return {
+        ...defaults,
+        ...course,
+        titleEnglish: isMissingText(course.titleEnglish) ? defaults.titleEnglish : course.titleEnglish,
+        descriptionEnglish: isMissingText(course.descriptionEnglish) ? defaults.descriptionEnglish : course.descriptionEnglish,
+        categoryEnglish: isMissingText(course.categoryEnglish) ? defaults.categoryEnglish : course.categoryEnglish,
+        durationEnglish: isMissingText(course.durationEnglish) ? defaults.durationEnglish : course.durationEnglish,
+        paymentDetailsEnglish: isMissingText(course.paymentDetailsEnglish) ? defaults.paymentDetailsEnglish : course.paymentDetailsEnglish,
+        subjectsEnglish: course.subjectsEnglish?.length ? course.subjectsEnglish : defaults.subjectsEnglish,
+        examsEnglish: course.examsEnglish?.length ? course.examsEnglish : defaults.examsEnglish,
+        featuresEnglish: course.featuresEnglish?.length ? course.featuresEnglish : defaults.featuresEnglish,
+      };
+    });
   }
   saveCourses(courses: Course[]): void {
     this.set('courses', courses);
