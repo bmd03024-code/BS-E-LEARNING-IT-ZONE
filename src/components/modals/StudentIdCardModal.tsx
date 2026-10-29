@@ -20,7 +20,11 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
   const [errorMsg, setErrorMsg] = useState('');
   const [printMode, setPrintMode] = useState<PrintMode>('single');
   const settings = storage.getSettings();
-  const englishOrFallback = (value: string | undefined, fallback: string) => value && value.trim() && !/[\u0980-\u09FF]/.test(value) ? value : fallback;
+  const englishOrFallback = (value: string | undefined, fallback: string) => value && value.trim() && !/[\u0980-\u09FF]/.test(value) ? value.trim() : fallback;
+  const englishDigits = (value: string | number | undefined, fallback = 'Not Provided') => {
+    if (value === undefined || value === null || String(value).trim() === '') return fallback;
+    return String(value).replace(/[০-৯]/g, digit => String('০১২৩৪৫৬৭৮৯'.indexOf(digit)));
+  };
 
   useEffect(() => {
     if (!courses.some(course => course.id === courseId) && courses[0]) setCourseId(courses[0].id);
@@ -93,7 +97,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
           {settings.logoUrl ? <img src={settings.logoUrl} alt="Institute Logo" className="id-card-logo" /> : <div className="id-card-logo id-card-logo-text">BS</div>}
           <div className="id-card-institute">
             <div className="id-card-institute-name">{englishOrFallback(settings.name, 'BS E-Learning & IT Zone')}</div>
-            <div className="id-card-subtitle">{settings.subNameEnglish || 'A Digital Academy for Skills and Success'}</div>
+            <div className="id-card-subtitle">{englishOrFallback(settings.subNameEnglish, 'A Digital Academy for Skills and Success')}</div>
             <div className="id-card-label">STUDENT IDENTITY CARD</div>
           </div>
         </div>
@@ -105,12 +109,12 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
           />
           <div className="id-card-details">
             <div className="id-card-student-name">{englishOrFallback(student.englishName, 'Student Name')}</div>
-            <div className="id-card-line"><b>Roll:</b> {student.roll} <span className="id-card-divider">|</span> <b>Session:</b> {student.academicYear}</div>
-            <div className="id-card-line"><b>Registration No.:</b> {student.registrationNo || 'Not Assigned'}</div>
+            <div className="id-card-line"><b>Roll:</b> {englishDigits(student.roll)} <span className="id-card-divider">|</span> <b>Session:</b> {englishDigits(student.academicYear)}</div>
+            <div className="id-card-line"><b>Registration No.:</b> {englishDigits(student.registrationNo, 'Not Assigned')}</div>
             <div className="id-card-line"><b>Course:</b> {englishOrFallback(course?.titleEnglish, englishOrFallback(student.courseId, 'Course'))}</div>
             <div className="id-card-line"><b>Father:</b> {englishOrFallback(student.fatherNameEnglish, 'Not Provided')}</div>
             <div className="id-card-line"><b>Mother:</b> {englishOrFallback(student.motherNameEnglish, 'Not Provided')}</div>
-            <div className="id-card-line"><b>Phone:</b> {student.phone || 'Not Provided'}</div>
+            <div className="id-card-line"><b>Phone:</b> {englishDigits(student.phone)}</div>
           </div>
         </div>
         <div className="id-card-footer">
@@ -187,7 +191,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div><label className="block text-[11px] font-bold text-slate-700 mb-1">Academic Year</label><select value={academicYear} onChange={event => setAcademicYear(event.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white">{Array.from(new Set(['2026','2025','2024',...storage.getStudents().map(student => student.academicYear)])).sort((a,b) => b.localeCompare(a)).map(year => <option key={year} value={year}>{year} Session</option>)}</select></div>
-            <div><label className="block text-[11px] font-bold text-slate-700 mb-1">Course</label><select value={courseId} onChange={event => setCourseId(event.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white">{courses.map(course => <option key={course.id} value={course.id}>{course.titleEnglish || course.title}</option>)}</select></div>
+            <div><label className="block text-[11px] font-bold text-slate-700 mb-1">Course</label><select value={courseId} onChange={event => setCourseId(event.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white">{courses.map(course => <option key={course.id} value={course.id}>{englishOrFallback(course.titleEnglish, 'Course')}</option>)}</select></div>
           </div>
           {printMode === 'single' ? (
             <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-end">
