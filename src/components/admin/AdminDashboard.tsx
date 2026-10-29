@@ -1423,6 +1423,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <tr>
                 <th className="py-2.5 px-3">ছবি</th>
                 <th className="py-2.5 px-3">রোল</th>
+                <th className="py-2.5 px-3">রেজিস্ট্রেশন নম্বর</th>
                 <th className="py-2.5 px-3">নাম</th>
                 <th className="py-2.5 px-3">কোর্স</th>
                 <th className="py-2.5 px-3">পিতা/মাতা</th>
@@ -1438,6 +1439,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     <img src={s.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="w-8 h-8 rounded-full object-cover" />
                   </td>
                   <td className="py-2.5 px-3 font-mono font-bold text-blue-900">{s.roll}</td>
+                  <td className="py-2.5 px-3 font-mono text-slate-700 whitespace-nowrap">{s.registrationNo || '—'}</td>
                   <td className="py-2.5 px-3 font-bold text-slate-900">{s.name}</td>
                   <td className="py-2.5 px-3 text-blue-800 font-medium truncate max-w-[120px]">
                     {courses.find(c => c.id === s.courseId)?.title || s.courseId}
