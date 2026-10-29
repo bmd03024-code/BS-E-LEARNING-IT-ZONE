@@ -136,6 +136,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [newTeacherBio, setNewTeacherBio] = useState('');
   const [newTeacherPhoto, setNewTeacherPhoto] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80');
 
+  // Generate a unique registration number for every newly admitted student.
+  const generateStudentRegistrationNo = (academicYear: string, existingStudents: Student[]) => {
+    const prefix = `BSIT-${String(academicYear).replace(/[^0-9]/g, '') || new Date().getFullYear()}-`;
+    const usedNumbers = existingStudents
+      .map(student => student.registrationNo || '')
+      .filter(value => value.startsWith(prefix))
+      .map(value => Number(value.slice(prefix.length)))
+      .filter(value => Number.isFinite(value) && value > 0);
+    const nextNumber = Math.max(0, ...usedNumbers) + 1;
+    return `${prefix}${String(nextNumber).padStart(4, '0')}`;
+  };
+
   // New Student Entry Form State
   const [newStdYear, setNewStdYear] = useState('2026');
   const [newStdCourse, setNewStdCourse] = useState(storage.getCourses()[0]?.id || '');
@@ -3171,13 +3183,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         const courseStds = students.filter(s => s.courseId === app.courseId && s.academicYear === app.academicYear);
         const nextRoll = (courseStds.length + 101).toString();
 
+        const registrationNo = generateStudentRegistrationNo(app.academicYear, students);
         const newStd: Student = {
           id: `std-${Date.now()}`,
           academicYear: app.academicYear,
           courseId: app.courseId,
           roll: nextRoll,
+          registrationNo,
           name: app.studentName,
           englishName: app.studentNameEnglish,
+          fatherNameEnglish: app.fatherNameEnglish,
+          motherNameEnglish: app.motherNameEnglish,
+          addressEnglish: app.addressEnglish,
           phone: app.phone,
           photoUrl: app.photoUrl,
           fatherName: app.fatherName,
@@ -6791,11 +6808,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   return;
                 }
                 const selectedCourseObj = courses.find(c => c.id === newStdCourse) || courses[0];
+                const registrationNo = generateStudentRegistrationNo(newStdYear, students);
                 const newStd: Student = {
                   id: `std-${Date.now()}`,
                   academicYear: newStdYear,
                   courseId: selectedCourseObj.id,
                   roll: newStdRoll.trim(),
+                  registrationNo,
                   name: newStdName.trim(),
                    englishName: newStdNameEnglish.trim(),
                   fatherName: newStdFather.trim(),
@@ -6844,6 +6863,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   motherName: newStd.motherName,
                   address: newStd.address,
                   issueDate: new Date().toISOString().split('T')[0],
+                  registrationNo: newStd.registrationNo,
                   certificateNo: `BS-ZONE-${newStd.academicYear}-${newStd.roll.padStart(4, '0')}`,
                   grade: 'A+ (প্রথম শ্রেণি)',
                   isFirstIssue: true,
