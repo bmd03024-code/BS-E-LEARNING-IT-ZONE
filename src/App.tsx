@@ -665,6 +665,7 @@ export default function App() {
         <CoursesSection
           courses={displayCourses}
           onEnrollCourse={handleEnrollCourse}
+          language={language}
         />
 
         <MonthlyFeePaymentSection
