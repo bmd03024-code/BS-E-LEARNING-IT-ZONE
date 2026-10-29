@@ -6505,17 +6505,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             </div>
 
             {/* A4 landscape certificate closely matching the supplied reference; English-only content */}
-            <div className="printable-area certificate-print-layout relative mx-auto aspect-[1122/794] w-full max-w-[1122px] overflow-hidden bg-white p-[2.2%] text-slate-900 shadow-xl" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+            <div className="printable-area certificate-print-layout relative mx-auto aspect-[13/8.5] w-full max-w-none overflow-hidden bg-white p-[1.2%] text-slate-900 shadow-xl" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
               {settings.logoUrl && <img src={settings.logoUrl} alt="" aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[48%] w-[48%] -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.09] print:opacity-[0.09]" />}
-              <div className="relative z-10 h-full w-full border-2 border-[#222] p-[0.45%]">
-                <div className="flex h-full w-full flex-col justify-between border border-[#444] px-[4.2%] py-[2.8%]">
+              <div className="relative z-10 h-full w-full border-[5px] border-double border-[#77736b] p-[0.35%]">
+                <div className="flex h-full w-full flex-col justify-between border border-[#77736b] px-[2.5%] py-[1.2%]">
                   <div>
                     <div className="mb-1 text-center">
                       <div className="text-[clamp(10px,1.95vw,22px)] font-bold uppercase tracking-[0.07em] text-[#111]">
-                        {selectedCertForPrint.institutionNameEnglish || settings.name || 'BS E-Learning & IT Zone'}
+                        {selectedCertForPrint.institutionNameEnglish || settings.nameEnglish || 'BS E-Learning & IT Zone'}
                       </div>
                       <div className="mt-[3px] text-[clamp(8px,1.15vw,13px)] font-bold tracking-[0.22em] text-[#333]">
-                        {selectedCertForPrint.institutionSubNameEnglish || settings.subNameEnglish || 'BANGLADESH'}
+                        {selectedCertForPrint.institutionSubNameEnglish || settings.subNameEnglish || 'LEARNING & IT TRAINING INSTITUTE'}
                       </div>
                     </div>
                     <div className="mt-1 flex items-start justify-between gap-3 text-[clamp(7px,1.15vw,13px)] font-bold leading-relaxed">
@@ -6533,7 +6533,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     </div>
                   </div>
 
-                  <div className="space-y-[0.55%] text-[clamp(8px,1.42vw,16px)] leading-[2.3] text-black">
+                  <div className="space-y-[0.55%] text-[clamp(8px,1.25vw,15px)] leading-[1.8] text-black">
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 whitespace-nowrap text-[clamp(7px,1.33vw,15px)]">This is to Certify that</span>
                       <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.studentNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.englishName || 'Rahim Ahmed'}</span>
@@ -6546,7 +6546,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.33vw,15px)]">of</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.addressEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.addressEnglish || selectedCertForPrint.institutionNameEnglish || settings.name || 'BS E-Learning & IT Zone'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.addressEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.addressEnglish || settings.addressEnglish || 'Chattogram, Bangladesh'}</span>
                     </div>
                     <div className="flex items-baseline justify-between gap-3">
                       <div className="flex min-w-0 w-[55%] items-baseline gap-[1%]">
@@ -6565,7 +6565,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.33vw,15px)]">Grade</span>
-                      <span className="min-w-0 flex-[0.3] border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.grade || 'A+'}</span>
+                      <span className="min-w-0 flex-[0.3] border-b border-dotted border-[#222] text-center font-bold italic">{String(selectedCertForPrint.grade || 'A+').replace(/\s*\([^)]*[\u0980-\u09FF][^)]*\)/g, '').trim() || 'A+'}</span>
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">on the course assessment.</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
