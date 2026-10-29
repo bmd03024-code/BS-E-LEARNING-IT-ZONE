@@ -722,6 +722,191 @@
         "Oral Examination",
         "Written Foundation Test"
       ]
+    },
+    {
+      "id": "course-1793293699300",
+      "title": "নতুন আধুনিক কোর্স",
+      "titleEnglish": "New Professional Course",
+      "logoUrl": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80",
+      "duration": "৩ মাস",
+      "durationEnglish": "3 Months",
+      "description": "কোর্সের বাস্তবমুখী সিলেবাস ও প্র্যাকটিক্যাল ল্যাব বিবরণ।",
+      "descriptionEnglish": "Practical course syllabus with hands-on lab training.",
+      "features": [
+        "দক্ষ মেন্টর সাপোর্ট",
+        "লাইভ প্রজেক্ট ও অ্যাসাইনমেন্ট",
+        "প্রফেশনাল কোর্স সার্টিফিকেট"
+      ],
+      "featuresEnglish": [
+        "Expert mentor support",
+        "Live projects and assignments",
+        "Professional course certificate"
+      ],
+      "originalAdmissionFee": 1500,
+      "admissionFee": 1000,
+      "monthlyFee": 500,
+      "offerTimerExpiry": "2026-11-12",
+      "certificateFee": 0,
+      "certificateFeeSecondTime": 0,
+      "hasGovtCert": false,
+      "paymentDetails": "ভর্তি ফি ১,০০০ টাকা। দ্বিতীয় মাস থেকে নিয়মিত মাসিক ফি।",
+      "category": "আইটি ও প্রফেশনাল স্কিল",
+      "subjects": [
+        "মৌলিক বিষয়",
+        "অ্যাডভান্সড মডিউল"
+      ],
+      "exams": [
+        "মাসিক মূল্যায়ন",
+        "চূড়ান্ত পরীক্ষা"
+      ]
+    },
+    {
+      "id": "course-1793293702218",
+      "title": "নতুন আধুনিক কোর্স",
+      "titleEnglish": "New Professional Course",
+      "logoUrl": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80",
+      "duration": "৩ মাস",
+      "durationEnglish": "3 Months",
+      "description": "কোর্সের বাস্তবমুখী সিলেবাস ও প্র্যাকটিক্যাল ল্যাব বিবরণ।",
+      "descriptionEnglish": "Practical course syllabus with hands-on lab training.",
+      "features": [
+        "দক্ষ মেন্টর সাপোর্ট",
+        "লাইভ প্রজেক্ট ও অ্যাসাইনমেন্ট",
+        "প্রফেশনাল কোর্স সার্টিফিকেট"
+      ],
+      "featuresEnglish": [
+        "Expert mentor support",
+        "Live projects and assignments",
+        "Professional course certificate"
+      ],
+      "originalAdmissionFee": 1500,
+      "admissionFee": 1000,
+      "monthlyFee": 500,
+      "offerTimerExpiry": "2026-11-12",
+      "certificateFee": 0,
+      "certificateFeeSecondTime": 0,
+      "hasGovtCert": false,
+      "paymentDetails": "ভর্তি ফি ১,০০০ টাকা। দ্বিতীয় মাস থেকে নিয়মিত মাসিক ফি।",
+      "category": "আইটি ও প্রফেশনাল স্কিল",
+      "subjects": [
+        "মৌলিক বিষয়",
+        "অ্যাডভান্সড মডিউল"
+      ],
+      "exams": [
+        "মাসিক মূল্যায়ন",
+        "চূড়ান্ত পরীক্ষা"
+      ]
+    },
+    {
+      "id": "course-1793293703189",
+      "title": "নতুন আধুনিক কোর্স",
+      "titleEnglish": "New Professional Course",
+      "logoUrl": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80",
+      "duration": "৩ মাস",
+      "durationEnglish": "3 Months",
+      "description": "কোর্সের বাস্তবমুখী সিলেবাস ও প্র্যাকটিক্যাল ল্যাব বিবরণ।",
+      "descriptionEnglish": "Practical course syllabus with hands-on lab training.",
+      "features": [
+        "দক্ষ মেন্টর সাপোর্ট",
+        "লাইভ প্রজেক্ট ও অ্যাসাইনমেন্ট",
+        "প্রফেশনাল কোর্স সার্টিফিকেট"
+      ],
+      "featuresEnglish": [
+        "Expert mentor support",
+        "Live projects and assignments",
+        "Professional course certificate"
+      ],
+      "originalAdmissionFee": 1500,
+      "admissionFee": 1000,
+      "monthlyFee": 500,
+      "offerTimerExpiry": "2026-11-12",
+      "certificateFee": 0,
+      "certificateFeeSecondTime": 0,
+      "hasGovtCert": false,
+      "paymentDetails": "ভর্তি ফি ১,০০০ টাকা। দ্বিতীয় মাস থেকে নিয়মিত মাসিক ফি।",
+      "category": "আইটি ও প্রফেশনাল স্কিল",
+      "subjects": [
+        "মৌলিক বিষয়",
+        "অ্যাডভান্সড মডিউল"
+      ],
+      "exams": [
+        "মাসিক মূল্যায়ন",
+        "চূড়ান্ত পরীক্ষা"
+      ]
+    },
+    {
+      "id": "course-1793293704447",
+      "title": "নতুন আধুনিক কোর্স",
+      "titleEnglish": "New Professional Course",
+      "logoUrl": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80",
+      "duration": "৩ মাস",
+      "durationEnglish": "3 Months",
+      "description": "কোর্সের বাস্তবমুখী সিলেবাস ও প্র্যাকটিক্যাল ল্যাব বিবরণ।",
+      "descriptionEnglish": "Practical course syllabus with hands-on lab training.",
+      "features": [
+        "দক্ষ মেন্টর সাপোর্ট",
+        "লাইভ প্রজেক্ট ও অ্যাসাইনমেন্ট",
+        "প্রফেশনাল কোর্স সার্টিফিকেট"
+      ],
+      "featuresEnglish": [
+        "Expert mentor support",
+        "Live projects and assignments",
+        "Professional course certificate"
+      ],
+      "originalAdmissionFee": 1500,
+      "admissionFee": 1000,
+      "monthlyFee": 500,
+      "offerTimerExpiry": "2026-11-12",
+      "certificateFee": 0,
+      "certificateFeeSecondTime": 0,
+      "hasGovtCert": false,
+      "paymentDetails": "ভর্তি ফি ১,০০০ টাকা। দ্বিতীয় মাস থেকে নিয়মিত মাসিক ফি।",
+      "category": "আইটি ও প্রফেশনাল স্কিল",
+      "subjects": [
+        "মৌলিক বিষয়",
+        "অ্যাডভান্সড মডিউল"
+      ],
+      "exams": [
+        "মাসিক মূল্যায়ন",
+        "চূড়ান্ত পরীক্ষা"
+      ]
+    },
+    {
+      "id": "course-1793293706711",
+      "title": "নতুন আধুনিক কোর্স",
+      "titleEnglish": "New Professional Course",
+      "logoUrl": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80",
+      "duration": "৩ মাস",
+      "durationEnglish": "3 Months",
+      "description": "কোর্সের বাস্তবমুখী সিলেবাস ও প্র্যাকটিক্যাল ল্যাব বিবরণ।",
+      "descriptionEnglish": "Practical course syllabus with hands-on lab training.",
+      "features": [
+        "দক্ষ মেন্টর সাপোর্ট",
+        "লাইভ প্রজেক্ট ও অ্যাসাইনমেন্ট",
+        "প্রফেশনাল কোর্স সার্টিফিকেট"
+      ],
+      "featuresEnglish": [
+        "Expert mentor support",
+        "Live projects and assignments",
+        "Professional course certificate"
+      ],
+      "originalAdmissionFee": 1500,
+      "admissionFee": 1000,
+      "monthlyFee": 500,
+      "offerTimerExpiry": "2026-11-12",
+      "certificateFee": 0,
+      "certificateFeeSecondTime": 0,
+      "hasGovtCert": false,
+      "paymentDetails": "ভর্তি ফি ১,০০০ টাকা। দ্বিতীয় মাস থেকে নিয়মিত মাসিক ফি।",
+      "category": "আইটি ও প্রফেশনাল স্কিল",
+      "subjects": [
+        "মৌলিক বিষয়",
+        "অ্যাডভান্সড মডিউল"
+      ],
+      "exams": [
+        "মাসিক মূল্যায়ন",
+        "চূড়ান্ত পরীক্ষা"
+      ]
     }
   ],
   "mentors": [
@@ -1014,6 +1199,111 @@
       "registrationNo": "DEMO-2026-0010",
       "name": "ডেমো শিক্ষার্থী 10",
       "englishName": "Demo Student 10",
+      "fatherName": "ডেমো অভিভাবক",
+      "fatherNameEnglish": "Demo Guardian",
+      "motherName": "ডেমো অভিভাবক",
+      "motherNameEnglish": "Demo Guardian",
+      "phone": "00000000000",
+      "address": "ডেমো তথ্য — বাস্তব শিক্ষার্থী নয়",
+      "addressEnglish": "Demo record — not a real student",
+      "trxId": "DEMO-ONLY",
+      "enrollmentDate": "2026-01-20",
+      "status": "active",
+      "hasPaidDues": false,
+      "admitCardBlocked": false
+    },
+    {
+      "id": "std-demo-course-course-1793293699300",
+      "academicYear": "2026",
+      "courseId": "course-1793293699300",
+      "roll": "D001",
+      "registrationNo": "DEMO-2026-0001",
+      "name": "ডেমো শিক্ষার্থী 1",
+      "englishName": "Demo Student 1",
+      "fatherName": "ডেমো অভিভাবক",
+      "fatherNameEnglish": "Demo Guardian",
+      "motherName": "ডেমো অভিভাবক",
+      "motherNameEnglish": "Demo Guardian",
+      "phone": "00000000000",
+      "address": "ডেমো তথ্য — বাস্তব শিক্ষার্থী নয়",
+      "addressEnglish": "Demo record — not a real student",
+      "trxId": "DEMO-ONLY",
+      "enrollmentDate": "2026-01-20",
+      "status": "active",
+      "hasPaidDues": false,
+      "admitCardBlocked": false
+    },
+    {
+      "id": "std-demo-course-course-1793293702218",
+      "academicYear": "2026",
+      "courseId": "course-1793293702218",
+      "roll": "D001",
+      "registrationNo": "DEMO-2026-0001",
+      "name": "ডেমো শিক্ষার্থী 1",
+      "englishName": "Demo Student 1",
+      "fatherName": "ডেমো অভিভাবক",
+      "fatherNameEnglish": "Demo Guardian",
+      "motherName": "ডেমো অভিভাবক",
+      "motherNameEnglish": "Demo Guardian",
+      "phone": "00000000000",
+      "address": "ডেমো তথ্য — বাস্তব শিক্ষার্থী নয়",
+      "addressEnglish": "Demo record — not a real student",
+      "trxId": "DEMO-ONLY",
+      "enrollmentDate": "2026-01-20",
+      "status": "active",
+      "hasPaidDues": false,
+      "admitCardBlocked": false
+    },
+    {
+      "id": "std-demo-course-course-1793293703189",
+      "academicYear": "2026",
+      "courseId": "course-1793293703189",
+      "roll": "D001",
+      "registrationNo": "DEMO-2026-0001",
+      "name": "ডেমো শিক্ষার্থী 1",
+      "englishName": "Demo Student 1",
+      "fatherName": "ডেমো অভিভাবক",
+      "fatherNameEnglish": "Demo Guardian",
+      "motherName": "ডেমো অভিভাবক",
+      "motherNameEnglish": "Demo Guardian",
+      "phone": "00000000000",
+      "address": "ডেমো তথ্য — বাস্তব শিক্ষার্থী নয়",
+      "addressEnglish": "Demo record — not a real student",
+      "trxId": "DEMO-ONLY",
+      "enrollmentDate": "2026-01-20",
+      "status": "active",
+      "hasPaidDues": false,
+      "admitCardBlocked": false
+    },
+    {
+      "id": "std-demo-course-course-1793293704447",
+      "academicYear": "2026",
+      "courseId": "course-1793293704447",
+      "roll": "D001",
+      "registrationNo": "DEMO-2026-0001",
+      "name": "ডেমো শিক্ষার্থী 1",
+      "englishName": "Demo Student 1",
+      "fatherName": "ডেমো অভিভাবক",
+      "fatherNameEnglish": "Demo Guardian",
+      "motherName": "ডেমো অভিভাবক",
+      "motherNameEnglish": "Demo Guardian",
+      "phone": "00000000000",
+      "address": "ডেমো তথ্য — বাস্তব শিক্ষার্থী নয়",
+      "addressEnglish": "Demo record — not a real student",
+      "trxId": "DEMO-ONLY",
+      "enrollmentDate": "2026-01-20",
+      "status": "active",
+      "hasPaidDues": false,
+      "admitCardBlocked": false
+    },
+    {
+      "id": "std-demo-course-course-1793293706711",
+      "academicYear": "2026",
+      "courseId": "course-1793293706711",
+      "roll": "D001",
+      "registrationNo": "DEMO-2026-0001",
+      "name": "ডেমো শিক্ষার্থী 1",
+      "englishName": "Demo Student 1",
       "fatherName": "ডেমো অভিভাবক",
       "fatherNameEnglish": "Demo Guardian",
       "motherName": "ডেমো অভিভাবক",
