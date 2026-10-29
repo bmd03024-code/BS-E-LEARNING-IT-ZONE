@@ -1462,37 +1462,43 @@ class StorageService {
   getStudents(): Student[] {
     const savedStudents = this.get<Student[]>('students', initialStudents);
     const courses = this.getCourses();
-    const demoStudents: Student[] = courses
-      .filter((course) => !savedStudents.some((student) =>
-        student.courseId === course.id && student.id === `std-demo-course-${course.id}`
-      ))
-      .map((course, index) => ({
+    const demoProfiles = [
+      { name: "আব্দুল্লাহ আল মামুন", englishName: "Abdullah Al Mamun", fatherName: "মোঃ আব্দুল করিম", fatherNameEnglish: "Md. Abdul Karim", motherName: "রহিমা বেগম", motherNameEnglish: "Rahima Begum", phone: "01700001001" },
+      { name: "নুসরাত জাহান", englishName: "Nusrat Jahan", fatherName: "মোঃ জাহাঙ্গীর আলম", fatherNameEnglish: "Md. Jahangir Alam", motherName: "শাহানা আক্তার", motherNameEnglish: "Shahana Akter", phone: "01800001002" },
+      { name: "সাদিয়া ইসলাম", englishName: "Sadia Islam", fatherName: "মোঃ রফিকুল ইসলাম", fatherNameEnglish: "Md. Rafiqul Islam", motherName: "নাসিমা খাতুন", motherNameEnglish: "Nasima Khatun", phone: "01900001003" },
+      { name: "আরিফ হোসেন", englishName: "Arif Hossain", fatherName: "মোঃ আবুল হোসেন", fatherNameEnglish: "Md. Abul Hossain", motherName: "ফারজানা বেগম", motherNameEnglish: "Farzana Begum", phone: "01600001004" },
+      { name: "তাসনিম আক্তার", englishName: "Tasnim Akter", fatherName: "মোঃ কামাল উদ্দিন", fatherNameEnglish: "Md. Kamal Uddin", motherName: "সেলিনা বেগম", motherNameEnglish: "Selina Begum", phone: "01300001005" },
+      { name: "মেহেদী হাসান", englishName: "Mehedi Hasan", fatherName: "মোঃ মনির হোসেন", fatherNameEnglish: "Md. Monir Hossain", motherName: "আসমা খাতুন", motherNameEnglish: "Asma Khatun", phone: "01400001006" },
+      { name: "ফারিহা রহমান", englishName: "Fariha Rahman", fatherName: "মোঃ সাইফুর রহমান", fatherNameEnglish: "Md. Saifur Rahman", motherName: "লায়লা রহমান", motherNameEnglish: "Laila Rahman", phone: "01500001007" },
+      { name: "ইমরান কবির", englishName: "Imran Kabir", fatherName: "মোঃ নাসির উদ্দিন", fatherNameEnglish: "Md. Nasir Uddin", motherName: "রোকেয়া বেগম", motherNameEnglish: "Rokeya Begum", phone: "01700001008" },
+      { name: "মাহিয়া সুলতানা", englishName: "Mahiya Sultana", fatherName: "মোঃ আনোয়ার হোসেন", fatherNameEnglish: "Md. Anwar Hossain", motherName: "পারভীন আক্তার", motherNameEnglish: "Parvin Akter", phone: "01800001009" },
+      { name: "তানভীর আহমেদ", englishName: "Tanvir Ahmed", fatherName: "মোঃ হাবিবুর রহমান", fatherNameEnglish: "Md. Habibur Rahman", motherName: "শিরিন আক্তার", motherNameEnglish: "Shirin Akter", phone: "01900001010" },
+    ];
+    const demoIds = new Set(courses.map(course => `std-demo-course-${course.id}`));
+    const realStudents = savedStudents.filter(student => !demoIds.has(student.id));
+    const demoStudents: Student[] = courses.map((course, index) => {
+      const profile = demoProfiles[index % demoProfiles.length];
+      const sequence = index + 1;
+      return {
         id: `std-demo-course-${course.id}`,
         academicYear: "2026",
         courseId: course.id,
-        roll: `D${String(index + 1).padStart(3, "0")}`,
-        registrationNo: `DEMO-2026-${String(index + 1).padStart(4, "0")}`,
-        name: `ডেমো শিক্ষার্থী ${index + 1}`,
-        englishName: `Demo Student ${index + 1}`,
-        fatherName: "ডেমো অভিভাবক",
-        fatherNameEnglish: "Demo Guardian",
-        motherName: "ডেমো অভিভাবক",
-        motherNameEnglish: "Demo Guardian",
-        phone: "00000000000",
-        address: "ডেমো তথ্য — বাস্তব শিক্ষার্থী নয়",
-        addressEnglish: "Demo record — not a real student",
+        roll: String(100 + sequence),
+        registrationNo: `BSIT-2026-${String(sequence).padStart(4, "0")}`,
+        ...profile,
+        address: "চট্টগ্রাম, বাংলাদেশ",
+        addressEnglish: "Chattogram, Bangladesh",
+        photoUrl: `https://i.pravatar.cc/300?img=${(index % 70) + 1}`,
         trxId: "DEMO-ONLY",
         enrollmentDate: "2026-01-20",
         status: "active" as const,
         hasPaidDues: false,
         admitCardBlocked: false,
-      }));
-    if (demoStudents.length > 0) {
-      const mergedStudents = [...savedStudents, ...demoStudents];
-      this.set('students', mergedStudents);
-      return mergedStudents;
-    }
-    return savedStudents;
+      };
+    });
+    const mergedStudents = [...realStudents, ...demoStudents];
+    this.set('students', mergedStudents);
+    return mergedStudents;
   }
   saveStudents(students: Student[]): void {
     this.set('students', students);
