@@ -850,44 +850,6 @@ const initialAdmitCards: AdmitCardRecord[] = [
 
 // Pre-seeded Certificates with Admin Fee Control & Unlimited Re-download logic
 const initialCertificates: CertificateRecord[] = [
-  {
-    id: "cert-101",
-    academicYear: "2026",
-    courseId: "course-computer-office",
-    roll: "101",
-    studentName: "মোহাম্মদ আব্দুল্লাহ",
-    fatherName: "রফিকুল ইসলাম",
-    motherName: "নাসিমা বেগম",
-    address: "উত্তরা, ঢাকা",
-    issueDate: "2026-04-10",
-    certificateNo: "BS-IT-2026-00101",
-    grade: "5.00 (A+)",
-    isFirstIssue: false,
-    feePaid: true,
-    isFree: false,
-    feeAmount: 500,
-    hasEverPaid: true, // Already paid! All subsequent downloads are 100% FREE!
-    hasGovtCert: true
-  },
-  {
-    id: "cert-103",
-    academicYear: "2026",
-    courseId: "course-quran",
-    roll: "103",
-    studentName: "তানভীর হাসান",
-    fatherName: "মো: কামরুল হাসান",
-    motherName: "রোকেয়া বেগম",
-    address: "টঙ্গী, গাজীপুর",
-    issueDate: "2026-04-12",
-    certificateNo: "BS-QR-2026-00103",
-    grade: "5.00 (A+)",
-    isFirstIssue: true,
-    feePaid: true,
-    isFree: true, // Always completely free
-    feeAmount: 0,
-    hasEverPaid: true,
-    hasGovtCert: false
-  },
   { id: "demo-cert-1", studentId: "std-103", academicYear: "2026", courseId: "course-quran", roll: "103", registrationNo: "BSIT-2026-0003", studentName: "তানভীর হাসান", studentNameEnglish: "Tanvir Hasan", fatherName: "রফিকুল ইসলাম", fatherNameEnglish: "Rafiqul Islam", motherName: "নাসিমা বেগম", motherNameEnglish: "Nasima Begum", issueDate: "2026-10-29", certificateNo: "BSIT-DEMO-2026-001", grade: "5.00 (A+)", isFirstIssue: true, feePaid: true, isFree: true, feeAmount: 0, hasEverPaid: true, hasGovtCert: false, courseTitleEnglish: "Authentic Quran Education", published: true },
   { id: "demo-cert-2", studentId: "std-102", academicYear: "2026", courseId: "course-ssc-acc", roll: "102", registrationNo: "BSIT-2026-0002", studentName: "ফাতেমা তুজ জোহরা", studentNameEnglish: "Fatema Tuz Zohra", fatherName: "আবুল কালাম", fatherNameEnglish: "Abul Kalam", motherName: "শাহনাজ পারভীন", motherNameEnglish: "Shahnaz Parvin", issueDate: "2026-10-29", certificateNo: "BSIT-DEMO-2026-002", grade: "4.67 (A)", isFirstIssue: true, feePaid: true, isFree: true, feeAmount: 0, hasEverPaid: true, hasGovtCert: false, courseTitleEnglish: "SSC Accounting", published: true },
   { id: "demo-cert-3", studentId: "std-demo-hsc-acc", academicYear: "2026", courseId: "course-hsc-acc", roll: "105", registrationNo: "BSIT-2026-0005", studentName: "রায়হান আহমেদ", studentNameEnglish: "Rayhan Ahmed", fatherName: "মোঃ কামাল হোসেন", fatherNameEnglish: "Mohammad Kamal Hossain", motherName: "সালমা বেগম", motherNameEnglish: "Salma Begum", issueDate: "2026-10-29", certificateNo: "BSIT-DEMO-2026-003", grade: "5.00 (A+)", isFirstIssue: true, feePaid: true, isFree: true, feeAmount: 0, hasEverPaid: true, hasGovtCert: false, courseTitleEnglish: "HSC Accounting", published: true },
