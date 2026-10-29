@@ -2217,6 +2217,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [certFounderTitle, setCertFounderTitle] = useState(settings.founderTitle || 'প্রতিষ্ঠাতা ও প্রধান প্রশিক্ষক');
   const [editingCertId, setEditingCertId] = useState<string | null>(null);
 
+  const toEnglishName = (value?: string) => {
+    if (!value) return '';
+    const transliteration: Record<string, string> = {
+      'অ':'o','আ':'a','ই':'i','ঈ':'i','উ':'u','ঊ':'u','ঋ':'ri','এ':'e','ঐ':'oi','ও':'o','ঔ':'ou',
+      'ক':'k','খ':'kh','গ':'g','ঘ':'gh','ঙ':'ng','চ':'ch','ছ':'chh','জ':'j','ঝ':'jh','ঞ':'n',
+      'ট':'t','ঠ':'th','ড':'d','ঢ':'dh','ণ':'n','ত':'t','থ':'th','দ':'d','ধ':'dh','ন':'n',
+      'প':'p','ফ':'f','ব':'b','ভ':'bh','ম':'m','য':'j','র':'r','ল':'l','শ':'sh','ষ':'sh','স':'s','হ':'h',
+      'ড়':'r','ঢ়':'rh','য়':'y','ং':'ng','ঃ':'h','ঁ':'n','া':'a','ি':'i','ী':'i','ু':'u','ূ':'u',
+      'ৃ':'ri','ে':'e','ৈ':'oi','ো':'o','ৌ':'ou','্':'','ৎ':'t','‌':'','‍':''
+    };
+    return Array.from(value).map(ch => transliteration[ch] ?? ch).join('')
+      .replace(/[\u0980-\u09FF]/g, '').replace(/\s+/g, ' ').trim()
+      .replace(/(^|\s)([a-z])/g, (_, space, letter) => space + letter.toUpperCase());
+  };
+
   // Function to auto-fetch student and course details into editable text boxes
   const handleAutoFetchCertificateData = (rollVal: string, courseVal: string, yearVal: string) => {
     const trimmedRoll = rollVal.trim();
@@ -2236,12 +2251,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       setCertMotherName(existing.motherName || '');
       setCertAddress(existing.address || 'ঢাকা, বাংলাদেশ');
       const savedStudent = students.find(st => st.roll === trimmedRoll && st.academicYear === yearVal && st.courseId === courseVal);
-      setCertStudentNameEnglish(existing.studentNameEnglish || savedStudent?.englishName || '');
-      setCertFatherNameEnglish(existing.fatherNameEnglish || savedStudent?.fatherNameEnglish || '');
-      setCertMotherNameEnglish(existing.motherNameEnglish || savedStudent?.motherNameEnglish || '');
-      setCertAddressEnglish(existing.addressEnglish || savedStudent?.addressEnglish || '');
-      setCertCourseTitle(existing.courseTitle || courseObj?.title || '');
-      setCertCourseTitleEnglish(existing.courseTitleEnglish || courseObj?.titleEnglish || '');
+      setCertStudentNameEnglish(savedStudent?.englishName || toEnglishName(savedStudent?.name) || existing.studentNameEnglish || '');
+      setCertFatherNameEnglish(savedStudent?.fatherNameEnglish || toEnglishName(savedStudent?.fatherName) || existing.fatherNameEnglish || '');
+      setCertMotherNameEnglish(savedStudent?.motherNameEnglish || toEnglishName(savedStudent?.motherName) || existing.motherNameEnglish || '');
+      setCertAddressEnglish(savedStudent?.addressEnglish || existing.addressEnglish || '');
+      setCertCourseTitle(courseObj?.title || existing.courseTitle || '');
+      setCertCourseTitleEnglish(courseObj?.titleEnglish || toEnglishName(courseObj?.title) || existing.courseTitleEnglish || '');
       setCertDuration(existing.duration || courseObj?.duration || '৬ মাস');
       setCertGrade((existing.grade || 'A+').replace(/\s*\([^)]*[\u0980-\u09FF][^)]*\)/g, '').trim() || 'A+');
       setCertNo(existing.certificateNo || `BS-ZONE-${yearVal}-${trimmedRoll.padStart(4, '0')}`);
@@ -2271,12 +2286,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       setCertFatherName(match.fatherName || '');
       setCertMotherName(match.motherName || '');
       setCertAddress(match.address || 'ঢাকা, বাংলাদেশ');
-      setCertStudentNameEnglish(match.englishName || '');
-      setCertFatherNameEnglish(match.fatherNameEnglish || '');
-      setCertMotherNameEnglish(match.motherNameEnglish || '');
+      setCertStudentNameEnglish(match.englishName || toEnglishName(match.name));
+      setCertFatherNameEnglish(match.fatherNameEnglish || toEnglishName(match.fatherName));
+      setCertMotherNameEnglish(match.motherNameEnglish || toEnglishName(match.motherName));
       setCertAddressEnglish(match.addressEnglish || '');
       setCertCourseTitle(courseObj?.title || match.courseId);
-      setCertCourseTitleEnglish(courseObj?.titleEnglish || '');
+      setCertCourseTitleEnglish(courseObj?.titleEnglish || toEnglishName(courseObj?.title) || '');
       setCertDuration(courseObj?.duration || '৬ মাস (২৪ সপ্তাহ)');
       setCertGrade('A+');
       setCertNo(`BS-ZONE-${yearVal}-${match.roll.padStart(4, '0')}`);
@@ -2325,18 +2340,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       academicYear: certYearInput,
       courseId: certCourseInput,
       roll: trimmedRoll,
-      studentName: certStudentName.trim() || 'শিক্ষার্থীর নাম',
-      studentNameEnglish: certStudentNameEnglish.trim(),
+      studentName: certStudentName.trim() || students.find(st => st.roll === trimmedRoll && st.academicYear === certYearInput && st.courseId === certCourseInput)?.name || '',
+      studentNameEnglish: certStudentNameEnglish.trim() || toEnglishName(students.find(st => st.roll === trimmedRoll && st.academicYear === certYearInput && st.courseId === certCourseInput)?.name),
       fatherName: certFatherName.trim(),
-      fatherNameEnglish: certFatherNameEnglish.trim(),
+      fatherNameEnglish: certFatherNameEnglish.trim() || toEnglishName(students.find(st => st.roll === trimmedRoll && st.academicYear === certYearInput && st.courseId === certCourseInput)?.fatherName),
       motherName: certMotherName.trim(),
-      motherNameEnglish: certMotherNameEnglish.trim(),
+      motherNameEnglish: certMotherNameEnglish.trim() || toEnglishName(students.find(st => st.roll === trimmedRoll && st.academicYear === certYearInput && st.courseId === certCourseInput)?.motherName),
       address: certAddress.trim() || 'ঢাকা, বাংলাদেশ',
       addressEnglish: certAddressEnglish.trim(),
       registrationNo: students.find(st => st.roll === trimmedRoll && st.academicYear === certYearInput && st.courseId === certCourseInput)?.registrationNo,
       issueDate: certIssueDate || new Date().toISOString().split('T')[0],
       certificateNo: certNo.trim() || `BS-ZONE-${certYearInput}-${trimmedRoll.padStart(4, '0')}`,
-      grade: certGrade.trim() || 'A+ (প্রথম শ্রেণি)',
+      grade: certGrade.trim() || 'A+',
       isFirstIssue: true,
       feePaid: certIsFree,
       isFree: certIsFree,
@@ -6524,7 +6539,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       <div className="flex h-[clamp(30px,5.4vw,60px)] w-[clamp(30px,5.4vw,60px)] shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#555] bg-slate-50 text-[clamp(6px,0.9vw,10px)] text-[#555]">
                         {settings.logoUrl ? <img src={settings.logoUrl} alt="Institution logo" className="h-full w-full rounded-full object-contain p-1" /> : 'LOGO'}
                       </div>
-                      <div className="text-right">Registration No. {selectedCertForPrint.registrationNo || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.registrationNo || selectedCertForPrint.certificateNo || selectedCertForPrint.roll || '0001'}</div>
+                      <div className="text-right">Registration No. {students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.registrationNo || selectedCertForPrint.registrationNo || selectedCertForPrint.certificateNo || selectedCertForPrint.roll || ''}</div>
                     </div>
                     <div className="my-[1.7%] text-center text-[clamp(8px,1.33vw,15px)] font-bold uppercase tracking-[0.06em] text-[#1a202c] underline underline-offset-2">
                       {selectedCertForPrint.certificateTitleEnglish || 'CERTIFICATE OF COMPLETION'}
@@ -6534,13 +6549,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <div className="space-y-[0.55%] text-[clamp(8px,1.25vw,15px)] leading-[1.8] text-black">
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 whitespace-nowrap text-[clamp(7px,1.33vw,15px)]">This is to Certify that</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.studentNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.englishName || 'Rahim Ahmed'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.englishName || toEnglishName(students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.name) || selectedCertForPrint.studentNameEnglish || ''}</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 whitespace-nowrap text-[clamp(7px,1.33vw,15px)]">Son / Daughter of</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.fatherNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.fatherNameEnglish || 'Karim Ahmed'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.fatherNameEnglish || toEnglishName(students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.fatherName) || selectedCertForPrint.fatherNameEnglish || ''}</span>
                       <span className="mx-[1%] shrink-0 text-[clamp(7px,1.33vw,15px)]">and</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.motherNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.motherNameEnglish || 'Ayesha Begum'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.motherNameEnglish || toEnglishName(students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.motherName) || selectedCertForPrint.motherNameEnglish || ''}</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.33vw,15px)]">of</span>
@@ -6553,12 +6568,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       </div>
                       <div className="flex min-w-0 w-[40%] items-baseline gap-[1%]">
                         <span className="ml-[4%] shrink-0 text-[clamp(7px,1.33vw,15px)]">No.</span>
-                        <span className="min-w-0 flex-1 border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.registrationNo || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.registrationNo || 'Registration Number'}</span>
+                        <span className="min-w-0 flex-1 border-b border-dotted border-[#222] text-center font-bold italic">{students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.registrationNo || selectedCertForPrint.registrationNo || selectedCertForPrint.certificateNo || selectedCertForPrint.roll || ''}</span>
                       </div>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">duly completed the course in</span>
-                      <span className="min-w-0 flex-[0.4] border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.courseTitleEnglish || courses.find(c => c.id === selectedCertForPrint.courseId)?.titleEnglish || 'Computer Training Course'}</span>
+                      <span className="min-w-0 flex-[0.4] border-b border-dotted border-[#222] text-center font-bold italic">{courses.find(c => c.id === selectedCertForPrint.courseId)?.titleEnglish || toEnglishName(courses.find(c => c.id === selectedCertForPrint.courseId)?.title) || selectedCertForPrint.courseTitleEnglish || ''}</span>
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">and achieved</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
