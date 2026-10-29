@@ -612,6 +612,39 @@
       "admitCardBlocked": true
     }
   ],
+  "applications": [
+    {
+      "amount": 1500,
+      "id": "app-201",
+      "trxId": "QR998877A1",
+      "type": "admission",
+      "studentName": "সাকিব আল হাসান",
+      "address": "উত্তরা, ঢাকা",
+      "status": "pending",
+      "academicYear": "2026",
+      "phone": "01755112233",
+      "courseId": "course-computer-office",
+      "appliedDate": "2026-04-12",
+      "photoUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80",
+      "fatherName": "মোঃ হাসান আলী",
+      "motherName": "মমতাজ বেগম"
+    },
+    {
+      "appliedDate": "2026-04-13",
+      "id": "app-202",
+      "roll": "102",
+      "amount": 500,
+      "phone": "01812345679",
+      "courseId": "course-ssc-acc",
+      "trxId": "QR554433B2",
+      "studentName": "ফাতেমা তুজ জোহরা",
+      "academicYear": "2026",
+      "month": "এপ্রিল ২০২৬",
+      "photoUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80",
+      "status": "pending",
+      "type": "monthly"
+    }
+  ],
   "routines": [
     {
       "time": "সন্ধ্যা ০৭:০০ - ০৮:৩০",
@@ -921,6 +954,40 @@
       "images": []
     }
   ],
+  "gallery": [
+    {
+      "category": "ল্যাব ক্লাস",
+      "url": "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+      "id": "gal-1",
+      "title": "কম্পিউটার প্র্যাকটিক্যাল ল্যাব সেশন",
+      "date": "২০২৬",
+      "type": "image"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80",
+      "category": "অনুষ্ঠান",
+      "date": "২০২৬",
+      "title": "কুরআন শিক্ষা ব্যাচের সমাপ্তি ও দোয়া মাহফিল",
+      "type": "image",
+      "id": "gal-2"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
+      "date": "২০২৬",
+      "category": "পুরস্কার বিতরণ",
+      "type": "image",
+      "title": "মেধাবী শিক্ষার্থীদের মাঝে সনদ ও পুরস্কার বিতরণী",
+      "id": "gal-3"
+    },
+    {
+      "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "date": "২০২৬",
+      "title": "সরাসরি শিক্ষক-শিক্ষার্থী মতবিনিময় সভার ঝলক",
+      "category": "ভিডিও লেকচার",
+      "id": "gal-4",
+      "type": "video"
+    }
+  ],
   "notes": [
     {
       "description": "সহজ নিয়ম ও শর্টকাট কৌশল সম্বলিত পিডিএফ লেকচার নোট। পরীক্ষায় শতভাগ কমন পাওয়ার উপযোগী।",
@@ -989,40 +1056,6 @@
       "title": "এসএসসি হিসাববিজ্ঞান: রেওয়ামিল প্রস্তুতের সহজ ৫টি নিয়ম",
       "instructor": "বোরহানউদ্দিন মহিম",
       "description": "কোন কোন ভুল রেওয়ামিলে ধরা পড়ে না এবং কীভাবে এক দেখায় রেওয়ামিল মেলাবেন।"
-    }
-  ],
-  "gallery": [
-    {
-      "category": "ল্যাব ক্লাস",
-      "url": "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
-      "id": "gal-1",
-      "title": "কম্পিউটার প্র্যাকটিক্যাল ল্যাব সেশন",
-      "date": "২০২৬",
-      "type": "image"
-    },
-    {
-      "url": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80",
-      "category": "অনুষ্ঠান",
-      "date": "২০২৬",
-      "title": "কুরআন শিক্ষা ব্যাচের সমাপ্তি ও দোয়া মাহফিল",
-      "type": "image",
-      "id": "gal-2"
-    },
-    {
-      "url": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
-      "date": "২০২৬",
-      "category": "পুরস্কার বিতরণ",
-      "type": "image",
-      "title": "মেধাবী শিক্ষার্থীদের মাঝে সনদ ও পুরস্কার বিতরণী",
-      "id": "gal-3"
-    },
-    {
-      "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      "date": "২০২৬",
-      "title": "সরাসরি শিক্ষক-শিক্ষার্থী মতবিনিময় সভার ঝলক",
-      "category": "ভিডিও লেকচার",
-      "id": "gal-4",
-      "type": "video"
     }
   ],
   "chatbot": {
@@ -1162,39 +1195,6 @@
       "fallbackToLocal": true
     }
   },
-  "applications": [
-    {
-      "amount": 1500,
-      "id": "app-201",
-      "trxId": "QR998877A1",
-      "type": "admission",
-      "studentName": "সাকিব আল হাসান",
-      "address": "উত্তরা, ঢাকা",
-      "status": "pending",
-      "academicYear": "2026",
-      "phone": "01755112233",
-      "courseId": "course-computer-office",
-      "appliedDate": "2026-04-12",
-      "photoUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80",
-      "fatherName": "মোঃ হাসান আলী",
-      "motherName": "মমতাজ বেগম"
-    },
-    {
-      "appliedDate": "2026-04-13",
-      "id": "app-202",
-      "roll": "102",
-      "amount": 500,
-      "phone": "01812345679",
-      "courseId": "course-ssc-acc",
-      "trxId": "QR554433B2",
-      "studentName": "ফাতেমা তুজ জোহরা",
-      "academicYear": "2026",
-      "month": "এপ্রিল ২০২৬",
-      "photoUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80",
-      "status": "pending",
-      "type": "monthly"
-    }
-  ],
   "admin_creds": {
     "password": "01612118307",
     "masterPin": "01585410330",
