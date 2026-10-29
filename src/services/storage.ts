@@ -1460,7 +1460,39 @@ class StorageService {
   }
 
   getStudents(): Student[] {
-    return this.get<Student[]>('students', initialStudents);
+    const savedStudents = this.get<Student[]>('students', initialStudents);
+    const courses = this.getCourses();
+    const demoStudents: Student[] = courses
+      .filter((course) => !savedStudents.some((student) =>
+        student.courseId === course.id && student.id === `std-demo-course-${course.id}`
+      ))
+      .map((course, index) => ({
+        id: `std-demo-course-${course.id}`,
+        academicYear: "2026",
+        courseId: course.id,
+        roll: `D${String(index + 1).padStart(3, "0")}`,
+        registrationNo: `DEMO-2026-${String(index + 1).padStart(4, "0")}`,
+        name: `ডেমো শিক্ষার্থী ${index + 1}`,
+        englishName: `Demo Student ${index + 1}`,
+        fatherName: "ডেমো অভিভাবক",
+        fatherNameEnglish: "Demo Guardian",
+        motherName: "ডেমো অভিভাবক",
+        motherNameEnglish: "Demo Guardian",
+        phone: "00000000000",
+        address: "ডেমো তথ্য — বাস্তব শিক্ষার্থী নয়",
+        addressEnglish: "Demo record — not a real student",
+        trxId: "DEMO-ONLY",
+        enrollmentDate: "2026-01-20",
+        status: "active" as const,
+        hasPaidDues: false,
+        admitCardBlocked: false,
+      }));
+    if (demoStudents.length > 0) {
+      const mergedStudents = [...savedStudents, ...demoStudents];
+      this.set('students', mergedStudents);
+      return mergedStudents;
+    }
+    return savedStudents;
   }
   saveStudents(students: Student[]): void {
     this.set('students', students);
