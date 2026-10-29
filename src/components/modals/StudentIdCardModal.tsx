@@ -40,7 +40,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({
     setErrorMsg('');
 
     if (!roll.trim()) {
-      setErrorMsg('Please enter the student's roll number.');
+      setErrorMsg("Please enter the student's roll number.");
       return;
     }
 
