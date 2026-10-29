@@ -109,6 +109,12 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => {
             const hasDiscount = !!(course.originalAdmissionFee && course.originalAdmissionFee > course.admissionFee);
+            const displayTitle = isEnglish ? (course.titleEnglish || course.title) : course.title;
+            const displayDescription = isEnglish ? (course.descriptionEnglish || course.description) : course.description;
+            const displayCategory = isEnglish ? (course.categoryEnglish || course.category) : course.category;
+            const displayDuration = isEnglish ? (course.durationEnglish || course.duration) : course.duration;
+            const displaySubjects = isEnglish ? (course.subjectsEnglish || course.subjects || []) : (course.subjects || []);
+            const displayFeatures = isEnglish ? (course.featuresEnglish || course.features) : course.features;
 
             return (
               <div
@@ -122,14 +128,14 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                     <div className="course-banner-reveal w-full h-36 rounded-xl overflow-hidden mb-4 bg-slate-900 border border-slate-200 relative">
                       <img
                         src={course.logoUrl}
-                        alt={course.title}
+                        alt={displayTitle}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                         }}
                       />
                       <span className="absolute top-2 left-2 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-900/90 text-white backdrop-blur-xs">
-                        {course.category}
+                        {displayCategory}
                       </span>
                     </div>
                   )}
@@ -137,7 +143,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                   <div className="flex items-start justify-between gap-2 mb-2">
                     {!course.logoUrl && (
                       <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200">
-                        {course.category}
+                        {displayCategory}
                       </span>
                     )}
                     {course.hasGovtCert && (
@@ -154,16 +160,16 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                   </div>
 
                   <h3 className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-blue-900 transition-colors">
-                    {course.title}
+                    {displayTitle}
                   </h3>
 
                   <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{isEnglish ? 'Duration:' : 'মেয়াদ:'} {course.duration}</span>
+                    <span>{isEnglish ? 'Duration:' : 'মেয়াদ:'} {displayDuration}</span>
                   </p>
 
                   <p className="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2">
-                    {course.description}
+                    {displayDescription}
                   </p>
 
                   {/* Pricing Box */}
@@ -198,21 +204,21 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                   </div>
 
                   {/* Subjects pill if available */}
-                  {course.subjects && course.subjects.length > 0 && (
+                  {displaySubjects.length > 0 && (
                     <div className="mt-3">
                       <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1 mb-1">
                         <Layers className="w-3 h-3 text-blue-800" />
                         <span>{isEnglish ? 'Subjects:' : 'পাঠ্য বিষয়সমূহ:'}</span>
                       </span>
                       <div className="flex flex-wrap gap-1">
-                        {course.subjects.slice(0, 3).map((sub, i) => (
+                        {displaySubjects.slice(0, 3).map((sub, i) => (
                           <span key={i} className="text-[10px] px-2 py-0.5 rounded-md bg-blue-50 text-blue-900 font-medium border border-blue-100">
                             {sub}
                           </span>
                         ))}
-                        {course.subjects.length > 3 && (
+                        {displaySubjects.length > 3 && (
                           <span className="text-[10px] px-1.5 py-0.5 text-slate-400 font-bold">
-                            +{course.subjects.length - 3} {isEnglish ? 'more' : 'টি'}
+                            +{displaySubjects.length - 3} {isEnglish ? 'more' : 'টি'}
                           </span>
                         )}
                       </div>
@@ -221,7 +227,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
 
                   {/* Highlights Bullet List */}
                   <div className="mt-4 space-y-1.5">
-                    {course.features.map((feat, idx) => (
+                    {displayFeatures.map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2 text-xs text-slate-700">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                         <span className="leading-snug">{feat}</span>
