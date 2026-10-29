@@ -6520,7 +6520,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       <div className="flex h-[clamp(30px,5.4vw,60px)] w-[clamp(30px,5.4vw,60px)] shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#555] bg-slate-50 text-[clamp(6px,0.9vw,10px)] text-[#555]">
                         {settings.logoUrl ? <img src={settings.logoUrl} alt="Institution logo" className="h-full w-full rounded-full object-contain p-1" /> : 'LOGO'}
                       </div>
-                      <div className="text-right">Registration No. {selectedCertForPrint.registrationNo || selectedCertForPrint.certificateNo || '131149/2023-24'}</div>
+                      <div className="text-right">Registration No. {selectedCertForPrint.registrationNo || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.registrationNo || selectedCertForPrint.certificateNo || 'Registration Number'}</div>
                     </div>
                     <div className="my-[1.7%] text-center text-[clamp(8px,1.33vw,15px)] font-bold uppercase tracking-[0.06em] text-[#1a202c] underline underline-offset-2">
                       {selectedCertForPrint.certificateTitleEnglish || 'CERTIFICATE OF COMPLETION'}
@@ -6530,17 +6530,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <div className="space-y-[0.55%] text-[clamp(8px,1.42vw,16px)] leading-[2.3] text-black">
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 whitespace-nowrap text-[clamp(7px,1.33vw,15px)]">This is to Certify that</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.studentNameEnglish || 'Student Name'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.studentNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.englishName || 'Student Name'}</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 whitespace-nowrap text-[clamp(7px,1.33vw,15px)]">Son / Daughter of</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.fatherNameEnglish || 'Father Name'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.fatherNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.fatherNameEnglish || 'Father Name'}</span>
                       <span className="mx-[1%] shrink-0 text-[clamp(7px,1.33vw,15px)]">and</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.motherNameEnglish || 'Mother Name'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.motherNameEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.motherNameEnglish || 'Mother Name'}</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.33vw,15px)]">of</span>
-                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.addressEnglish || selectedCertForPrint.institutionNameEnglish || settings.name || 'BS E-Learning & IT Zone'}</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-[#222] pl-[1.2%] font-bold italic">{selectedCertForPrint.addressEnglish || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.addressEnglish || selectedCertForPrint.institutionNameEnglish || settings.name || 'BS E-Learning & IT Zone'}</span>
                     </div>
                     <div className="flex items-baseline justify-between gap-3">
                       <div className="flex min-w-0 w-[55%] items-baseline gap-[1%]">
@@ -6549,12 +6549,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       </div>
                       <div className="flex min-w-0 w-[40%] items-baseline gap-[1%]">
                         <span className="ml-[4%] shrink-0 text-[clamp(7px,1.33vw,15px)]">No.</span>
-                        <span className="min-w-0 flex-1 border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.registrationNo || 'Registration Number'}</span>
+                        <span className="min-w-0 flex-1 border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.registrationNo || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.registrationNo || 'Registration Number'}</span>
                       </div>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">duly completed the course in</span>
-                      <span className="min-w-0 flex-[0.4] border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.courseTitleEnglish || 'Course Name'}</span>
+                      <span className="min-w-0 flex-[0.4] border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.courseTitleEnglish || courses.find(c => c.id === selectedCertForPrint.courseId)?.titleEnglish || courses.find(c => c.id === selectedCertForPrint.courseId)?.title || 'Course Name'}</span>
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">and achieved</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
