@@ -15,6 +15,8 @@ export interface InstituteSettings {
   founderTitleEnglish?: string;
   founderSpeech: string;
   founderSpeechEnglish?: string;
+  founderTagline?: string;
+  founderTaglineEnglish?: string;
   founderPhotoUrl: string;
   signatureUrl: string;
   signatureSealUrl: string;
