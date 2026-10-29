@@ -2230,7 +2230,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       setCertFatherName(existing.fatherName || '');
       setCertMotherName(existing.motherName || '');
       setCertAddress(existing.address || 'ঢাকা, বাংলাদেশ');
+      const savedStudent = students.find(st => st.roll === trimmedRoll && st.academicYear === yearVal && st.courseId === courseVal);
+      setCertStudentNameEnglish(existing.studentNameEnglish || savedStudent?.englishName || '');
+      setCertFatherNameEnglish(existing.fatherNameEnglish || savedStudent?.fatherNameEnglish || '');
+      setCertMotherNameEnglish(existing.motherNameEnglish || savedStudent?.motherNameEnglish || '');
+      setCertAddressEnglish(existing.addressEnglish || savedStudent?.addressEnglish || '');
       setCertCourseTitle(existing.courseTitle || courseObj?.title || '');
+      setCertCourseTitleEnglish(existing.courseTitleEnglish || courseObj?.titleEnglish || '');
       setCertDuration(existing.duration || courseObj?.duration || '৬ মাস');
       setCertGrade(existing.grade || 'A+ (প্রথম শ্রেণি)');
       setCertNo(existing.certificateNo || `BS-ZONE-${yearVal}-${trimmedRoll.padStart(4, '0')}`);
@@ -2260,7 +2266,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       setCertFatherName(match.fatherName || '');
       setCertMotherName(match.motherName || '');
       setCertAddress(match.address || 'ঢাকা, বাংলাদেশ');
+      setCertStudentNameEnglish(match.englishName || '');
+      setCertFatherNameEnglish(match.fatherNameEnglish || '');
+      setCertMotherNameEnglish(match.motherNameEnglish || '');
+      setCertAddressEnglish(match.addressEnglish || '');
       setCertCourseTitle(courseObj?.title || match.courseId);
+      setCertCourseTitleEnglish(courseObj?.titleEnglish || '');
       setCertDuration(courseObj?.duration || '৬ মাস (২৪ সপ্তাহ)');
       setCertGrade('A+ (প্রথম শ্রেণি)');
       setCertNo(`BS-ZONE-${yearVal}-${match.roll.padStart(4, '0')}`);
@@ -2277,6 +2288,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     } else if (trimmedRoll) {
       // Direct new roll fallback
       setCertCourseTitle(courseObj?.title || '');
+      setCertCourseTitleEnglish(courseObj?.titleEnglish || '');
       setCertDuration(courseObj?.duration || '৬ মাস (২৪ সপ্তাহ)');
       setCertGrade('A+ (প্রথম শ্রেণি)');
       setCertNo(`BS-ZONE-${yearVal}-${trimmedRoll.padStart(4, '0')}`);
@@ -2309,9 +2321,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       courseId: certCourseInput,
       roll: trimmedRoll,
       studentName: certStudentName.trim() || 'শিক্ষার্থীর নাম',
+      studentNameEnglish: certStudentNameEnglish.trim(),
       fatherName: certFatherName.trim(),
+      fatherNameEnglish: certFatherNameEnglish.trim(),
       motherName: certMotherName.trim(),
+      motherNameEnglish: certMotherNameEnglish.trim(),
       address: certAddress.trim() || 'ঢাকা, বাংলাদেশ',
+      addressEnglish: certAddressEnglish.trim(),
+      registrationNo: students.find(st => st.roll === trimmedRoll && st.academicYear === certYearInput && st.courseId === certCourseInput)?.registrationNo,
       issueDate: certIssueDate || new Date().toISOString().split('T')[0],
       certificateNo: certNo.trim() || `BS-ZONE-${certYearInput}-${trimmedRoll.padStart(4, '0')}`,
       grade: certGrade.trim() || 'A+ (প্রথম শ্রেণি)',
@@ -2324,7 +2341,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       certificateTitle: certTitle,
       bodyText: certBodyText,
       duration: certDuration || courseObj?.duration,
+      durationEnglish: courseObj?.durationEnglish || '',
       courseTitle: certCourseTitle || courseObj?.title,
+      courseTitleEnglish: certCourseTitleEnglish || courseObj?.titleEnglish || '',
       institutionName: settings.name,
       institutionSubName: settings.subName,
       founderName: certFounderName || settings.founderName,
