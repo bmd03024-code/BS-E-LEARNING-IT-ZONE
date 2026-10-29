@@ -1348,6 +1348,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [searchRoll, setSearchRoll] = useState('');
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [selectedStudentForIdCard, setSelectedStudentForIdCard] = useState<Student | null>(null);
+  const [showBulkIdCards, setShowBulkIdCards] = useState(false);
 
   const filteredStudents = students.filter(s => {
     if (s.academicYear !== filterYear) return false;
@@ -1409,6 +1410,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setShowBulkIdCards(true)}
+          disabled={filteredStudents.length === 0}
+          className="px-4 py-2.5 rounded-xl bg-blue-900 text-white text-xs font-bold disabled:opacity-40"
+        >
+          <Printer className="inline w-4 h-4 mr-2" />Print Multiple Student ID Cards ({filteredStudents.length})
+        </button>
       </div>
 
       {/* Student List Table */}
@@ -1655,14 +1667,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-xs overflow-y-auto">
           <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl my-8">
             <h4 className="text-sm font-bold text-slate-900 border-b pb-2 flex items-center justify-between">
-              <span>শিক্ষার্থী আইডি কার্ড প্রিভিউ ও প্রিন্ট</span>
+              <span>Student ID Card Preview &amp; Print</span>
               <button onClick={() => setSelectedStudentForIdCard(null)} className="text-slate-400 hover:text-slate-700">
                 <X className="w-4 h-4" />
               </button>
             </h4>
 
             {/* High-Fidelity Printable Area with Watermark, Parents Names, Seal & Signature */}
-            <div className="printable-area relative bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white rounded-2xl p-6 shadow-xl border-2 border-amber-400 text-center space-y-3 overflow-hidden">
+            <div className="printable-area relative mx-auto bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white p-3 shadow-xl border-2 border-amber-400 text-center space-y-2 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box" }}>
               {/* Background Subtle Watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 select-none">
                 {settings.logoUrl ? (
@@ -1681,10 +1693,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   BS E-LEARNING &amp; IT ZONE
                 </div>
                 <div className="text-[10px] text-slate-300">
-                  {settings.subName || 'দক্ষতা ও সাফল্যের সেরা ডিজিটাল একাডেমি'}
+                  {settings.subNameEnglish || 'Skills and Success Through Digital Learning'}
                 </div>
                 <div className="inline-block mt-1 px-3 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[9px] tracking-wide uppercase">
-                  STUDENT IDENTITY CARD | পরিচয়পত্র
+                  STUDENT IDENTITY CARD
                 </div>
               </div>
 
@@ -1702,10 +1714,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <h5 className="text-base font-bold text-white">{selectedStudentForIdCard.name}</h5>
                 <div className="inline-flex items-center gap-2 mt-0.5">
                   <span className="px-2 py-0.5 rounded-md bg-blue-900/90 text-amber-300 font-mono font-black text-xs border border-amber-400/30">
-                    রোল: {selectedStudentForIdCard.roll}
+                    Roll No: {selectedStudentForIdCard.roll}
                   </span>
                   <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-semibold">
-                    সেশন: {toBengaliNum(selectedStudentForIdCard.academicYear)}
+                    Academic Year: {selectedStudentForIdCard.academicYear}
                   </span>
                 </div>
               </div>
@@ -1713,34 +1725,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               {/* Personal & Parents Details (পিতার নাম ও মাতার নাম স্পষ্টভাবে) */}
               <div className="relative z-10 bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 text-xs space-y-1.5 text-left backdrop-blur-xs">
                 <div className="flex justify-between border-b border-slate-800 pb-1">
-                  <span className="text-amber-300 font-bold shrink-0">কোর্স:</span>
+                  <span className="text-amber-300 font-bold shrink-0">Registration No:</span>
+                  <span className="font-mono font-extrabold text-white text-right pl-2">{selectedStudentForIdCard.registrationNo || '—'}</span>
+                </div>
+                <div className="flex justify-between border-b border-slate-800 pb-1">
+                  <span className="text-amber-300 font-bold shrink-0">Course:</span>
                   <span className="font-semibold text-white text-right truncate pl-2">
-                    {courses.find(c => c.id === selectedStudentForIdCard.courseId)?.title || selectedStudentForIdCard.courseId}
+                    {courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || courses.find(c => c.id === selectedStudentForIdCard.courseId)?.title || selectedStudentForIdCard.courseId}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
-                  <span className="text-amber-300 font-bold shrink-0">পিতার নাম:</span>
+                  <span className="text-amber-300 font-bold shrink-0">Father:</span>
                   <span className="font-extrabold text-white text-right pl-2">
-                    {selectedStudentForIdCard.fatherName || 'উল্লেখিত নেই'}
+                    {selectedStudentForIdCard.fatherNameEnglish || '—'}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
-                  <span className="text-amber-300 font-bold shrink-0">মাতার নাম:</span>
+                  <span className="text-amber-300 font-bold shrink-0">Mother:</span>
                   <span className="font-extrabold text-white text-right pl-2">
-                    {selectedStudentForIdCard.motherName || 'উল্লেখিত নেই'}
+                    {selectedStudentForIdCard.motherNameEnglish || '—'}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
-                  <span className="text-slate-400 font-semibold shrink-0">মোবাইল:</span>
+                  <span className="text-slate-400 font-semibold shrink-0">Phone:</span>
                   <span className="font-mono text-slate-200 text-right">{selectedStudentForIdCard.phone}</span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-slate-400 font-semibold shrink-0">ঠিকানা:</span>
-                  <span className="text-slate-200 text-right truncate pl-2">{selectedStudentForIdCard.address || 'বাংলাদেশ'}</span>
+                  <span className="text-slate-400 font-semibold shrink-0">Address:</span>
+                  <span className="text-slate-200 text-right truncate pl-2">{selectedStudentForIdCard.addressEnglish || '—'}</span>
                 </div>
               </div>
 
@@ -1781,10 +1797,59 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 className="px-4 py-2 text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 rounded-xl flex items-center gap-1.5 shadow-sm"
               >
                 <Printer className="w-3.5 h-3.5 text-amber-400" />
-                <span>আইডি কার্ড প্রিন্ট করুন</span>
+                <span>Print ID Card</span>
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {showBulkIdCards && (
+        <div className="fixed inset-0 z-[70] bg-white overflow-auto">
+          <div className="no-print sticky top-0 z-10 flex items-center justify-between gap-3 border-b bg-white p-4">
+            <div>
+              <h2 className="font-bold text-slate-900">Multiple Student ID Cards</h2>
+              <p className="text-xs text-slate-600">Academic Year: {filterYear} · Course: {filterCourse === 'all' ? 'All Courses' : (courses.find(c => c.id === filterCourse)?.titleEnglish || courses.find(c => c.id === filterCourse)?.title || filterCourse)} · Students: {filteredStudents.length}</p>
+            </div>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => window.print()} className="rounded-lg bg-blue-900 px-4 py-2 text-sm font-bold text-white">Print All</button>
+              <button type="button" onClick={() => setShowBulkIdCards(false)} className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700">Close</button>
+            </div>
+          </div>
+          <div className="bulk-id-print-grid mx-auto grid grid-cols-2 justify-items-center gap-2 p-3">
+            {filteredStudents.map((student) => (
+              <article key={student.id} className="bulk-id-card relative flex flex-col items-center overflow-hidden border-2 border-amber-500 bg-gradient-to-b from-slate-900 to-blue-950 p-3 text-center text-white">
+                <h3 className="text-[10px] font-extrabold tracking-wide text-amber-300">BS E-LEARNING &amp; IT ZONE</h3>
+                <p className="mt-0.5 text-[7px] font-bold">STUDENT IDENTITY CARD</p>
+                <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="mt-2 h-14 w-14 rounded-lg border border-amber-400 object-cover" />
+                <h4 className="mt-2 w-full break-words text-[10px] font-extrabold">{student.englishName || student.name || '—'}</h4>
+                <div className="mt-1 w-full space-y-1 text-left text-[7px]">
+                  <p><b>Registration No:</b> {student.registrationNo || '—'}</p>
+                  <p><b>Roll No:</b> {student.roll || '—'}</p>
+                  <p><b>Academic Year:</b> {student.academicYear || '—'}</p>
+                  <p><b>Course:</b> {courses.find(c => c.id === student.courseId)?.titleEnglish || courses.find(c => c.id === student.courseId)?.title || student.courseId || '—'}</p>
+                  <p><b>Father:</b> {student.fatherNameEnglish || '—'}</p>
+                  <p><b>Mother:</b> {student.motherNameEnglish || '—'}</p>
+                  <p><b>Phone:</b> {student.phone || '—'}</p>
+                </div>
+                <div className="mt-auto w-full pt-2 text-[6px] text-amber-200">AUTHORIZED STUDENT ID</div>
+              </article>
+            ))}
+          </div>
+          <style>{`
+            @page { size: A4 portrait; margin: 5mm; }
+            @media print {
+              body * { visibility: hidden !important; }
+              .bulk-id-print-grid, .bulk-id-print-grid * { visibility: visible !important; }
+              .bulk-id-print-grid { position: absolute; left: 0; top: 0; width: 100%; display: grid !important; grid-template-columns: repeat(2, 2.216in) !important; justify-content: center !important; gap: 3mm !important; padding: 0 !important; margin: 0 !important; }
+              .bulk-id-card { width: 2.216in !important; height: 3.316in !important; box-sizing: border-box !important; break-inside: avoid !important; page-break-inside: avoid !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+              .bulk-id-card:nth-child(6n) { page-break-after: always; }
+              .no-print { display: none !important; }
+            }
+            @media screen {
+              .bulk-id-card { width: 2.216in; height: 3.316in; box-sizing: border-box; }
+            }
+          `}</style>
         </div>
       )}
 
