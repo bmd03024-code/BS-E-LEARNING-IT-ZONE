@@ -6470,7 +6470,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="relative z-10 px-3 py-4 sm:px-7 sm:py-5">
                 <div className="text-center">
                   <div className="text-[11px] sm:text-xl font-bold uppercase tracking-wide text-[#111]">
-                    {selectedCertForPrint.institutionNameEnglish || settings.nameEnglish || settings.name || 'BS E-Learning & IT Zone'}
+                    {selectedCertForPrint.institutionNameEnglish || settings.name || 'BS E-Learning & IT Zone'}
                   </div>
                   <div className="mt-1 text-[9px] sm:text-sm font-bold tracking-[0.2em] text-[#222]">
                     {selectedCertForPrint.institutionSubNameEnglish || settings.subNameEnglish || settings.subName || 'BANGLADESH'}
@@ -6506,7 +6506,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   </div>
                   <div className="flex items-end gap-2">
                     <span className="shrink-0">of</span>
-                    <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-words">{selectedCertForPrint.addressEnglish || selectedCertForPrint.address || selectedCertForPrint.institutionNameEnglish || selectedCertForPrint.institutionName || settings.nameEnglish || settings.name || 'BS E-Learning & IT Zone'}</span>
+                    <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-words">{selectedCertForPrint.addressEnglish || selectedCertForPrint.address || selectedCertForPrint.institutionNameEnglish || selectedCertForPrint.institutionName || settings.name || 'BS E-Learning & IT Zone'}</span>
                   </div>
                   <div className="grid grid-cols-[1.25fr_1fr] gap-4">
                     <div className="flex min-w-0 items-end gap-2">
@@ -6538,7 +6538,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <div className="mt-5 sm:mt-8 flex items-end justify-between gap-4 text-[8px] sm:text-xs">
                   <div className="max-w-[45%] leading-relaxed">
                     {settings.addressEnglish || settings.address || 'Bangladesh'}<br />
-                    Issued by {selectedCertForPrint.institutionNameEnglish || selectedCertForPrint.institutionName || settings.nameEnglish || settings.name || 'BS E-Learning & IT Zone'}
+                    Issued by {selectedCertForPrint.institutionNameEnglish || selectedCertForPrint.institutionName || settings.name || 'BS E-Learning & IT Zone'}
                   </div>
                   <div className="flex flex-col items-center text-center">
                     {settings.signatureUrl ? <img src={settings.signatureUrl} alt="Authorized signature" className="mb-1 h-7 sm:h-10 max-w-[120px] object-contain" /> : <div className="h-7 sm:h-10" />}
