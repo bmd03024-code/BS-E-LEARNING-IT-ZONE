@@ -2974,7 +2974,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     className="font-bold text-sm sm:text-base text-blue-950 border rounded-xl px-3 py-1.5 w-full sm:w-96"
                   />
                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mt-2">Course title (English):</label>
-                   <input type="text" value={c.titleEnglish || ''} placeholder="Enter English course title" onChange={(e) => { const updated = courses.map(item => item.id === c.id ? { ...item, titleEnglish: e.target.value } : item); setCourses(updated); storage.saveCourses(updated); }} className="text-sm border rounded-xl px-3 py-1.5 w-full sm:w-96" />
+                   <input type="text" value={c.titleEnglish || ''} placeholder="Write the actual English course title" onChange={(e) => { const updated = courses.map(item => item.id === c.id ? { ...item, titleEnglish: e.target.value } : item); setCourses(updated); storage.saveCourses(updated); }} className="text-sm border rounded-xl px-3 py-1.5 w-full sm:w-96" />
                 </div>
 
                 <div className="flex items-center gap-2 self-end sm:self-center">
@@ -3136,7 +3136,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     }}
                     className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-semibold"
                   />
-                  <input type="text" value={c.durationEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, durationEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for c.duration" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
+                  <input type="text" value={c.durationEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, durationEnglish: e.target.value } : item)); }} placeholder="Enter course duration in English" aria-label="Course duration in English" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-slate-600 mb-1">ক্যাটাগরি</label>
@@ -3149,7 +3149,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     }}
                     className="w-full px-2.5 py-1.5 border rounded-lg text-xs font-semibold"
                   />
-                  <input type="text" value={c.categoryEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, categoryEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for c.category" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
+                  <input type="text" value={c.categoryEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, categoryEnglish: e.target.value } : item)); }} placeholder="Enter course category in English" aria-label="Course category in English" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 </div>
                 <div className="sm:col-span-3">
                   <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্সের বিস্তারিত বর্ণনা (Description)</label>
@@ -3162,52 +3162,76 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     }}
                     className="w-full px-3 py-1.5 border rounded-lg text-xs leading-relaxed"
                   />
-                  <input type="text" value={c.descriptionEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, descriptionEnglish: e.target.value } : item)); }} placeholder="English translation..." aria-label="English translation for c.description" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
+                  <input type="text" value={c.descriptionEnglish || ''} onChange={(e) => { setCourses(courses.map(item => item.id === c.id ? { ...item, descriptionEnglish: e.target.value } : item)); }} placeholder="Write the full course description in English" aria-label="Course description in English" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
                 </div>
               </div>
 
-              {/* Course Features / Highlights */}
+              {/* English payment details are edited separately, not auto-translated. */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">পেমেন্টের বিস্তারিত (বাংলা)</label>
+                  <textarea rows={2} value={c.paymentDetails || ''} onChange={(e) => {
+                    const updated = courses.map(item => item.id === c.id ? { ...item, paymentDetails: e.target.value } : item);
+                    setCourses(updated);
+                  }} className="w-full px-3 py-2 border rounded-lg text-xs" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-blue-800 mb-1">Payment Details (English)</label>
+                  <textarea rows={2} value={c.paymentDetailsEnglish || ''} placeholder="Enter payment details in English" onChange={(e) => {
+                    const updated = courses.map(item => item.id === c.id ? { ...item, paymentDetailsEnglish: e.target.value } : item);
+                    setCourses(updated);
+                  }} className="w-full px-3 py-2 border border-blue-200 bg-blue-50 rounded-lg text-xs" />
+                </div>
+              </div>
+
+              {/* Course Features / Highlights: Bengali and English fields side by side */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-[11px] font-bold text-slate-700">কোর্সের প্রধান বৈশিষ্ট্য ও সুবিধাসমূহ (Features):</label>
+                  <label className="text-[11px] font-bold text-slate-700">কোর্সের প্রধান বৈশিষ্ট্য ও সুবিধাসমূহ (বাংলা + English)</label>
                   <button
                     onClick={() => {
                       const updated = courses.map(item => item.id === c.id ? {
                         ...item,
-                        features: [...item.features, 'নতুন আকর্ষণীয় সুবিধা']
+                        features: [...(item.features || []), 'নতুন সুবিধা'],
+                        featuresEnglish: [...(item.featuresEnglish || []), 'New course benefit']
                       } : item);
                       setCourses(updated);
                     }}
                     className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200"
                   >
-                    + সুবিধা যোগ করুন
+                    + সুবিধা যোগ করুন / Add feature
                   </button>
                 </div>
 
-                <div className="space-y-1.5">
-                  {c.features.map((feat, fIdx) => (
-                    <div key={fIdx} className="flex items-center gap-2">
+                <div className="space-y-2">
+                  {(c.features || []).map((feat, fIdx) => (
+                    <div key={fIdx} className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <input
                         type="text"
+                        aria-label={`বাংলা সুবিধা ${fIdx + 1}`}
                         value={feat}
+                        placeholder="সুবিধাটি বাংলায় লিখুন"
                         onChange={(e) => {
-                          const newFeats = [...c.features];
+                          const newFeats = [...(c.features || [])];
                           newFeats[fIdx] = e.target.value;
                           const updated = courses.map(item => item.id === c.id ? { ...item, features: newFeats } : item);
                           setCourses(updated);
                         }}
-                        className="w-full px-2.5 py-1 border rounded-lg text-xs"
+                        className="w-full px-2.5 py-2 border rounded-lg text-xs"
                       />
-                      <button
-                        onClick={() => {
-                          const newFeats = c.features.filter((_, i) => i !== fIdx);
-                          const updated = courses.map(item => item.id === c.id ? { ...item, features: newFeats } : item);
+                      <input
+                        type="text"
+                        aria-label={`English feature ${fIdx + 1}`}
+                        value={(c.featuresEnglish || [])[fIdx] || ''}
+                        placeholder="Enter this feature in English"
+                        onChange={(e) => {
+                          const newFeatsEnglish = [...(c.featuresEnglish || [])];
+                          newFeatsEnglish[fIdx] = e.target.value;
+                          const updated = courses.map(item => item.id === c.id ? { ...item, featuresEnglish: newFeatsEnglish } : item);
                           setCourses(updated);
                         }}
-                        className="text-red-400 hover:text-red-600 p-1"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
+                        className="w-full px-2.5 py-2 border border-blue-200 bg-blue-50 rounded-lg text-xs"
+                      />
                     </div>
                   ))}
                 </div>
