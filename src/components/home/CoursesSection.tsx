@@ -5,6 +5,7 @@ import { Clock, CheckCircle2, ArrowRight, ShieldCheck, Sparkles, BookOpen, Layer
 interface CoursesSectionProps {
   courses: Course[];
   onEnrollCourse: (course: Course) => void;
+  language?: 'bn' | 'en';
 }
 
 // Convert English numbers to Bengali numerals
@@ -16,7 +17,9 @@ export const toBengaliNum = (num: number | string): string => {
   return String(num).replace(/[0-9]/g, (match) => bnNums[match] || match);
 };
 
-export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrollCourse }) => {
+export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrollCourse, language = 'bn' }) => {
+  const isEnglish = language === 'en';
+  const formatMoney = (amount: number) => isEnglish ? String(amount) : toBengaliNum(amount);
   // Live countdown state
   const [timeLeft, setTimeLeft] = useState({
     days: 12,
@@ -44,13 +47,13 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 mb-3">
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>নির্ধারিত কোর্স ফি ও বিশেষ অফার প্যাকেজ</span>
+            <span>{isEnglish ? 'Course Fees & Special Offers' : 'নির্ধারিত কোর্স ফি ও বিশেষ অফার প্যাকেজ'}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900">
-            আমাদের অফিশিয়াল কোর্সসমূহ
+            {isEnglish ? 'Our Official Courses' : 'আমাদের অফিশিয়াল কোর্সসমূহ'}
           </h2>
           <p className="text-sm sm:text-base text-slate-600 mt-2">
-            দক্ষ শিক্ষক মণ্ডলী, মানসম্মত সিলেবাস ও নিয়মিত পরীক্ষার মাধ্যমে শতভাগ সাফল্যের নিশ্চয়তা
+            {isEnglish ? 'Quality learning with experienced teachers, structured syllabuses, and regular assessments.' : 'দক্ষ শিক্ষক মণ্ডলী, মানসম্মত সিলেবাস ও নিয়মিত পরীক্ষার মাধ্যমে শতভাগ সাফল্যের নিশ্চয়তা'}
           </p>
         </div>
 
@@ -62,10 +65,10 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
             </div>
             <div>
               <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
-                সীমিত সময়ের বিশেষ ভর্তি অফার চলছে!
+                {isEnglish ? 'Limited-Time Admission Offer!' : 'সীমিত সময়ের বিশেষ ভর্তি অফার চলছে!'}
               </span>
               <h3 className="text-lg sm:text-xl font-bold mt-0.5">
-                কাটা মূল্যে স্পেশাল ছাড়ে এখনই এনরোল করুন
+                {isEnglish ? 'Enroll now and save with our special discounted fees' : 'কাটা মূল্যে স্পেশাল ছাড়ে এখনই এনরোল করুন'}
               </h3>
             </div>
           </div>
@@ -76,28 +79,28 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
               <span className="block text-lg sm:text-2xl font-black text-amber-400">
                 {toBengaliNum(timeLeft.days)}
               </span>
-              <span className="text-[10px] text-slate-300 font-semibold">দিন</span>
+              <span className="text-[10px] text-slate-300 font-semibold">{isEnglish ? 'Days' : 'দিন'}</span>
             </div>
             <span className="text-amber-400 font-bold">:</span>
             <div className="bg-black/40 border border-white/20 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 min-w-[54px]">
               <span className="block text-lg sm:text-2xl font-black text-amber-400">
                 {toBengaliNum(timeLeft.hours)}
               </span>
-              <span className="text-[10px] text-slate-300 font-semibold">ঘণ্টা</span>
+              <span className="text-[10px] text-slate-300 font-semibold">{isEnglish ? 'Hours' : 'ঘণ্টা'}</span>
             </div>
             <span className="text-amber-400 font-bold">:</span>
             <div className="bg-black/40 border border-white/20 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 min-w-[54px]">
               <span className="block text-lg sm:text-2xl font-black text-amber-400">
                 {toBengaliNum(timeLeft.minutes)}
               </span>
-              <span className="text-[10px] text-slate-300 font-semibold">মিনিট</span>
+              <span className="text-[10px] text-slate-300 font-semibold">{isEnglish ? 'Minutes' : 'মিনিট'}</span>
             </div>
             <span className="text-amber-400 font-bold">:</span>
             <div className="bg-black/40 border border-white/20 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 min-w-[54px]">
               <span className="block text-lg sm:text-2xl font-black text-amber-400">
                 {toBengaliNum(timeLeft.seconds)}
               </span>
-              <span className="text-[10px] text-slate-300 font-semibold">সেকেন্ড</span>
+              <span className="text-[10px] text-slate-300 font-semibold">{isEnglish ? 'Seconds' : 'সেকেন্ড'}</span>
             </div>
           </div>
         </div>
@@ -140,12 +143,12 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                     {course.hasGovtCert && (
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
                         <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                        সরকারি সনদ
+                        {isEnglish ? 'Government Certificate' : 'সরকারি সনদ'}
                       </span>
                     )}
                     {course.certificateFee === 0 && (
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                        সনদ ফ্রি
+                        {isEnglish ? 'Free Certificate' : 'সনদ ফ্রি'}
                       </span>
                     )}
                   </div>
@@ -156,7 +159,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
 
                   <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>মেয়াদ: {course.duration}</span>
+                    <span>{isEnglish ? 'Duration:' : 'মেয়াদ:'} {course.duration}</span>
                   </p>
 
                   <p className="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2">
@@ -166,30 +169,30 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                   {/* Pricing Box */}
                   <div className="mt-4 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
                     <div className="flex items-baseline justify-between">
-                      <span className="text-xs font-semibold text-slate-600">ভর্তি ফি:</span>
+                      <span className="text-xs font-semibold text-slate-600">{isEnglish ? 'Admission fee:' : 'ভর্তি ফি:'}</span>
                       <div className="flex items-center gap-2">
                         {hasDiscount && (
                           <span className="text-xs sm:text-sm line-through text-slate-400 font-medium">
-                            {toBengaliNum(course.originalAdmissionFee!)}৳
+                            {formatMoney(course.originalAdmissionFee!)} BDT
                           </span>
                         )}
                         <span className="text-base sm:text-lg font-extrabold text-blue-900">
-                          {toBengaliNum(course.admissionFee)} টাকা
+                          {formatMoney(course.admissionFee)} {isEnglish ? 'BDT' : 'টাকা'}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-baseline justify-between mt-1 pt-1 border-t border-slate-200 text-xs">
-                      <span className="text-slate-600 font-medium">মাসিক ফি:</span>
+                      <span className="text-slate-600 font-medium">{isEnglish ? 'Monthly fee:' : 'মাসিক ফি:'}</span>
                       <span className="font-bold text-emerald-700">
-                        {course.monthlyFee > 0 ? `${toBengaliNum(course.monthlyFee)} টাকা / মাস` : 'মাসিক ফি নেই'}
+                        {course.monthlyFee > 0 ? `${formatMoney(course.monthlyFee)} ${isEnglish ? 'BDT / month' : 'টাকা / মাস'}` : (isEnglish ? 'No monthly fee' : 'মাসিক ফি নেই')}
                       </span>
                     </div>
 
                     <div className="flex items-baseline justify-between mt-1 pt-1 border-t border-slate-200 text-[11px]">
-                      <span className="text-slate-500">সনদ ফি:</span>
+                      <span className="text-slate-500">{isEnglish ? 'Certificate fee:' : 'সনদ ফি:'}</span>
                       <span className="font-semibold text-slate-700">
-                        {course.certificateFee === 0 ? 'সম্পূর্ণ ফ্রি' : `${toBengaliNum(course.certificateFee)} টাকা`}
+                        {course.certificateFee === 0 ? (isEnglish ? 'Free' : 'সম্পূর্ণ ফ্রি') : `${formatMoney(course.certificateFee)} ${isEnglish ? 'BDT' : 'টাকা'}`}
                       </span>
                     </div>
                   </div>
@@ -199,7 +202,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                     <div className="mt-3">
                       <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1 mb-1">
                         <Layers className="w-3 h-3 text-blue-800" />
-                        <span>পাঠ্য বিষয়সমূহ:</span>
+                        <span>{isEnglish ? 'Subjects:' : 'পাঠ্য বিষয়সমূহ:'}</span>
                       </span>
                       <div className="flex flex-wrap gap-1">
                         {course.subjects.slice(0, 3).map((sub, i) => (
@@ -209,7 +212,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                         ))}
                         {course.subjects.length > 3 && (
                           <span className="text-[10px] px-1.5 py-0.5 text-slate-400 font-bold">
-                            +{course.subjects.length - 3}টি
+                            +{course.subjects.length - 3} {isEnglish ? 'more' : 'টি'}
                           </span>
                         )}
                       </div>
@@ -233,7 +236,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ courses, onEnrol
                     onClick={() => onEnrollCourse(course)}
                     className="w-full flex items-center justify-center gap-2 py-2.5 sm:py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-blue-900 hover:bg-blue-800 text-white shadow-sm hover:shadow-md transition-all group-hover:bg-gradient-to-r group-hover:from-blue-900 group-hover:to-indigo-900"
                   >
-                    <span>এনরোল করুন</span>
+                    <span>{isEnglish ? 'Enroll Now' : 'এনরোল করুন'}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
