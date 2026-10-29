@@ -87,7 +87,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
   };
 
   const selectedCourseFor = (student: Student) => courses.find(course => course.id === student.courseId) || courses[0];
-  const pages = Array.from({ length: Math.ceil(matchingStudents.length / 8) }, (_, index) => matchingStudents.slice(index * 8, index * 8 + 8));
+  const pages = Array.from({ length: Math.ceil(matchingStudents.length / 6) }, (_, index) => matchingStudents.slice(index * 6, index * 6 + 6));
 
   const renderCard = (student: Student) => {
     const course = selectedCourseFor(student);
@@ -136,7 +136,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
     <div className={`student-id-modal ${printMode === 'bulk' ? 'print-mode-bulk' : 'print-mode-single'} fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 overflow-y-auto`}>
       <style>{`
         .student-id-modal { font-family: Arial, Helvetica, sans-serif; }
-        .id-card { width:85.6mm; height:53.98mm; min-width:85.6mm; max-width:85.6mm; min-height:53.98mm; max-height:53.98mm; box-sizing:border-box; padding:2.2mm; color:#fff; background:linear-gradient(135deg,#0f172a,#172554 65%,#020617); border:0.65mm solid #d9a441; border-radius:1.5mm; display:flex; flex-direction:column; overflow:hidden; break-inside:avoid; page-break-inside:avoid; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+        .id-card { width:56.2864mm; height:84.2264mm; min-width:56.2864mm; max-width:56.2864mm; min-height:84.2264mm; max-height:84.2264mm; box-sizing:border-box; padding:2.2mm; color:#fff; background:linear-gradient(135deg,#0f172a,#172554 65%,#020617); border:0.65mm solid #d9a441; border-radius:1.5mm; display:flex; flex-direction:column; overflow:hidden; break-inside:avoid; page-break-inside:avoid; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
         .id-card-top { height:11mm; flex:none; display:flex; align-items:center; gap:2mm; border-bottom:.25mm solid rgba(245,190,70,.6); padding-bottom:1mm; }
         .id-card-logo { width:8mm; height:8mm; object-fit:contain; flex:none; border-radius:50%; }
         .id-card-logo-text { display:flex; align-items:center; justify-content:center; background:#fbbf24; color:#0f172a; font-size:10pt; font-weight:900; }
@@ -169,9 +169,9 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
           .print-mode-single .bulk-print-pages { display:none!important; }
           .print-mode-bulk .single-preview { display:none!important; }
           .print-mode-bulk .bulk-print-pages { display:block!important; }
-          .bulk-print-page { width:100%; display:grid; grid-template-columns:85.6mm 85.6mm; grid-auto-rows:53.98mm; gap:4mm; justify-content:center; align-content:start; break-after:page; page-break-after:always; }
+          .bulk-print-page { width:100%; display:grid; grid-template-columns:56.2864mm 56.2864mm; grid-auto-rows:84.2264mm; gap:4mm; justify-content:center; align-content:start; break-after:page; page-break-after:always; }
           .bulk-print-page:last-child { break-after:auto; page-break-after:auto; }
-          @page { size: ${printMode === 'bulk' ? 'A4 portrait' : '85.6mm 53.98mm'}; margin: ${printMode === 'bulk' ? '8mm' : '0'}; }
+          @page { size: ${printMode === 'bulk' ? 'A4 portrait' : '56.2864mm 84.2264mm'}; margin: ${printMode === 'bulk' ? '8mm' : '0'}; }
         }
       `}</style>
 
@@ -179,7 +179,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
         <div className="no-print bg-gradient-to-r from-blue-950 via-slate-900 to-blue-900 text-white px-6 py-4 flex items-center justify-between border-b border-amber-400/30">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-amber-400/20 text-amber-300"><UserCheck className="w-5 h-5" /></div>
-            <div><h3 className="font-bold text-base sm:text-lg">Student ID Card Download &amp; Print</h3><p className="text-xs text-slate-300">CR80 size: 85.6 × 53.98 mm</p></div>
+            <div><h3 className="font-bold text-base sm:text-lg">Student ID Card Download &amp; Print</h3><p className="text-xs text-slate-300">ID Card size: 2.216 × 3.316 inches</p></div>
           </div>
           <button onClick={onClose} aria-label="Close" className="p-1.5 rounded-full hover:bg-white/10 text-slate-300"><X className="w-5 h-5" /></button>
         </div>
@@ -199,7 +199,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
               <button type="submit" className="py-2.5 px-5 rounded-xl text-xs font-bold bg-blue-900 hover:bg-blue-800 text-white flex items-center justify-center gap-2"><Search className="w-4 h-4" /> Search Student</button>
             </form>
           ) : (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-blue-50 border border-blue-100 p-3"><p className="text-xs text-blue-950">Found <b>{matchingStudents.length}</b> student(s) for this academic year and course. Bulk sheets fit up to 8 exact-size cards per A4 page.</p><button onClick={printBulk} className="py-2.5 px-4 rounded-xl text-xs font-bold bg-blue-900 hover:bg-blue-800 text-white inline-flex items-center gap-2"><Printer className="w-4 h-4" /> Print All Cards</button></div>
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-blue-50 border border-blue-100 p-3"><p className="text-xs text-blue-950">Found <b>{matchingStudents.length}</b> student(s) for this academic year and course. Bulk sheets fit up to 6 exact-size cards per A4 page.</p><button onClick={printBulk} className="py-2.5 px-4 rounded-xl text-xs font-bold bg-blue-900 hover:bg-blue-800 text-white inline-flex items-center gap-2"><Printer className="w-4 h-4" /> Print All Cards</button></div>
           )}
           {errorMsg && <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2"><AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /><span>{errorMsg}</span></div>}
         </div>
