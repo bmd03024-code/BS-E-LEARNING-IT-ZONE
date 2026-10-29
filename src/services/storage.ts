@@ -181,6 +181,12 @@ const initialCourses: Course[] = [
     category: "ধর্মীয় ও নৈতিক শিক্ষা",
     subjects: ["হরফ ও মাখরাজ", "তাজবীদ রুলস", "মাদ্দ ও গুন্নাহ", "সূরা হিফজ ও তিলাওয়াত"],
     exams: ["মাখরাজ মূল্যায়ন", "তাজবীদ টেস্ট", "চূড়ান্ত তিলাওয়াত পরীক্ষা"]
+    durationEnglish: "Ongoing Batches",
+    descriptionEnglish: "Learn accurate Quran recitation with Tajweed, correct articulation (Makharij), and practical Surah memorization.",
+    categoryEnglish: "Religious & Moral Education",
+    featuresEnglish: ["Admission fee: BDT 500 (first month included)","Monthly fee from the second month: BDT 500","Certificate is free of charge","Separate class arrangements for women and men"],
+    subjectsEnglish: ["Arabic Letters & Makharij","Tajweed Rules","Madd & Ghunnah","Surah Memorization & Recitation"],
+    examsEnglish: ["Makharij Assessment","Tajweed Test","Final Recitation Examination"],
   },
   {
     id: "course-ssc-acc",
@@ -204,6 +210,12 @@ const initialCourses: Course[] = [
     category: "একাডেমিক কোর্স",
     subjects: ["লেনদেন ও হিসাব সমীকরণ", "জাবেদা ও খতিয়ান", "রেওয়ামিল", "আর্থিক বিবরণী"],
     exams: ["অধ্যায়ভিত্তিক টেস্ট", "প্রাক-নির্বাচনী মডেল টেস্ট", "এসএসসি ফাইনাল প্রস্তুতি পরীক্ষা"]
+    durationEnglish: "Full Academic Session",
+    descriptionEnglish: "Cover all SSC Accounting chapters from basic concepts to creative and multiple-choice problem solving.",
+    categoryEnglish: "Academic Course",
+    featuresEnglish: ["Discounted admission fee: BDT 800 (regular BDT 1,000)","Monthly fee: BDT 500","Chapter-based handouts and model tests"],
+    subjectsEnglish: ["Transactions & Accounting Equation","Journal & Ledger","Trial Balance","Financial Statements"],
+    examsEnglish: ["Chapter Tests","Pre-selection Model Test","SSC Final Preparation Exam"],
   },
   {
     id: "course-hsc-acc",
@@ -227,6 +239,12 @@ const initialCourses: Course[] = [
     category: "একাডেমিক কোর্স",
     subjects: ["হিসাববিজ্ঞান ১ম পত্র", "অংশীদারি কারবার", "কোম্পানির মূলধন", "উৎপাদন ব্যয় হিসাব"],
     exams: ["১ম পত্র ফাইনাল মডেল টেস্ট", "২য় পত্র ফাইনাল মডেল টেস্ট"]
+    durationEnglish: "HSC First and Second Papers",
+    descriptionEnglish: "A focused HSC Accounting program covering both papers, with simplified concepts and exam preparation.",
+    categoryEnglish: "Academic Course",
+    featuresEnglish: ["Discounted admission fee: BDT 800 (regular BDT 1,000)","Monthly fee: BDT 500","Basic university admission preparation"],
+    subjectsEnglish: ["Accounting First Paper","Partnership Business","Company Share Capital","Manufacturing Cost Accounting"],
+    examsEnglish: ["First Paper Final Model Test","Second Paper Final Model Test"],
   },
   {
     id: "course-class8-10-eng",
@@ -250,6 +268,12 @@ const initialCourses: Course[] = [
     category: "একাডেমিক কোর্স",
     subjects: ["Grammar Fundamentals", "Right Form of Verbs", "Transformation", "Composition"],
     exams: ["Monthly Grammar Test", "Final Model Test"]
+    durationEnglish: "Full Academic Session",
+    descriptionEnglish: "Strengthen English through grammar, writing, and textbook-based practice for Grades 8–10.",
+    categoryEnglish: "Academic Course",
+    featuresEnglish: ["Discounted admission fee: BDT 800 (regular BDT 1,000)","Monthly fee: BDT 500","Grammar rules and vocabulary tests"],
+    subjectsEnglish: ["Grammar Fundamentals","Right Form of Verbs","Sentence Transformation","Composition Writing"],
+    examsEnglish: ["Monthly Grammar Test","Final Model Test"],
   },
   {
     id: "course-class8-10-math",
@@ -273,6 +297,12 @@ const initialCourses: Course[] = [
     category: "একাডেমিক কোর্স",
     subjects: ["বীজগণিতীয় রাশি", "জ্যামিতি ও সম্পাদ্য", "ত্রিকোণমিতি ও পরিমিতি", "পরিসংখ্যান"],
     exams: ["জ্যামিতি মূল্যায়ন", "বীজগণিত টেস্ট", "ফাইনাল মডেল টেস্ট"]
+    durationEnglish: "Full Academic Session",
+    descriptionEnglish: "Build confidence in mathematics through formulas, geometry, algebra, trigonometry, and statistics.",
+    categoryEnglish: "Academic Course",
+    featuresEnglish: ["Discounted admission fee: BDT 800 (regular BDT 1,000)","Monthly fee: BDT 500","Easy methods and shortcut techniques"],
+    subjectsEnglish: ["Algebraic Expressions","Geometry & Constructions","Trigonometry & Mensuration","Statistics"],
+    examsEnglish: ["Geometry Assessment","Algebra Test","Final Model Test"],
   },
   {
     id: "course-math-eng-combo",
@@ -294,6 +324,12 @@ const initialCourses: Course[] = [
     category: "স্পেশাল কম্বো অফার",
     subjects: ["গণিত বেসিক ও সৃজনশীল", "ইংরেজি গ্রামার ও রাইটিং"],
     exams: ["যৌথ মূল্যায়ন পরীক্ষা", "সেমিস্টার ফাইনাল"]
+    durationEnglish: "Combined Course",
+    descriptionEnglish: "Study Mathematics and English together for Grades 8–10 in one combined package.",
+    categoryEnglish: "Special Combo Offer",
+    featuresEnglish: ["Admission fee: BDT 1,000","Monthly fee: BDT 800","Special notes and question bank for both subjects"],
+    subjectsEnglish: ["Mathematics Basics & Creative Questions","English Grammar & Writing"],
+    examsEnglish: ["Combined Assessment","Semester Final Examination"],
   },
   {
     id: "course-class1-7-all",
@@ -315,6 +351,12 @@ const initialCourses: Course[] = [
     category: "প্রাথমিক ও জুনিয়র",
     subjects: ["বাংলা ও বানান", "প্রাথমিক গণিত", "ইংরেজি রিডিং ও রাইটিং", "সাধারণ বিজ্ঞান"],
     exams: ["প্রথম প্রান্তিক মূল্যায়ন", "দ্বিতীয় প্রান্তিক মূল্যায়ন", "বার্ষিক পরীক্ষা"]
+    durationEnglish: "Year-round Batch",
+    descriptionEnglish: "Foundational learning for Grades 1–7, with homework support and regular assessments across core subjects.",
+    categoryEnglish: "Primary & Junior",
+    featuresEnglish: ["Admission fee: BDT 1,000","Monthly fee: BDT 1,000","Extra support in Bangla, English, Mathematics, and Science"],
+    subjectsEnglish: ["Bangla & Spelling","Basic Mathematics","English Reading & Writing","General Science"],
+    examsEnglish: ["First Term Assessment","Second Term Assessment","Annual Examination"],
   },
   {
     id: "course-computer-office",
@@ -340,6 +382,12 @@ const initialCourses: Course[] = [
     category: "আইটি ও প্রফেশনাল",
     subjects: ["Computer Fundamentals & OS", "MS Word & Typing Speed", "MS Excel & Financial Formula", "MS PowerPoint & Access", "Internet & Email Communication"],
     exams: ["টাইপিং স্পিড টেস্ট", "এক্সেল প্র্যাকটিক্যাল ল্যাব", "কারিগরি বোর্ড ফাইনাল পরীক্ষা"]
+    durationEnglish: "6 Months",
+    descriptionEnglish: "Hands-on practical training in MS Word, Excel, PowerPoint, Access, internet use, and typing.",
+    categoryEnglish: "IT & Professional",
+    featuresEnglish: ["Total course price: BDT 4,500; special offer: BDT 3,500","Admission starts with BDT 1,500","Remaining course fee is due before the examination","Online marksheet and certificate; government certificate option where applicable"],
+    subjectsEnglish: ["Computer Fundamentals & Operating Systems","MS Word & Typing Speed","MS Excel & Financial Formulas","MS PowerPoint & Access","Internet & Email Communication"],
+    examsEnglish: ["Typing Speed Test","Excel Practical Lab","Final Technical Examination"],
   },
   {
     id: "course-spoken-english",
@@ -362,6 +410,12 @@ const initialCourses: Course[] = [
     category: "ভাষা ও যোগাযোগ",
     subjects: ["Pronunciation & Phonetics", "Daily Conversation Patterns", "Public Speaking & Presentation", "Listening & Accent Training"],
     exams: ["Oral Presentation Test", "Final Fluency Interview"]
+    durationEnglish: "4 Months",
+    descriptionEnglish: "Develop fluent spoken English, British pronunciation, and public-speaking skills through practical sessions.",
+    categoryEnglish: "Language & Communication",
+    featuresEnglish: ["Total course price: BDT 4,000","Admission can start with BDT 2,000","Real-time conversation and presentation sessions"],
+    subjectsEnglish: ["Pronunciation & Phonetics","Daily Conversation Patterns","Public Speaking & Presentation","Listening & Accent Training"],
+    examsEnglish: ["Oral Presentation Test","Final Fluency Interview"],
   },
   {
     id: "course-basic-bangla-math-eng",
@@ -385,6 +439,12 @@ const initialCourses: Course[] = [
     category: "ফাউন্ডেশন কোর্স",
     subjects: ["শুদ্ধ বাংলা উচ্চারণ ও বর্ণমালা", "সহজ গণিত ও নামতা", "ইংরেজি বেসিক শব্দ ও বাক্য"],
     exams: ["মৌখিক পরীক্ষা", "লিখিত বেসিক টেস্ট"]
+    durationEnglish: "3-Month Foundation Course",
+    descriptionEnglish: "Build foundational Bangla pronunciation and spelling, basic arithmetic, multiplication tables, and beginner English.",
+    categoryEnglish: "Foundation Course",
+    featuresEnglish: ["Total course price: BDT 4,500 (including offer)","Admission can start with BDT 2,000","Remaining BDT 2,500 can be paid in installments"],
+    subjectsEnglish: ["Bangla Pronunciation & Alphabet","Basic Mathematics & Multiplication Tables","Basic English Words & Sentences"],
+    examsEnglish: ["Oral Examination","Written Foundation Test"],
   }
 ];
 
