@@ -20,6 +20,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
   const [errorMsg, setErrorMsg] = useState('');
   const [printMode, setPrintMode] = useState<PrintMode>('single');
   const settings = storage.getSettings();
+  const englishOrFallback = (value: string | undefined, fallback: string) => value && value.trim() && !/[\u0980-\u09FF]/.test(value) ? value : fallback;
 
   useEffect(() => {
     if (!courses.some(course => course.id === courseId) && courses[0]) setCourseId(courses[0].id);
@@ -91,7 +92,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
         <div className="id-card-top">
           {settings.logoUrl ? <img src={settings.logoUrl} alt="Institute Logo" className="id-card-logo" /> : <div className="id-card-logo id-card-logo-text">BS</div>}
           <div className="id-card-institute">
-            <div className="id-card-institute-name">{settings.name || 'BS E-Learning & IT Zone'}</div>
+            <div className="id-card-institute-name">{englishOrFallback(settings.name, 'BS E-Learning & IT Zone')}</div>
             <div className="id-card-subtitle">{settings.subNameEnglish || 'A Digital Academy for Skills and Success'}</div>
             <div className="id-card-label">STUDENT IDENTITY CARD</div>
           </div>
@@ -103,12 +104,12 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
             className="id-card-photo"
           />
           <div className="id-card-details">
-            <div className="id-card-student-name">{student.englishName || student.name || 'Student Name'}</div>
+            <div className="id-card-student-name">{englishOrFallback(student.englishName, 'Student Name')}</div>
             <div className="id-card-line"><b>Roll:</b> {student.roll} <span className="id-card-divider">|</span> <b>Session:</b> {student.academicYear}</div>
             <div className="id-card-line"><b>Registration No.:</b> {student.registrationNo || 'Not Assigned'}</div>
-            <div className="id-card-line"><b>Course:</b> {course?.titleEnglish || course?.title || student.courseId}</div>
-            <div className="id-card-line"><b>Father:</b> {student.fatherNameEnglish || student.fatherName || 'Not Provided'}</div>
-            <div className="id-card-line"><b>Mother:</b> {student.motherNameEnglish || student.motherName || 'Not Provided'}</div>
+            <div className="id-card-line"><b>Course:</b> {englishOrFallback(course?.titleEnglish, englishOrFallback(student.courseId, 'Course'))}</div>
+            <div className="id-card-line"><b>Father:</b> {englishOrFallback(student.fatherNameEnglish, 'Not Provided')}</div>
+            <div className="id-card-line"><b>Mother:</b> {englishOrFallback(student.motherNameEnglish, 'Not Provided')}</div>
             <div className="id-card-line"><b>Phone:</b> {student.phone || 'Not Provided'}</div>
           </div>
         </div>
@@ -119,7 +120,7 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
           </div>
           <div className="id-card-signature">
             {settings.signatureUrl && <img src={settings.signatureUrl} alt="Head Teacher Signature" />}
-            <div className="id-card-signature-name">{settings.founderNameEnglish || 'Head Teacher'}</div>
+            <div className="id-card-signature-name">{englishOrFallback(settings.founderNameEnglish, 'Head Teacher')}</div>
             <span>HEAD TEACHER</span>
           </div>
         </div>
