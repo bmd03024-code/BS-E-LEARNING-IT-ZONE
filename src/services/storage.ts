@@ -522,6 +522,11 @@ const initialStudents: Student[] = [
     status: "active",
     hasPaidDues: true,
     admitCardBlocked: false
+    registrationNo: "BSIT-2026-0001",
+    englishName: "Mohammad Abdullah",
+    fatherNameEnglish: "Rafiqul Islam",
+    motherNameEnglish: "Nasima Begum",
+    addressEnglish: "Sector 7, Uttara, Dhaka",
   },
   {
     id: "std-102",
@@ -539,6 +544,11 @@ const initialStudents: Student[] = [
     status: "active",
     hasPaidDues: true,
     admitCardBlocked: false
+    registrationNo: "BSIT-2026-0002",
+    englishName: "Fatema Tuz Zohra",
+    fatherNameEnglish: "Abul Kalam",
+    motherNameEnglish: "Shahnaz Parvin",
+    addressEnglish: "Mirpur 10, Dhaka",
   },
   {
     id: "std-103",
@@ -556,6 +566,11 @@ const initialStudents: Student[] = [
     status: "active",
     hasPaidDues: true,
     admitCardBlocked: false
+    registrationNo: "BSIT-2026-0003",
+    englishName: "Tanvir Hasan",
+    fatherNameEnglish: "Kamrul Hasan",
+    motherNameEnglish: "Rokeya Begum",
+    addressEnglish: "Tongi, Gazipur",
   },
   {
     id: "std-104",
@@ -574,6 +589,36 @@ const initialStudents: Student[] = [
     hasPaidDues: false,
     admitCardBlocked: true,
     blockedReason: "মাসিক ফি বকেয়া থাকায় এডমিট কার্ড স্থগিত রয়েছে।"
+    registrationNo: "BSIT-2026-0010",
+    englishName: "Nusrat Jahan",
+    fatherNameEnglish: "Zahirul Haque",
+    motherNameEnglish: "Nazmin Akter",
+    addressEnglish: "Mohammadpur, Dhaka",
+  },
+  {
+    id: "std-demo-hsc-acc", academicYear: "2026", courseId: "course-hsc-acc", roll: "105", registrationNo: "BSIT-2026-0005",
+    name: "রায়হান আহমেদ", englishName: "Rayhan Ahmed", fatherName: "মোঃ কামাল হোসেন", fatherNameEnglish: "Mohammad Kamal Hossain", motherName: "সালমা বেগম", motherNameEnglish: "Salma Begum",
+    phone: "01700000105", address: "ঢাকা, বাংলাদেশ", addressEnglish: "Dhaka, Bangladesh", trxId: "DEMO-ONLY-105", enrollmentDate: "2026-01-20", photoUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80", status: "active", hasPaidDues: true, admitCardBlocked: false
+  },
+  {
+    id: "std-demo-eng", academicYear: "2026", courseId: "course-class8-10-eng", roll: "106", registrationNo: "BSIT-2026-0006",
+    name: "সুমাইয়া আক্তার", englishName: "Sumaiya Akter", fatherName: "মোঃ রফিকুল ইসলাম", fatherNameEnglish: "Mohammad Rafiqul Islam", motherName: "রেহানা বেগম", motherNameEnglish: "Rehana Begum",
+    phone: "01700000106", address: "ঢাকা, বাংলাদেশ", addressEnglish: "Dhaka, Bangladesh", trxId: "DEMO-ONLY-106", enrollmentDate: "2026-01-20", photoUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80", status: "active", hasPaidDues: true, admitCardBlocked: false
+  },
+  {
+    id: "std-demo-math", academicYear: "2026", courseId: "course-class8-10-math", roll: "107", registrationNo: "BSIT-2026-0007",
+    name: "আরিফ হোসেন", englishName: "Arif Hossain", fatherName: "মোঃ জসিম উদ্দিন", fatherNameEnglish: "Mohammad Jasim Uddin", motherName: "নাসরিন আক্তার", motherNameEnglish: "Nasrin Akter",
+    phone: "01700000107", address: "ঢাকা, বাংলাদেশ", addressEnglish: "Dhaka, Bangladesh", trxId: "DEMO-ONLY-107", enrollmentDate: "2026-01-20", photoUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80", status: "active", hasPaidDues: true, admitCardBlocked: false
+  },
+  {
+    id: "std-demo-primary", academicYear: "2026", courseId: "course-class1-7-all", roll: "108", registrationNo: "BSIT-2026-0008",
+    name: "মিম আক্তার", englishName: "Mim Akter", fatherName: "মোঃ আব্দুল করিম", fatherNameEnglish: "Mohammad Abdul Karim", motherName: "শারমিন বেগম", motherNameEnglish: "Sharmin Begum",
+    phone: "01700000108", address: "ঢাকা, বাংলাদেশ", addressEnglish: "Dhaka, Bangladesh", trxId: "DEMO-ONLY-108", enrollmentDate: "2026-01-20", photoUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80", status: "active", hasPaidDues: true, admitCardBlocked: false
+  },
+  {
+    id: "std-demo-basic", academicYear: "2026", courseId: "course-basic-bangla-math-eng", roll: "109", registrationNo: "BSIT-2026-0009",
+    name: "সাদিয়া ইসলাম", englishName: "Sadia Islam", fatherName: "মোঃ আনোয়ার হোসেন", fatherNameEnglish: "Mohammad Anwar Hossain", motherName: "লায়লা বেগম", motherNameEnglish: "Laila Begum",
+    phone: "01700000109", address: "ঢাকা, বাংলাদেশ", addressEnglish: "Dhaka, Bangladesh", trxId: "DEMO-ONLY-109", enrollmentDate: "2026-01-20", photoUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80", status: "active", hasPaidDues: true, admitCardBlocked: false
   }
 ];
 
