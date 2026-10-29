@@ -6463,85 +6463,92 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </button>
             </div>
 
-            {/* Professional course completion certificate — shared by every course */}
-            <div className="printable-area certificate-border relative bg-[#fffdf7] p-3 sm:p-6 shadow-xl text-center overflow-hidden">
-              <div className="absolute inset-[5px] border-[3px] border-double border-[#20365f] pointer-events-none" />
-              <div className="absolute inset-[11px] border border-[#c59a45] pointer-events-none" />
-              <div className="relative z-10 px-4 py-5 sm:px-8 sm:py-7">
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  {settings.logoUrl ? (
-                    <img src={settings.logoUrl} alt="BS E-Learning & IT Zone logo" className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-full border border-[#c59a45] p-1 bg-white" />
-                  ) : (
-                    <div className="w-14 h-14 rounded-full border-2 border-[#c59a45] flex items-center justify-center text-[#20365f] font-black text-xs">BS</div>
-                  )}
-                </div>
-                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.22em] text-[#8a6827] font-bold">Professional Training & Skills Development</p>
-                <h1 className="mt-1 text-xl sm:text-3xl font-black text-[#20365f] tracking-wide font-serif uppercase">
-                  BS E-Learning &amp; IT Zone
-                </h1>
-                <div className="w-24 h-[2px] bg-[#c59a45] mx-auto my-3" />
-                <p className="text-[10px] sm:text-xs text-slate-600 tracking-widest uppercase">Certificate of Completion</p>
-                <h2 className="mt-2 inline-block px-4 sm:px-8 py-2 border-y border-[#c59a45] text-lg sm:text-2xl font-serif font-bold text-[#20365f]">
-                  {selectedCertForPrint.certificateTitle || 'Course Completion Certificate'}
-                </h2>
-
-                <div className="mt-6 sm:mt-8">
-                  <p className="text-xs sm:text-sm italic text-slate-600 font-serif">This certificate is proudly presented to</p>
-                  <h3 className="mt-2 text-2xl sm:text-4xl font-serif font-bold text-[#17294d] break-words">
-                    {selectedCertForPrint.studentNameEnglish || selectedCertForPrint.studentName || 'Student Name'}
-                  </h3>
-                  <div className="w-3/4 max-w-md mx-auto border-b-2 border-[#c59a45] mt-2" />
-                  <p className="mt-3 text-[10px] sm:text-xs text-slate-700">
-                    Son / Daughter of <strong>{selectedCertForPrint.fatherName || 'Not provided'}</strong>
-                    {selectedCertForPrint.motherName ? <> and <strong>{selectedCertForPrint.motherName}</strong></> : null}
-                  </p>
-                </div>
-
-                <p className="max-w-2xl mx-auto mt-5 text-xs sm:text-sm leading-6 text-slate-700">
-                  {selectedCertForPrint.bodyText && !/[\u0980-\u09FF]/.test(selectedCertForPrint.bodyText)
-                    ? selectedCertForPrint.bodyText
-                    : <>has successfully completed the course <strong className="text-[#20365f]">{selectedCertForPrint.courseTitle || selectedCertForPrint.courseId}</strong> and has been awarded the grade <strong className="text-[#276749]">{selectedCertForPrint.grade}</strong>.</>}
-                </p>
-
-                <div className="mt-5 mx-auto max-w-xl grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
-                  <div className="border border-[#dfd4b8] bg-white/80 p-2 rounded-sm">
-                    <p className="text-[8px] uppercase tracking-wider text-slate-500">Academic year</p>
-                    <p className="text-xs font-bold text-[#20365f]">{selectedCertForPrint.academicYear || '—'}</p>
+            {/* Formal A4 landscape certificate — institution-issued, not a board certificate */}
+            <div className="printable-area certificate-print-layout relative mx-auto w-full overflow-hidden bg-white p-3 sm:p-6 text-slate-900 shadow-xl" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+              <div className="pointer-events-none absolute inset-[7px] border border-[#444]" />
+              <div className="pointer-events-none absolute inset-[12px] border-2 border-[#222]" />
+              <div className="relative z-10 px-3 py-4 sm:px-7 sm:py-5">
+                <div className="text-center">
+                  <div className="text-[11px] sm:text-xl font-bold uppercase tracking-wide text-[#111]">
+                    {selectedCertForPrint.institutionNameEnglish || settings.nameEnglish || settings.name || 'BS E-Learning & IT Zone'}
                   </div>
-                  <div className="border border-[#dfd4b8] bg-white/80 p-2 rounded-sm">
-                    <p className="text-[8px] uppercase tracking-wider text-slate-500">Student roll</p>
-                    <p className="text-xs font-bold text-[#20365f]">{selectedCertForPrint.roll || '—'}</p>
-                  </div>
-                  <div className="border border-[#dfd4b8] bg-white/80 p-2 rounded-sm">
-                    <p className="text-[8px] uppercase tracking-wider text-slate-500">Grade</p>
-                    <p className="text-xs font-bold text-[#20365f]">{selectedCertForPrint.grade || '—'}</p>
-                  </div>
-                  <div className="border border-[#dfd4b8] bg-white/80 p-2 rounded-sm">
-                    <p className="text-[8px] uppercase tracking-wider text-slate-500">Certificate no.</p>
-                    <p className="text-[10px] sm:text-xs font-bold text-[#20365f] break-all">{selectedCertForPrint.certificateNo || '—'}</p>
+                  <div className="mt-1 text-[9px] sm:text-sm font-bold tracking-[0.2em] text-[#222]">
+                    {selectedCertForPrint.institutionSubNameEnglish || settings.subNameEnglish || settings.subName || 'BANGLADESH'}
                   </div>
                 </div>
 
-                <div className="mt-7 sm:mt-9 grid grid-cols-3 gap-3 items-end text-center">
-                  <div className="flex flex-col items-center justify-end min-h-[72px]">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 border border-[#dfd4b8] bg-white flex items-center justify-center rounded-sm">
-                      <QrCode className="w-9 h-9 text-[#20365f]" />
+                <div className="mt-3 grid grid-cols-3 items-center gap-2 text-[8px] sm:text-xs font-bold">
+                  <div className="text-left break-words">Certificate No. {selectedCertForPrint.certificateNo || '—'}</div>
+                  <div className="flex justify-center">
+                    {settings.logoUrl ? (
+                      <img src={settings.logoUrl} alt="Institution logo" className="h-9 w-9 sm:h-14 sm:w-14 rounded-full border border-slate-400 bg-white object-contain p-1" />
+                    ) : (
+                      <div className="flex h-9 w-9 sm:h-14 sm:w-14 items-center justify-center rounded-full border border-slate-400 text-[8px] sm:text-[10px] font-bold text-slate-600">LOGO</div>
+                    )}
+                  </div>
+                  <div className="text-right">Academic Year: {selectedCertForPrint.academicYear || '—'}</div>
+                </div>
+
+                <div className="mt-3 text-center text-[10px] sm:text-sm font-bold uppercase tracking-wide underline underline-offset-4">
+                  {selectedCertForPrint.certificateTitleEnglish || selectedCertForPrint.certificateTitle || 'CERTIFICATE OF COMPLETION'}
+                </div>
+
+                <div className="mt-4 sm:mt-5 space-y-2 sm:space-y-3 text-[9px] sm:text-[14px] leading-relaxed">
+                  <div className="flex items-end gap-2">
+                    <span className="shrink-0 whitespace-nowrap">This is to certify that</span>
+                    <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-words">{selectedCertForPrint.studentNameEnglish || selectedCertForPrint.studentName || 'Student Name'}</span>
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <span className="shrink-0 whitespace-nowrap">Son / Daughter of</span>
+                    <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-words">{selectedCertForPrint.fatherNameEnglish || selectedCertForPrint.fatherName || '—'}</span>
+                    <span className="shrink-0">and</span>
+                    <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-words">{selectedCertForPrint.motherNameEnglish || selectedCertForPrint.motherName || '—'}</span>
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <span className="shrink-0">of</span>
+                    <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-words">{selectedCertForPrint.addressEnglish || selectedCertForPrint.address || selectedCertForPrint.institutionNameEnglish || selectedCertForPrint.institutionName || settings.nameEnglish || settings.name || 'BS E-Learning & IT Zone'}</span>
+                  </div>
+                  <div className="grid grid-cols-[1.25fr_1fr] gap-4">
+                    <div className="flex min-w-0 items-end gap-2">
+                      <span className="shrink-0">bearing Roll</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-words">{selectedCertForPrint.roll || '—'}</span>
                     </div>
-                    <p className="mt-1 text-[8px] uppercase tracking-wide text-slate-500">Certificate reference</p>
-                  </div>
-                  <div className="flex flex-col items-center justify-end min-h-[72px]">
-                    {settings.institutionSealUrl ? <img src={settings.institutionSealUrl} alt="Institution seal" className="h-12 sm:h-14 w-auto max-w-full object-contain" /> : <div className="h-12 sm:h-14 w-14 rounded-full border border-[#c59a45] flex items-center justify-center text-[8px] font-bold text-[#20365f]">BS ZONE</div>}
-                    <p className="mt-1 text-[8px] uppercase tracking-wide text-[#8a6827]">Institution seal</p>
-                  </div>
-                  <div className="flex flex-col items-center justify-end min-h-[72px]">
-                    {settings.signatureUrl ? <img src={settings.signatureUrl} alt="Authorized signature" className="h-9 sm:h-11 w-auto max-w-full object-contain mb-1" /> : <div className="h-9 sm:h-11" />}
-                    <div className="w-full max-w-[150px] border-t border-slate-700 pt-1">
-                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-900">{settings.founderName || 'Authorized Signatory'}</p>
-                      <p className="text-[8px] text-slate-600">Authorized Signatory</p>
+                    <div className="flex min-w-0 items-end gap-2">
+                      <span className="shrink-0">Course</span>
+                      <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-words">{selectedCertForPrint.courseTitleEnglish || selectedCertForPrint.courseTitle || selectedCertForPrint.courseId || '—'}</span>
                     </div>
                   </div>
+                  <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
+                    <span>duly completed the course and achieved the grade</span>
+                    <span className="min-w-[60px] flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic">{selectedCertForPrint.grade || '—'}</span>
+                    <span>during the academic year</span>
+                    <span className="min-w-[70px] border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic">{selectedCertForPrint.academicYear || '—'}</span>
+                  </div>
+                  <div className="flex items-end gap-2">
+                    <span className="shrink-0">Date of issue</span>
+                    <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic">{selectedCertForPrint.issueDate || '—'}</span>
+                    <span className="shrink-0">Certificate ID</span>
+                    <span className="min-w-0 flex-1 border-b border-dotted border-black px-2 pb-0.5 text-center font-bold italic break-all">{selectedCertForPrint.certificateNo || '—'}</span>
+                  </div>
+                  {selectedCertForPrint.bodyTextEnglish && !/[\u0980-\u09FF]/.test(selectedCertForPrint.bodyTextEnglish) ? (
+                    <p className="pt-1 text-[9px] sm:text-xs text-slate-700">{selectedCertForPrint.bodyTextEnglish}</p>
+                  ) : null}
                 </div>
-                <p className="mt-5 text-[8px] tracking-wider text-slate-500">Issued by BS E-Learning &amp; IT Zone • {selectedCertForPrint.certificateNo}</p>
+
+                <div className="mt-5 sm:mt-8 flex items-end justify-between gap-4 text-[8px] sm:text-xs">
+                  <div className="max-w-[45%] leading-relaxed">
+                    {settings.addressEnglish || settings.address || 'Bangladesh'}<br />
+                    Issued by {selectedCertForPrint.institutionNameEnglish || selectedCertForPrint.institutionName || settings.nameEnglish || settings.name || 'BS E-Learning & IT Zone'}
+                  </div>
+                  <div className="flex flex-col items-center text-center">
+                    {settings.signatureUrl ? <img src={settings.signatureUrl} alt="Authorized signature" className="mb-1 h-7 sm:h-10 max-w-[120px] object-contain" /> : <div className="h-7 sm:h-10" />}
+                    <div className="w-28 sm:w-44 border-t border-black pt-1 font-bold">{selectedCertForPrint.founderNameEnglish || selectedCertForPrint.founderName || settings.founderNameEnglish || settings.founderName || 'Authorized Signatory'}</div>
+                    <div>{selectedCertForPrint.founderTitleEnglish || selectedCertForPrint.founderTitle || settings.founderTitleEnglish || settings.founderTitle || 'Authorized Signatory'}</div>
+                  </div>
+                </div>
+                <div className="mt-3 border-t border-slate-300 pt-1 text-center text-[7px] sm:text-[9px] text-slate-600">
+                  This certificate is issued by the institution named above and is not a government education board certificate.
+                </div>
               </div>
             </div>
 
