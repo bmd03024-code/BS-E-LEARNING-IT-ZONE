@@ -1412,17 +1412,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setShowBulkIdCards(true)}
-          disabled={filteredStudents.length === 0}
-          className="px-4 py-2.5 rounded-xl bg-blue-900 text-white text-xs font-bold disabled:opacity-40"
-        >
-          <Printer className="inline w-4 h-4 mr-2" />Print Multiple Student ID Cards ({filteredStudents.length})
-        </button>
-      </div>
-
       {/* Student List Table */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
         <div className="p-4 border-b flex justify-between items-center">
@@ -1504,6 +1493,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setShowBulkIdCards(true)}
+          disabled={filteredStudents.length === 0}
+          className="px-4 py-2.5 rounded-xl bg-blue-900 text-white text-xs font-bold disabled:opacity-40"
+        >
+          <Printer className="inline w-4 h-4 mr-2" />Print Multiple Student ID Cards ({filteredStudents.length})
+        </button>
       </div>
 
       {/* Edit Student Modal */}
@@ -1711,7 +1711,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
               {/* Student Name & Roll */}
               <div className="relative z-10">
-                <h5 className="text-base font-bold text-white">{selectedStudentForIdCard.name}</h5>
+                <h5 className="text-base font-bold text-white">{selectedStudentForIdCard.englishName || '—'}</h5>
                 <div className="inline-flex items-center gap-2 mt-0.5">
                   <span className="px-2 py-0.5 rounded-md bg-blue-900/90 text-amber-300 font-mono font-black text-xs border border-amber-400/30">
                     Roll No: {selectedStudentForIdCard.roll}
@@ -1731,7 +1731,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-300 font-bold shrink-0">Course:</span>
                   <span className="font-semibold text-white text-right truncate pl-2">
-                    {courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || courses.find(c => c.id === selectedStudentForIdCard.courseId)?.title || selectedStudentForIdCard.courseId}
+                    {courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || selectedStudentForIdCard.courseId || '—'}
                   </span>
                 </div>
 
@@ -1822,12 +1822,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <h3 className="text-[10px] font-extrabold tracking-wide text-amber-300">BS E-LEARNING &amp; IT ZONE</h3>
                 <p className="mt-0.5 text-[7px] font-bold">STUDENT IDENTITY CARD</p>
                 <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="mt-2 h-14 w-14 rounded-lg border border-amber-400 object-cover" />
-                <h4 className="mt-2 w-full break-words text-[10px] font-extrabold">{student.englishName || student.name || '—'}</h4>
+                <h4 className="mt-2 w-full break-words text-[10px] font-extrabold">{student.englishName || '—'}</h4>
                 <div className="mt-1 w-full space-y-1 text-left text-[7px]">
                   <p><b>Registration No:</b> {student.registrationNo || '—'}</p>
                   <p><b>Roll No:</b> {student.roll || '—'}</p>
                   <p><b>Academic Year:</b> {student.academicYear || '—'}</p>
-                  <p><b>Course:</b> {courses.find(c => c.id === student.courseId)?.titleEnglish || courses.find(c => c.id === student.courseId)?.title || student.courseId || '—'}</p>
+                  <p><b>Course:</b> {courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId || '—'}</p>
                   <p><b>Father:</b> {student.fatherNameEnglish || '—'}</p>
                   <p><b>Mother:</b> {student.motherNameEnglish || '—'}</p>
                   <p><b>Phone:</b> {student.phone || '—'}</p>
