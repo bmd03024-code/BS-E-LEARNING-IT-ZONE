@@ -180,7 +180,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ফি ৫০০ টাকা দিয়ে শুরু, দ্বিতীয় মাস থেকে মাসিক ৫০০ টাকা।",
     category: "ধর্মীয় ও নৈতিক শিক্ষা",
     subjects: ["হরফ ও মাখরাজ", "তাজবীদ রুলস", "মাদ্দ ও গুন্নাহ", "সূরা হিফজ ও তিলাওয়াত"],
-    exams: ["মাখরাজ মূল্যায়ন", "তাজবীদ টেস্ট", "চূড়ান্ত তিলাওয়াত পরীক্ষা"]
+    exams: ["মাখরাজ মূল্যায়ন", "তাজবীদ টেস্ট", "চূড়ান্ত তিলাওয়াত পরীক্ষা"],
     durationEnglish: "Ongoing Batches",
     descriptionEnglish: "Learn accurate Quran recitation with Tajweed, correct articulation (Makharij), and practical Surah memorization.",
     categoryEnglish: "Religious & Moral Education",
@@ -209,7 +209,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ফি ৮০০ টাকা (অফার), প্রতি মাসে নিয়মিত ৫০০ টাকা।",
     category: "একাডেমিক কোর্স",
     subjects: ["লেনদেন ও হিসাব সমীকরণ", "জাবেদা ও খতিয়ান", "রেওয়ামিল", "আর্থিক বিবরণী"],
-    exams: ["অধ্যায়ভিত্তিক টেস্ট", "প্রাক-নির্বাচনী মডেল টেস্ট", "এসএসসি ফাইনাল প্রস্তুতি পরীক্ষা"]
+    exams: ["অধ্যায়ভিত্তিক টেস্ট", "প্রাক-নির্বাচনী মডেল টেস্ট", "এসএসসি ফাইনাল প্রস্তুতি পরীক্ষা"],
     durationEnglish: "Full Academic Session",
     descriptionEnglish: "Cover all SSC Accounting chapters from basic concepts to creative and multiple-choice problem solving.",
     categoryEnglish: "Academic Course",
@@ -238,7 +238,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ফি ৮০০ টাকা (অফার), প্রতি মাসে নিয়মিত ৫০০ টাকা।",
     category: "একাডেমিক কোর্স",
     subjects: ["হিসাববিজ্ঞান ১ম পত্র", "অংশীদারি কারবার", "কোম্পানির মূলধন", "উৎপাদন ব্যয় হিসাব"],
-    exams: ["১ম পত্র ফাইনাল মডেল টেস্ট", "২য় পত্র ফাইনাল মডেল টেস্ট"]
+    exams: ["১ম পত্র ফাইনাল মডেল টেস্ট", "২য় পত্র ফাইনাল মডেল টেস্ট"],
     durationEnglish: "HSC First and Second Papers",
     descriptionEnglish: "A focused HSC Accounting program covering both papers, with simplified concepts and exam preparation.",
     categoryEnglish: "Academic Course",
@@ -267,7 +267,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ফি ৮০০ টাকা (অফার), প্রতি মাসে নিয়মিত ৫০০ টাকা।",
     category: "একাডেমিক কোর্স",
     subjects: ["Grammar Fundamentals", "Right Form of Verbs", "Transformation", "Composition"],
-    exams: ["Monthly Grammar Test", "Final Model Test"]
+    exams: ["Monthly Grammar Test", "Final Model Test"],
     durationEnglish: "Full Academic Session",
     descriptionEnglish: "Strengthen English through grammar, writing, and textbook-based practice for Grades 8–10.",
     categoryEnglish: "Academic Course",
@@ -296,7 +296,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ফি ৮০০ টাকা (অফার), প্রতি মাসে নিয়মিত ৫০০ টাকা।",
     category: "একাডেমিক কোর্স",
     subjects: ["বীজগণিতীয় রাশি", "জ্যামিতি ও সম্পাদ্য", "ত্রিকোণমিতি ও পরিমিতি", "পরিসংখ্যান"],
-    exams: ["জ্যামিতি মূল্যায়ন", "বীজগণিত টেস্ট", "ফাইনাল মডেল টেস্ট"]
+    exams: ["জ্যামিতি মূল্যায়ন", "বীজগণিত টেস্ট", "ফাইনাল মডেল টেস্ট"],
     durationEnglish: "Full Academic Session",
     descriptionEnglish: "Build confidence in mathematics through formulas, geometry, algebra, trigonometry, and statistics.",
     categoryEnglish: "Academic Course",
@@ -323,7 +323,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ফি ১,০০০ টাকা, প্রতি মাসে মাসিক ফি ৮০০ টাকা।",
     category: "স্পেশাল কম্বো অফার",
     subjects: ["গণিত বেসিক ও সৃজনশীল", "ইংরেজি গ্রামার ও রাইটিং"],
-    exams: ["যৌথ মূল্যায়ন পরীক্ষা", "সেমিস্টার ফাইনাল"]
+    exams: ["যৌথ মূল্যায়ন পরীক্ষা", "সেমিস্টার ফাইনাল"],
     durationEnglish: "Combined Course",
     descriptionEnglish: "Study Mathematics and English together for Grades 8–10 in one combined package.",
     categoryEnglish: "Special Combo Offer",
@@ -350,7 +350,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ফি ১,০০০ টাকা, প্রতি মাসে মাসিক ফি ১,০০০ টাকা।",
     category: "প্রাথমিক ও জুনিয়র",
     subjects: ["বাংলা ও বানান", "প্রাথমিক গণিত", "ইংরেজি রিডিং ও রাইটিং", "সাধারণ বিজ্ঞান"],
-    exams: ["প্রথম প্রান্তিক মূল্যায়ন", "দ্বিতীয় প্রান্তিক মূল্যায়ন", "বার্ষিক পরীক্ষা"]
+    exams: ["প্রথম প্রান্তিক মূল্যায়ন", "দ্বিতীয় প্রান্তিক মূল্যায়ন", "বার্ষিক পরীক্ষা"],
     durationEnglish: "Year-round Batch",
     descriptionEnglish: "Foundational learning for Grades 1–7, with homework support and regular assessments across core subjects.",
     categoryEnglish: "Primary & Junior",
@@ -381,7 +381,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ১,৫০০৳, পরীক্ষা পূর্বে বাকি কোর্স ফি, এবং সার্টিফিকেট ফি ৫০০৳।",
     category: "আইটি ও প্রফেশনাল",
     subjects: ["Computer Fundamentals & OS", "MS Word & Typing Speed", "MS Excel & Financial Formula", "MS PowerPoint & Access", "Internet & Email Communication"],
-    exams: ["টাইপিং স্পিড টেস্ট", "এক্সেল প্র্যাকটিক্যাল ল্যাব", "কারিগরি বোর্ড ফাইনাল পরীক্ষা"]
+    exams: ["টাইপিং স্পিড টেস্ট", "এক্সেল প্র্যাকটিক্যাল ল্যাব", "কারিগরি বোর্ড ফাইনাল পরীক্ষা"],
     durationEnglish: "6 Months",
     descriptionEnglish: "Hands-on practical training in MS Word, Excel, PowerPoint, Access, internet use, and typing.",
     categoryEnglish: "IT & Professional",
@@ -409,7 +409,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ২,০০০৳, বাকি ২,০০০৳ কোর্স চলাকালীন বা শেষে পরিশোধ।",
     category: "ভাষা ও যোগাযোগ",
     subjects: ["Pronunciation & Phonetics", "Daily Conversation Patterns", "Public Speaking & Presentation", "Listening & Accent Training"],
-    exams: ["Oral Presentation Test", "Final Fluency Interview"]
+    exams: ["Oral Presentation Test", "Final Fluency Interview"],
     durationEnglish: "4 Months",
     descriptionEnglish: "Develop fluent spoken English, British pronunciation, and public-speaking skills through practical sessions.",
     categoryEnglish: "Language & Communication",
@@ -438,7 +438,7 @@ const initialCourses: Course[] = [
     paymentDetails: "ভর্তি ২,০০০৳, ১ম মাসে ১,০০০৳, ২য় মাসে ১,০০০৳, সার্টিফিকেট উত্তোলনে ৫০০৳।",
     category: "ফাউন্ডেশন কোর্স",
     subjects: ["শুদ্ধ বাংলা উচ্চারণ ও বর্ণমালা", "সহজ গণিত ও নামতা", "ইংরেজি বেসিক শব্দ ও বাক্য"],
-    exams: ["মৌখিক পরীক্ষা", "লিখিত বেসিক টেস্ট"]
+    exams: ["মৌখিক পরীক্ষা", "লিখিত বেসিক টেস্ট"],
     durationEnglish: "3-Month Foundation Course",
     descriptionEnglish: "Build foundational Bangla pronunciation and spelling, basic arithmetic, multiplication tables, and beginner English.",
     categoryEnglish: "Foundation Course",
