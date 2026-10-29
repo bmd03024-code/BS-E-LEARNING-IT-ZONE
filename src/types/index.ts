@@ -133,6 +133,7 @@ export interface Student {
   academicYear: string;
   courseId: string;
   roll: string;
+  registrationNo?: string;
   name: string;
   englishName?: string;
   fatherName?: string;
@@ -413,6 +414,7 @@ export interface CertificateRecord {
   academicYear: string;
   courseId: string;
   roll: string;
+  registrationNo?: string;
   studentName: string;
   studentNameEnglish?: string;
   fatherName?: string;
