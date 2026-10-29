@@ -2208,7 +2208,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [certAddress, setCertAddress] = useState('ঢাকা, বাংলাদেশ');
   const [certCourseTitle, setCertCourseTitle] = useState('');
   const [certDuration, setCertDuration] = useState('৬ মাস (২৪ সপ্তাহ)');
-  const [certGrade, setCertGrade] = useState('A+ (প্রথম শ্রেণি)');
+  const [certGrade, setCertGrade] = useState('A+');
   const [certNo, setCertNo] = useState('');
   const [certIssueDate, setCertIssueDate] = useState(new Date().toISOString().split('T')[0]);
   const [certTitle, setCertTitle] = useState('কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
@@ -2243,7 +2243,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       setCertCourseTitle(existing.courseTitle || courseObj?.title || '');
       setCertCourseTitleEnglish(existing.courseTitleEnglish || courseObj?.titleEnglish || '');
       setCertDuration(existing.duration || courseObj?.duration || '৬ মাস');
-      setCertGrade(existing.grade || 'A+ (প্রথম শ্রেণি)');
+      setCertGrade((existing.grade || 'A+').replace(/\s*\([^)]*[\u0980-\u09FF][^)]*\)/g, '').trim() || 'A+');
       setCertNo(existing.certificateNo || `BS-ZONE-${yearVal}-${trimmedRoll.padStart(4, '0')}`);
       setCertIssueDate(existing.issueDate || new Date().toISOString().split('T')[0]);
       setCertTitle(existing.certificateTitle || 'কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
@@ -2278,7 +2278,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       setCertCourseTitle(courseObj?.title || match.courseId);
       setCertCourseTitleEnglish(courseObj?.titleEnglish || '');
       setCertDuration(courseObj?.duration || '৬ মাস (২৪ সপ্তাহ)');
-      setCertGrade('A+ (প্রথম শ্রেণি)');
+      setCertGrade('A+');
       setCertNo(`BS-ZONE-${yearVal}-${match.roll.padStart(4, '0')}`);
       setCertIssueDate(new Date().toISOString().split('T')[0]);
       setCertTitle('কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
@@ -2295,7 +2295,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       setCertCourseTitle(courseObj?.title || '');
       setCertCourseTitleEnglish(courseObj?.titleEnglish || '');
       setCertDuration(courseObj?.duration || '৬ মাস (২৪ সপ্তাহ)');
-      setCertGrade('A+ (প্রথম শ্রেণি)');
+      setCertGrade('A+');
       setCertNo(`BS-ZONE-${yearVal}-${trimmedRoll.padStart(4, '0')}`);
       setCertIssueDate(new Date().toISOString().split('T')[0]);
       setCertTitle('কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
@@ -2378,7 +2378,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
     setCertAddress(cert.address || 'ঢাকা, বাংলাদেশ');
     setCertCourseTitle(cert.courseTitle || courses.find(c => c.id === cert.courseId)?.title || '');
     setCertDuration(cert.duration || courses.find(c => c.id === cert.courseId)?.duration || '৬ মাস');
-    setCertGrade(cert.grade || 'A+ (প্রথম শ্রেণি)');
+    setCertGrade((cert.grade || 'A+').replace(/\s*\([^)]*[\u0980-\u09FF][^)]*\)/g, '').trim() || 'A+');
     setCertNo(cert.certificateNo);
     setCertIssueDate(cert.issueDate || new Date().toISOString().split('T')[0]);
     setCertTitle(cert.certificateTitle || 'কোর্স সমাপ্তি সনদপত্র • CERTIFICATE OF COMPLETION');
@@ -2642,22 +2642,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               {/* Course Title, Duration, Grade */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্সের নাম</label>
-                  <input
-                    type="text"
-                    value={certCourseTitle}
-                    onChange={(e) => setCertCourseTitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white"
-                  />
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্সের নাম (বাংলা)</label>
+                  <input type="text" value={certCourseTitle} onChange={(e) => setCertCourseTitle(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white" />
+                  <label className="block text-[11px] font-bold text-blue-700 mt-2 mb-1">Course Name (English)</label>
+                  <input type="text" value={certCourseTitleEnglish} onChange={(e) => setCertCourseTitleEnglish(e.target.value)} placeholder="Auto-filled from selected course" className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-blue-50 text-xs font-semibold text-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্সের মেয়াদ</label>
-                  <input
-                    type="text"
-                    value={certDuration}
-                    onChange={(e) => setCertDuration(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white"
-                  />
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">কোর্সের মেয়াদ (বাংলা)</label>
+                  <input type="text" value={certDuration} onChange={(e) => setCertDuration(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white" />
+                  <label className="block text-[11px] font-bold text-blue-700 mt-2 mb-1">Course Duration (English)</label>
+                  <input type="text" value={courses.find(c => c.id === certCourseInput)?.durationEnglish || ''} readOnly placeholder="Auto-filled from selected course" className="w-full px-3 py-2 rounded-xl border border-blue-200 bg-blue-50 text-xs text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-slate-600 mb-1">গ্রেড / ফলাফল</label>
@@ -6526,7 +6520,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                       <div className="flex h-[clamp(30px,5.4vw,60px)] w-[clamp(30px,5.4vw,60px)] shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#555] bg-slate-50 text-[clamp(6px,0.9vw,10px)] text-[#555]">
                         {settings.logoUrl ? <img src={settings.logoUrl} alt="Institution logo" className="h-full w-full rounded-full object-contain p-1" /> : 'LOGO'}
                       </div>
-                      <div className="text-right">Registration No. {selectedCertForPrint.registrationNo || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.registrationNo || selectedCertForPrint.certificateNo || 'Registration Number'}</div>
+                      <div className="text-right">Registration No. {selectedCertForPrint.registrationNo || students.find(st => st.roll === selectedCertForPrint.roll && st.academicYear === selectedCertForPrint.academicYear && st.courseId === selectedCertForPrint.courseId)?.registrationNo || selectedCertForPrint.certificateNo || selectedCertForPrint.roll || '0001'}</div>
                     </div>
                     <div className="my-[1.7%] text-center text-[clamp(8px,1.33vw,15px)] font-bold uppercase tracking-[0.06em] text-[#1a202c] underline underline-offset-2">
                       {selectedCertForPrint.certificateTitleEnglish || 'CERTIFICATE OF COMPLETION'}
@@ -6560,7 +6554,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                     </div>
                     <div className="flex items-baseline gap-[1%]">
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">duly completed the course in</span>
-                      <span className="min-w-0 flex-[0.4] border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.courseTitleEnglish || courses.find(c => c.id === selectedCertForPrint.courseId)?.titleEnglish || 'Course Name'}</span>
+                      <span className="min-w-0 flex-[0.4] border-b border-dotted border-[#222] text-center font-bold italic">{selectedCertForPrint.courseTitleEnglish || courses.find(c => c.id === selectedCertForPrint.courseId)?.titleEnglish || 'Computer Training Course'}</span>
                       <span className="shrink-0 text-[clamp(7px,1.25vw,14px)]">and achieved</span>
                     </div>
                     <div className="flex items-baseline gap-[1%]">
