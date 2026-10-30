@@ -202,11 +202,8 @@
   color: #0f172a !important;
   isolation: isolate;
 }
-.student-id-card > div:not(.no-print) {
-  background-color: #ffffff !important;
-}
 .student-id-card img[alt="Watermark"] {
-  opacity: 0.30 !important;
+  opacity: 1 !important;
 }
 .bulk-id-card {
   background: #ffffff !important;
