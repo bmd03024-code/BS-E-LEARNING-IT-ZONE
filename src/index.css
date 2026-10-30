@@ -193,3 +193,14 @@
 @media (prefers-reduced-motion: reduce) {
   .quick-action-icon { clip-path: none; opacity: 1; animation: none; transition: none; }
 }
+
+
+/* Student ID card must remain white in preview and print, independent of theme styles. */
+.student-id-card,
+.student-id-card > div:not(.no-print) {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+.student-id-card img[alt="Watermark"] {
+  opacity: 0.30 !important;
+}
