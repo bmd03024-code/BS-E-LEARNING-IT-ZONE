@@ -1688,7 +1688,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             </h4>
 
             {/* High-Fidelity Printable Area with Watermark, Parents Names, Seal & Signature */}
-            <div className="printable-area relative mx-auto flex flex-col items-center bg-white text-slate-900 p-1 shadow-xl border-2 border-amber-400 text-center gap-0.5 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box" }}>
+            <div className="printable-area student-id-card relative mx-auto flex flex-col items-center text-slate-900 p-1 shadow-xl border-2 border-amber-400 text-center gap-0.5 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box", backgroundColor: "#ffffff" }} style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box", backgroundColor: "#ffffff" }}>
               {/* Background Subtle Watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] select-none">
                 {settings.logoUrl ? (
@@ -1778,13 +1778,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="relative z-10 w-full mt-auto shrink-0 min-h-[48px] border-t border-slate-300 px-1 py-0.5 flex items-center justify-between bg-white">
                 <div className="flex w-1/2 flex-col items-center justify-center">
                   <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="Official Institutional Seal" className="h-8 w-8 rounded-full bg-transparent object-contain" />
-                  <span className="mt-0.5 text-[6px] font-bold tracking-wide text-white">INSTITUTIONAL SEAL</span>
+                  <span className="mt-0.5 text-[6px] font-bold tracking-wide text-slate-700">INSTITUTIONAL SEAL</span>
                 </div>
                 <div className="flex w-1/2 flex-col items-center justify-center text-center">
                   <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="Principal Signature" className="h-6 w-[78px] bg-transparent object-contain" />
                   <div className="mt-0.5 w-full border-t border-slate-500 pt-0.5">
-                    <p className="text-[7px] font-bold text-white">{idCardEnglish(settings.founderNameEnglish, 'HEAD TEACHER')}</p>
-                    <p className="text-[6px] font-bold text-slate-300">HEAD TEACHER</p>
+                    <p className="text-[7px] font-bold text-slate-900">{idCardEnglish(settings.founderNameEnglish, 'HEAD TEACHER')}</p>
+                    <p className="text-[6px] font-bold text-slate-700">HEAD TEACHER</p>
                   </div>
                 </div>
               </div>
