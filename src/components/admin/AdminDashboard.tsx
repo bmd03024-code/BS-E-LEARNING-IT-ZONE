@@ -44,27 +44,30 @@ const getIdCardCourseTitle = (courseId: string | null | undefined, courses: Cour
   if (!requested) return 'COURSE TITLE NOT FOUND';
 
   const course = courses.find(item => {
-    const candidates = [
-      item.id,
-      item.titleEnglish,
-      item.title
-    ];
+    const candidates = [item.id, item.titleEnglish, item.title];
     return candidates.some(value => {
       const candidate = normalize(value);
       return candidate && (candidate === requested || candidate.includes(requested) || requested.includes(candidate));
     });
   });
 
-  const englishTitle = String(course?.titleEnglish ?? '').trim();
-  if (englishTitle && !/[\u0980-\u09FF]/.test(englishTitle)) return englishTitle.replace(/\s+/g, ' ');
+  // Keep the English parts of mixed-language titles, but never print Bengali text on the ID card.
+  const cleanEnglishTitle = (value: unknown) => String(value ?? '')
+    .replace(/[\u0980-\u09FF]+/g, '')
+    .replace(/\(\s*\)/g, '')
+    .replace(/\s+([,.)])/g, '$1')
+    .replace(/([(])\s+/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-  const englishFallback = String(course?.title ?? '').trim();
-  if (englishFallback && !/[\u0980-\u09FF]/.test(englishFallback)) return englishFallback.replace(/\s+/g, ' ');
+  const englishTitle = cleanEnglishTitle(course?.titleEnglish);
+  if (englishTitle) return englishTitle;
 
-  const rawCourseId = String(courseId ?? '').trim();
-  if (rawCourseId && !/[\u0980-\u09FF]/.test(rawCourseId) && !/^[a-z0-9_-]{12,}$/i.test(rawCourseId)) {
-    return rawCourseId.replace(/\s+/g, ' ');
-  }
+  const englishFallback = cleanEnglishTitle(course?.title);
+  if (englishFallback) return englishFallback;
+
+  const rawCourseId = cleanEnglishTitle(courseId);
+  if (rawCourseId && !/^[a-z0-9_-]{12,}$/i.test(rawCourseId)) return rawCourseId;
   return 'ENGLISH COURSE TITLE NOT FOUND';
 };
 
