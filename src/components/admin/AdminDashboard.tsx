@@ -23,6 +23,13 @@ import {
   AISettings
 } from '../../types';
 import { storage, DEFAULT_ASSETS, compressImage } from '../../services/storage';
+
+const idCardEnglish = (value?: string | number | null, fallback = '—') => {
+  if (value === undefined || value === null || String(value).trim() === '') return fallback;
+  const text = String(value).trim();
+  if (/[\u0980-\u09FF]/.test(text)) return fallback;
+  return text.replace(/[০-৯]/g, digit => String('০১২৩৪৫৬৭৮৯'.indexOf(digit)));
+};
 import { aiKnowledgeStore, QAItem, TrainingChunk } from '../../services/aiKnowledgeStore';
 import {
   Settings,
@@ -294,7 +301,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
   // The 17 Modules Catalog with exact user specifications
   const moduleCatalog = [
-    { id: 1, title: 'প্রতিষ্ঠাতা, হেডার, ফুটার ও সিল-স্বাক্ষর', desc: 'লোগো পরিবর্তন, ফন্ট সাইজ, প্রধান শিক্ষকের বাণী/ছবি/স্বাক্ষর, সম্পূর্ণ ফুটার ও বাংলা কিউআর কন্ট্রোল', icon: Settings, color: 'from-blue-600 to-indigo-700' },
+    { id: 1, title: 'প্রতিষ্ঠাতা, হেডার, ফুটার ও সিল-স্বাক্ষর', desc: 'লোগো পরিবর্তন, ফন্ট সাইজ, HEAD TEACHERের বাণী/ছবি/স্বাক্ষর, সম্পূর্ণ ফুটার ও বাংলা কিউআর কন্ট্রোল', icon: Settings, color: 'from-blue-600 to-indigo-700' },
     { id: 2, title: 'হিরো স্লাইডার ম্যানেজমেন্ট', desc: 'হোম পেজের ৩টি স্লাইডের ছবি, শিরোনাম ও সাবটেক্সট এডিট এবং নতুন স্লাইড যোগ', icon: Sliders, color: 'from-amber-600 to-orange-700' },
     { id: 3, title: 'শিক্ষক মণ্ডলী প্রোফাইল ম্যানেজমেন্ট', desc: 'শিক্ষকদের তালিকা এডিট, ছবি, যোগ্যতা, নতুন শিক্ষক যুক্তকরণ ও টিচার আইডি কার্ড প্রিন্ট', icon: Users, color: 'from-emerald-600 to-teal-700' },
     { id: 4, title: 'শিক্ষার্থীদের ডাটাবেজ ও আইডি কার্ড প্রিন্ট', desc: 'শিক্ষাবর্ষ ও কোর্সভিত্তিক তালিকা, শিক্ষার্থী এডিট, আইডি কার্ড প্রিন্ট, সাইন কপি ও হাজিরা শিট', icon: GraduationCap, color: 'from-purple-600 to-indigo-800' },
@@ -485,14 +492,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
         <h3 className="text-base font-bold text-slate-900 border-b pb-2 flex items-center gap-2">
           <Award className="w-4 h-4 text-amber-600" />
-          <span>প্রতিষ্ঠাতা ও প্রধান শিক্ষকের তথ্য, বাণী ও স্বাক্ষর</span>
+          <span>প্রতিষ্ঠাতা ও HEAD TEACHERের তথ্য, বাণী ও স্বাক্ষর</span>
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">প্রতিষ্ঠাতা ও প্রধান শিক্ষকের নাম</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">প্রতিষ্ঠাতা ও HEAD TEACHERের নাম</label>
             <input
               type="text"
-              value={settings.founderName}
+              value={idCardEnglish(settings.founderNameEnglish, 'Head Teacher')}
               onChange={(e) => setSettings({ ...settings, founderName: e.target.value })}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-bold text-blue-900"
             />
@@ -511,7 +518,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
           {/* Founder Photo Upload & URL */}
           <div className="sm:col-span-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <label className="block text-xs font-bold text-slate-700 mb-2">প্রধান শিক্ষকের ছবি আপলোড ও প্রিভিউ</label>
+            <label className="block text-xs font-bold text-slate-700 mb-2">HEAD TEACHERের ছবি আপলোড ও প্রিভিউ</label>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="w-20 h-24 rounded-xl border-2 border-amber-400 overflow-hidden shrink-0 shadow-sm bg-slate-900">
                 <img src={settings.founderPhotoUrl} alt="Founder" className="w-full h-full object-cover" />
@@ -525,7 +532,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 />
                 <input
                   type="text"
-                  placeholder="অথবা প্রধান শিক্ষকের ছবির URL..."
+                  placeholder="অথবা HEAD TEACHERের ছবির URL..."
                   value={settings.founderPhotoUrl}
                   onChange={(e) => setSettings({ ...settings, founderPhotoUrl: e.target.value })}
                   className="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-mono"
@@ -536,7 +543,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
           {/* Founder Signature Upload & URL */}
           <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <label className="block text-xs font-bold text-slate-700 mb-2">১. প্রধান শিক্ষকের সিগনেচার (Headmaster's Signature)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-2">১. HEAD TEACHERের সিগনেচার (Headmaster's Signature)</label>
             <div className="flex items-center gap-4">
               <div className="w-24 h-14 bg-white rounded-lg border border-slate-300 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
                 <img src={settings.signatureUrl} alt="Signature" className="max-h-full max-w-full object-contain" />
@@ -557,12 +564,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 />
               </div>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1">এডমিট কার্ড, রেজাল্ট শিট, সার্টিফিকেট ও আইডি কার্ডে প্রধান শিক্ষকের স্বাক্ষর হিসেবে বসবে</p>
+            <p className="text-[10px] text-slate-500 mt-1">এডমিট কার্ড, রেজাল্ট শিট, সার্টিফিকেট ও আইডি কার্ডে HEAD TEACHERের স্বাক্ষর হিসেবে বসবে</p>
           </div>
 
           {/* Headmaster's Personal Seal (সিল) */}
           <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <label className="block text-xs font-bold text-slate-700 mb-2">২. প্রধান শিক্ষকের ব্যক্তিগত সিল (Headmaster's Seal)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-2">২. HEAD TEACHERের ব্যক্তিগত সিল (Headmaster's Seal)</label>
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white rounded-full border border-slate-300 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
                 <img src={settings.signatureSealUrl || DEFAULT_ASSETS.signatureSeal} alt="Headmaster Seal" className="max-h-full max-w-full object-contain" />
@@ -582,19 +589,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 />
                 <input
                   type="text"
-                  placeholder="প্রধান শিক্ষকের সিলের URL..."
+                  placeholder="HEAD TEACHERের সিলের URL..."
                   value={settings.signatureSealUrl || ''}
                   onChange={(e) => setSettings({ ...settings, signatureSealUrl: e.target.value })}
                   className="w-full px-2 py-1 rounded-lg border border-slate-300 text-xs font-mono"
                 />
               </div>
             </div>
-            <p className="text-[10px] text-slate-500 mt-1">প্রধান শিক্ষকের নাম ও পদবি খচিত সিলমোহর</p>
+            <p className="text-[10px] text-slate-500 mt-1">HEAD TEACHERের নাম ও পদবি খচিত সিলমোহর</p>
           </div>
 
           {/* Institute Official Seal Upload & URL */}
           <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-            <label className="block text-xs font-bold text-slate-700 mb-2">৩. প্রতিষ্ঠানের অফিশিয়াল সিল / স্ট্যাম্প (Institutional Seal)</label>
+            <label className="block text-xs font-bold text-slate-700 mb-2">৩. প্রতিষ্ঠানের OFFICIAL SEAL / স্ট্যাম্প (Institutional Seal)</label>
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white rounded-full border border-slate-300 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
                 <img src={settings.institutionSealUrl} alt="Seal" className="max-h-full max-w-full object-contain" />
@@ -631,8 +638,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   logoUrl: DEFAULT_ASSETS.logo,
                   watermarkUrl: DEFAULT_ASSETS.logo
                 }));
-                triggerSaveNotification('ডিফল্ট অফিশিয়াল সিল ও সিগনেচার রিস্টোর হয়েছে!');
-                alert('অফিশিয়াল গোল্ড লোগো, প্রধান শিক্ষকের সিল ও সিগনেচার সফলভাবে রিস্টোর হয়েছে!');
+                triggerSaveNotification('ডিফল্ট OFFICIAL SEAL ও সিগনেচার রিস্টোর হয়েছে!');
+                alert('অফিশিয়াল গোল্ড লোগো, HEAD TEACHERের সিল ও সিগনেচার সফলভাবে রিস্টোর হয়েছে!');
               }}
               className="px-4 py-2 text-xs font-bold text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-200 flex items-center gap-1.5 transition-colors"
             >
@@ -1312,10 +1319,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="pt-3 border-t border-slate-700/80 flex items-end justify-between px-2 text-[10px]">
                 <div className="flex flex-col items-start">
                   <img src={settings.institutionSealUrl} alt="" className="h-8 w-auto object-contain filter drop-shadow" />
-                  <span className="text-[8px] text-amber-300 mt-0.5">অফিশিয়াল সিল</span>
+                  <span className="text-[8px] text-amber-300 mt-0.5">OFFICIAL SEAL</span>
                 </div>
                 <div className="text-center">
-                  <img src={settings.signatureUrl} alt="" className="h-6 w-auto mx-auto filter invert brightness-200" />
+                  <img src={settings.signatureUrl} alt="" className="h-4 w-auto mx-auto filter invert brightness-200" />
                   <span className="text-[8px] text-amber-300">অনুমোদিত স্বাক্ষর</span>
                 </div>
               </div>
@@ -1674,7 +1681,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             </h4>
 
             {/* High-Fidelity Printable Area with Watermark, Parents Names, Seal & Signature */}
-            <div className="printable-area relative mx-auto bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white p-3 shadow-xl border-2 border-amber-400 text-center space-y-2 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box" }}>
+            <div className="printable-area relative mx-auto flex flex-col items-center bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white p-2 shadow-xl border-2 border-amber-400 text-center gap-1 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box" }}>
               {/* Background Subtle Watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10 select-none">
                 {settings.logoUrl ? (
@@ -1693,7 +1700,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   BS E-LEARNING &amp; IT ZONE
                 </div>
                 <div className="text-[10px] text-slate-300">
-                  {settings.subNameEnglish || 'Skills and Success Through Digital Learning'}
+                  {idCardEnglish(settings.subNameEnglish, 'Skills and Success Through Digital Learning')}
                 </div>
                 <div className="inline-block mt-1 px-3 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[9px] tracking-wide uppercase">
                   STUDENT IDENTITY CARD
@@ -1701,7 +1708,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Student Photo */}
-              <div className="relative z-10 w-20 h-20 mx-auto rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md bg-slate-800">
+              <div className="relative z-10 w-14 h-14 mx-auto rounded-xl overflow-hidden border-2 border-amber-400 shadow-md bg-slate-800 shrink-0">
                 <img
                   src={selectedStudentForIdCard.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
                   alt=""
@@ -1711,75 +1718,75 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
               {/* Student Name & Roll */}
               <div className="relative z-10">
-                <h5 className="text-base font-bold text-white">{selectedStudentForIdCard.englishName || '—'}</h5>
+                <h5 className="text-base font-bold text-white">{idCardEnglish(selectedStudentForIdCard.englishName, 'STUDENT NAME')}</h5>
                 <div className="inline-flex items-center gap-2 mt-0.5">
                   <span className="px-2 py-0.5 rounded-md bg-blue-900/90 text-amber-300 font-mono font-black text-xs border border-amber-400/30">
-                    Roll No: {selectedStudentForIdCard.roll}
+                    Roll No: {idCardEnglish(selectedStudentForIdCard.roll)}
                   </span>
                   <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-semibold">
-                    Academic Year: {selectedStudentForIdCard.academicYear}
+                    Academic Year: {idCardEnglish(selectedStudentForIdCard.academicYear)}
                   </span>
                 </div>
               </div>
 
               {/* Personal & Parents Details (পিতার নাম ও মাতার নাম স্পষ্টভাবে) */}
-              <div className="relative z-10 bg-slate-900/80 rounded-xl p-3 border border-slate-700/60 text-xs space-y-1.5 text-left backdrop-blur-xs">
+              <div className="relative z-10 w-full bg-slate-900/80 rounded-lg p-2 border border-slate-700/60 text-[9px] leading-tight space-y-1 text-left">
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-300 font-bold shrink-0">Registration No:</span>
-                  <span className="font-mono font-extrabold text-white text-right pl-2">{selectedStudentForIdCard.registrationNo || '—'}</span>
+                  <span className="font-mono font-extrabold text-white text-right pl-2">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-300 font-bold shrink-0">Course:</span>
                   <span className="font-semibold text-white text-right truncate pl-2">
-                    {courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || selectedStudentForIdCard.courseId || '—'}
+                    {idCardEnglish(courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || selectedStudentForIdCard.courseId)}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-300 font-bold shrink-0">Father:</span>
                   <span className="font-extrabold text-white text-right pl-2">
-                    {selectedStudentForIdCard.fatherNameEnglish || '—'}
+                    {idCardEnglish(selectedStudentForIdCard.fatherNameEnglish, 'NOT PROVIDED')}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-300 font-bold shrink-0">Mother:</span>
                   <span className="font-extrabold text-white text-right pl-2">
-                    {selectedStudentForIdCard.motherNameEnglish || '—'}
+                    {idCardEnglish(selectedStudentForIdCard.motherNameEnglish, 'NOT PROVIDED')}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-slate-400 font-semibold shrink-0">Phone:</span>
-                  <span className="font-mono text-slate-200 text-right">{selectedStudentForIdCard.phone}</span>
+                  <span className="font-mono text-slate-200 text-right">{idCardEnglish(selectedStudentForIdCard.phone)}</span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="text-slate-400 font-semibold shrink-0">Address:</span>
-                  <span className="text-slate-200 text-right truncate pl-2">{selectedStudentForIdCard.addressEnglish || '—'}</span>
+                  <span className="text-slate-200 text-right truncate pl-2">{idCardEnglish(selectedStudentForIdCard.addressEnglish, 'NOT PROVIDED')}</span>
                 </div>
               </div>
 
               {/* Bottom Official Seal & Principal Signature */}
-              <div className="relative z-10 pt-3 border-t border-slate-700/80 flex items-end justify-between px-1 text-[10px]">
+              <div className="relative z-10 w-full mt-auto pt-1 border-t border-slate-700/80 flex items-end justify-between px-1 text-[8px] shrink-0">
                 <div className="flex flex-col items-center">
                   <img
                     src={settings.institutionSealUrl}
-                    alt="সিল"
-                    className="h-9 w-auto object-contain filter drop-shadow"
+                    alt="Official Seal"
+                    className="h-5 w-auto object-contain filter drop-shadow"
                   />
-                  <span className="text-[8px] text-amber-300 mt-0.5">অফিশিয়াল সিল</span>
+                  <span className="text-[8px] text-amber-300 mt-0.5">OFFICIAL SEAL</span>
                 </div>
 
                 <div className="flex flex-col items-center text-center">
                   <img
                     src={settings.signatureUrl}
-                    alt="স্বাক্ষর"
+                    alt="Signature"
                     className="h-6 w-auto mx-auto filter invert brightness-200"
                   />
                   <div className="w-24 border-t border-slate-600 mt-0.5 pt-0.5">
-                    <p className="text-[9px] font-bold text-white">{settings.founderName}</p>
-                    <p className="text-[7px] text-amber-300">প্রধান শিক্ষক</p>
+                    <p className="text-[9px] font-bold text-white">{idCardEnglish(settings.founderNameEnglish, 'Head Teacher')}</p>
+                    <p className="text-[7px] text-amber-300">HEAD TEACHER</p>
                   </div>
                 </div>
               </div>
@@ -1821,16 +1828,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <article key={student.id} className="bulk-id-card relative flex flex-col items-center overflow-hidden border-2 border-amber-500 bg-gradient-to-b from-slate-900 to-blue-950 p-3 text-center text-white">
                 <h3 className="text-[10px] font-extrabold tracking-wide text-amber-300">BS E-LEARNING &amp; IT ZONE</h3>
                 <p className="mt-0.5 text-[7px] font-bold">STUDENT IDENTITY CARD</p>
-                <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="mt-2 h-14 w-14 rounded-lg border border-amber-400 object-cover" />
-                <h4 className="mt-2 w-full break-words text-[10px] font-extrabold">{student.englishName || '—'}</h4>
-                <div className="mt-1 w-full space-y-1 text-left text-[7px]">
-                  <p><b>Registration No:</b> {student.registrationNo || '—'}</p>
-                  <p><b>Roll No:</b> {student.roll || '—'}</p>
-                  <p><b>Academic Year:</b> {student.academicYear || '—'}</p>
-                  <p><b>Course:</b> {courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId || '—'}</p>
-                  <p><b>Father:</b> {student.fatherNameEnglish || '—'}</p>
-                  <p><b>Mother:</b> {student.motherNameEnglish || '—'}</p>
-                  <p><b>Phone:</b> {student.phone || '—'}</p>
+                <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="mt-1 h-10 w-10 rounded-lg border border-amber-400 object-cover shrink-0" />
+                <h4 className="mt-2 w-full break-words text-[10px] font-extrabold">{idCardEnglish(student.englishName, 'STUDENT NAME')}</h4>
+                <div className="mt-1 w-full space-y-0.5 text-left text-[6.5px] leading-tight">
+                  <p><b>Registration No:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
+                  <p><b>Roll No:</b> {idCardEnglish(student.roll)}</p>
+                  <p><b>Academic Year:</b> {idCardEnglish(student.academicYear)}</p>
+                  <p><b>Course:</b> {idCardEnglish(courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId)}</p>
+                  <p><b>Father:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
+                  <p><b>Mother:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
+                  <p><b>Phone:</b> {idCardEnglish(student.phone)}</p>
+                  <p><b>Address:</b> {idCardEnglish(student.addressEnglish, "NOT PROVIDED")}</p>
                 </div>
                 <div className="mt-auto w-full pt-2 text-[6px] text-amber-200">AUTHORIZED STUDENT ID</div>
               </article>
@@ -2805,7 +2813,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               {/* Signatory Name & Title */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">স্বাক্ষরকারী / প্রধান শিক্ষক</label>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">স্বাক্ষরকারী / HEAD TEACHER</label>
                   <input
                     type="text"
                     value={certFounderName}
@@ -6569,7 +6577,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="relative z-10 pt-4 flex items-end justify-between">
                 <div className="text-center">
                   <img src={settings.institutionSealUrl} alt="" className="h-12 w-auto mx-auto object-contain" />
-                  <span className="text-[10px] font-bold text-slate-600 border-t border-slate-400 block mt-1 pt-0.5">অফিশিয়াল সিল</span>
+                  <span className="text-[10px] font-bold text-slate-600 border-t border-slate-400 block mt-1 pt-0.5">OFFICIAL SEAL</span>
                 </div>
                 <div className="text-center">
                   <div className="h-10 w-28 border-b border-dashed border-slate-400 mb-1 mx-auto flex items-end justify-center text-[9px] text-slate-400">পরীক্ষার্থীর স্বাক্ষর</div>
@@ -6578,8 +6586,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <div className="text-center">
                   <img src={settings.signatureUrl} alt="" className="h-10 w-auto mx-auto object-contain" />
                   <div className="border-t border-slate-600 pt-0.5 mt-0.5">
-                    <p className="text-[10px] font-bold text-slate-900">{settings.founderName}</p>
-                    <p className="text-[9px] text-slate-500 font-semibold">পরীক্ষা নিয়ন্ত্রক / প্রধান শিক্ষক</p>
+                    <p className="text-[10px] font-bold text-slate-900">{idCardEnglish(settings.founderNameEnglish, 'Head Teacher')}</p>
+                    <p className="text-[9px] text-slate-500 font-semibold">পরীক্ষা নিয়ন্ত্রক / HEAD TEACHER</p>
                   </div>
                 </div>
               </div>
