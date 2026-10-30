@@ -33,9 +33,15 @@ const idCardEnglish = (value?: string | number | null, fallback = '—') => {
 
 const idCardCourseEnglish = (value?: string | null) => {
   if (!value) return 'COURSE NAME';
-  const text = value.trim();
-  if (/[\u0980-\u09FF]/.test(text)) return 'COURSE NAME';
-  return text.replace(/\s+/g, ' ').trim() || 'COURSE NAME';
+  const text = String(value).trim();
+  if (/[\\u0980-\\u09FF]/.test(text)) return 'COURSE NAME';
+  return text.replace(/\\s+/g, ' ').trim() || 'COURSE NAME';
+};
+
+const getIdCardCourseTitle = (courseId: string | null | undefined, courses: Course[]) => {
+  const normalizedId = String(courseId ?? '').trim().toLowerCase();
+  const course = courses.find(item => String(item.id ?? '').trim().toLowerCase() === normalizedId);
+  return idCardCourseEnglish(course?.titleEnglish || course?.title || 'COURSE NOT FOUND');
 };
 import { aiKnowledgeStore, QAItem, TrainingChunk } from '../../services/aiKnowledgeStore';
 import {
@@ -1688,7 +1694,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             </h4>
 
             {/* High-Fidelity Printable Area with Watermark, Parents Names, Seal & Signature */}
-            <div className="printable-area student-id-card relative mx-auto flex flex-col items-center text-slate-900 p-1 shadow-xl border-2 border-amber-400 text-center gap-0.5 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box", backgroundColor: "#ffffff" }} style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box", backgroundColor: "#ffffff" }}>
+            <div className="printable-area student-id-card relative mx-auto flex flex-col items-center bg-white text-slate-900 p-1 shadow-xl border-2 border-amber-400 text-center gap-0.5 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box", backgroundColor: "#ffffff" }}>
               {/* Background Subtle Watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] select-none">
                 {settings.logoUrl ? (
@@ -1702,7 +1708,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Institution Header */}
-              <div className="relative z-10 pb-1 border-b border-amber-400/40 shrink-0">
+              <div className="relative z-10 w-full bg-white pb-1 border-b border-amber-400/40 shrink-0">
                 <div className="text-amber-400 font-extrabold text-sm tracking-wide">
                   BS E-LEARNING &amp; IT ZONE
                 </div>
@@ -1715,7 +1721,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Student Photo */}
-              <div className="relative z-10 w-9 h-9 mx-auto rounded-lg overflow-hidden border-2 border-amber-400 shadow-md bg-slate-800 shrink-0">
+              <div className="relative z-10 w-9 h-9 mx-auto rounded-lg overflow-hidden border-2 border-amber-400 shadow-md bg-white shrink-0">
                 <img
                   src={selectedStudentForIdCard.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
                   alt=""
@@ -1742,10 +1748,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <span className="text-amber-700 font-bold shrink-0">Registration No:</span>
                   <span className="font-mono font-extrabold text-slate-900 text-right pl-2">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
                 </div>
-                <div className="flex items-start justify-between gap-1 border-b border-slate-800 pb-1">
+                <div className="flex flex-col items-start gap-0.5 border-b border-slate-300 bg-white pb-1">
                   <span className="text-amber-700 font-bold shrink-0">COURSE:</span>
-                  <span className="min-w-0 flex-1 whitespace-normal break-all text-right font-medium text-[6px] leading-[1.1] text-slate-900 pl-1 whitespace-normal break-words">
-                    {idCardCourseEnglish(courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || courses.find(c => c.id === selectedStudentForIdCard.courseId)?.title || selectedStudentForIdCard.courseId)}
+                  <span className="block w-full whitespace-normal break-words text-left font-semibold text-[6.5px] leading-[1.15] text-slate-900">
+                    {getIdCardCourseTitle(selectedStudentForIdCard.courseId, courses)}
                   </span>
                 </div>
 
@@ -1823,7 +1829,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           </div>
           <div className="bulk-id-print-grid mx-auto grid grid-cols-2 justify-items-center gap-2 p-3">
             {filteredStudents.map((student) => (
-              <article key={student.id} className="bulk-id-card relative flex flex-col items-center overflow-hidden border-2 border-amber-500 bg-white p-2 text-center text-slate-900">
+              <article key={student.id} className="bulk-id-card relative flex flex-col items-center overflow-hidden border-2 border-amber-500 bg-white p-2 text-center text-slate-900" style={{ backgroundColor: "#ffffff" }}>
                 {settings.logoUrl && <img src={settings.logoUrl} alt="" aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-28 w-28 -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.22]" />}
                 <h3 className="text-[10px] font-extrabold tracking-wide text-amber-300">BS E-LEARNING &amp; IT ZONE</h3>
                 <p className="mt-0.5 text-[7px] font-bold">STUDENT IDENTITY CARD</p>
@@ -1833,7 +1839,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <p><b>REGISTRATION NO:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
                   <p><b>ROLL NO:</b> {idCardEnglish(student.roll)}</p>
                   <p><b>ACADEMIC YEAR:</b> {idCardEnglish(student.academicYear)}</p>
-                  <p className="flex items-start gap-1"><b className="shrink-0">COURSE:</b><span className="min-w-0 flex-1 whitespace-normal break-all text-[5px] leading-[1.05] line-clamp-2">{idCardCourseEnglish(courses.find(c => c.id === student.courseId)?.titleEnglish || courses.find(c => c.id === student.courseId)?.title || student.courseId)}</span></p>
+                  <p className="flex flex-col items-start gap-0.5 border-b border-slate-200 pb-0.5"><b className="shrink-0">COURSE:</b><span className="block w-full whitespace-normal break-words text-left text-[6px] leading-[1.1]">{getIdCardCourseTitle(student.courseId, courses)}</span></p>
                   <p><b>FATHER:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
                   <p><b>MOTHER:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
                   <p><b>PHONE:</b> {idCardEnglish(student.phone)}</p>
