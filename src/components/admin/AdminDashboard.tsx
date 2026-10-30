@@ -1777,9 +1777,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <span className="text-amber-700 font-bold shrink-0">Registration No:</span>
                   <span className="font-mono font-extrabold text-slate-900 text-left">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
                 </div>
-                <div className="flex flex-col items-start gap-0.5 border-b border-slate-300 bg-transparent pb-1">
+                <div className="flex flex-wrap items-baseline justify-start gap-x-1 border-b border-slate-300 bg-transparent pb-1 text-left">
                   <span className="text-amber-700 font-bold shrink-0">COURSE:</span>
-                  <span className="block w-full whitespace-normal break-words text-left font-bold text-[8px] leading-[1.2] text-slate-900">
+                  <span className="min-w-0 whitespace-normal break-words text-left font-bold text-[8px] leading-[1.2] text-slate-900">
                     {getIdCardCourseTitle(selectedStudentForIdCard.courseId, courses)}
                   </span>
                 </div>
@@ -1793,7 +1793,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
                 <div className="flex flex-wrap items-baseline justify-start gap-x-1 border-b border-slate-800 pb-1 text-left">
                   <span className="text-amber-700 font-bold shrink-0">MOTHER:</span>
-                  <span className="font-extrabold text-slate-900 text-right pl-2">
+                  <span className="font-extrabold text-slate-900 text-left">
                     {idCardEnglish(selectedStudentForIdCard.motherNameEnglish, 'NOT PROVIDED')}
                   </span>
                 </div>
