@@ -1769,7 +1769,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
                 <div className="flex justify-between">
                   <span className="text-slate-400 font-semibold shrink-0">ADDRESS:</span>
-                  <span className="text-slate-200 text-right truncate pl-2">{idCardEnglish(selectedStudentForIdCard.addressEnglish, 'NOT PROVIDED')}</span>
+                  <span className="min-w-0 max-w-[68%] whitespace-normal break-words text-slate-200 text-right pl-2 leading-tight">{idCardEnglish(selectedStudentForIdCard.addressEnglish, 'NOT PROVIDED')}</span>
                 </div>
               </div>
 
@@ -1777,7 +1777,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="relative z-10 w-full mt-auto shrink-0 min-h-[48px] border-t border-slate-600 px-1 py-0.5 flex items-center justify-between bg-black">
                 <div className="flex w-1/2 flex-col items-center justify-center">
                   <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="Official Institutional Seal" className="h-8 w-8 rounded-full bg-transparent object-contain" />
-                  <span className="mt-0.5 text-[6px] font-bold tracking-wide text-slate-700">INSTITUTIONAL SEAL</span>
+                  <span className="mt-0.5 text-[6px] font-bold tracking-wide text-white">INSTITUTIONAL SEAL</span>
                 </div>
                 <div className="flex w-1/2 flex-col items-center justify-center text-center">
                   <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="Principal Signature" className="h-6 w-[78px] bg-transparent object-contain invert" />
