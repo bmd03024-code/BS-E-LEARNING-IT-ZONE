@@ -39,21 +39,31 @@ const idCardCourseEnglish = (value?: string | null) => {
 };
 
 const getIdCardCourseTitle = (courseId: string | null | undefined, courses: Course[]) => {
-  const normalizedId = String(courseId ?? '').trim().toLowerCase();
-  if (!normalizedId) return 'COURSE TITLE NOT FOUND';
-  const normalize = (value?: string | null) => String(value ?? '').trim().toLowerCase();
-  const course = courses.find(item =>
-    normalize(item.id) === normalizedId ||
-    normalize(item.titleEnglish) === normalizedId ||
-    normalize(item.title) === normalizedId
-  );
+  const normalize = (value: unknown) => String(value ?? '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  const requested = normalize(courseId);
+  if (!requested) return 'COURSE TITLE NOT FOUND';
+
+  const course = courses.find(item => {
+    const candidates = [
+      item.id,
+      item.titleEnglish,
+      item.title
+    ];
+    return candidates.some(value => {
+      const candidate = normalize(value);
+      return candidate && (candidate === requested || candidate.includes(requested) || requested.includes(candidate));
+    });
+  });
+
   const englishTitle = String(course?.titleEnglish ?? '').trim();
-  if (englishTitle && !/[\u0980-\u09FF]/.test(englishTitle)) {
-    return englishTitle.replace(/\s+/g, ' ');
-  }
+  if (englishTitle && !/[\u0980-\u09FF]/.test(englishTitle)) return englishTitle.replace(/\s+/g, ' ');
+
   const englishFallback = String(course?.title ?? '').trim();
-  if (englishFallback && !/[\u0980-\u09FF]/.test(englishFallback)) {
-    return englishFallback.replace(/\s+/g, ' ');
+  if (englishFallback && !/[\u0980-\u09FF]/.test(englishFallback)) return englishFallback.replace(/\s+/g, ' ');
+
+  const rawCourseId = String(courseId ?? '').trim();
+  if (rawCourseId && !/[\u0980-\u09FF]/.test(rawCourseId) && !/^[a-z0-9_-]{12,}$/i.test(rawCourseId)) {
+    return rawCourseId.replace(/\s+/g, ' ');
   }
   return 'ENGLISH COURSE TITLE NOT FOUND';
 };
@@ -1712,9 +1722,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             {/* High-Fidelity Printable Area with Watermark, Parents Names, Seal & Signature */}
             <div className="printable-area student-id-card relative mx-auto flex flex-col items-center bg-white text-slate-900 p-1 shadow-xl border-2 border-amber-400 text-center gap-0.5 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box", backgroundColor: "#ffffff" }}>
               {/* Background Subtle Watermark */}
-              <div className="absolute inset-0 z-[1] flex items-center justify-center pointer-events-none opacity-[0.18] select-none">
-                {settings.logoUrl ? (
-                  <img src={settings.logoUrl} alt="Watermark" className="h-full w-full object-contain" />
+              <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-[0.24] select-none">
+                {(settings.watermarkUrl || settings.logoUrl) ? (
+                  <img src={settings.watermarkUrl || settings.logoUrl} alt="Watermark" className="h-[94%] w-[94%] object-contain" />
                 ) : (
                   <div className="w-48 h-48 rounded-full border-8 border-dashed border-amber-400 flex flex-col items-center justify-center text-center p-4">
                     <span className="text-xl font-black text-amber-300">BS ZONE</span>
@@ -1846,12 +1856,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           <div className="bulk-id-print-grid mx-auto grid grid-cols-2 justify-items-center gap-2 p-3">
             {filteredStudents.map((student) => (
               <article key={student.id} className="bulk-id-card relative flex flex-col items-center overflow-hidden border-2 border-amber-500 bg-white p-2 text-center text-slate-900" style={{ backgroundColor: "#ffffff" }}>
-                {settings.logoUrl && <img src={settings.logoUrl} alt="" aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-28 w-28 -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.22]" />}
-                <h3 className="text-[10px] font-extrabold tracking-wide text-amber-300">BS E-LEARNING &amp; IT ZONE</h3>
-                <p className="mt-0.5 text-[7px] font-bold">STUDENT IDENTITY CARD</p>
-                <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="mt-1 h-10 w-10 rounded-lg border border-amber-400 object-cover shrink-0" />
-                <h4 className="mt-2 w-full break-words text-[10px] font-extrabold">{idCardEnglish(student.englishName, 'STUDENT NAME')}</h4>
-                <div className="mt-1 w-full space-y-0.5 rounded-sm border border-slate-300 bg-white/90 p-1 text-left text-[6.5px] leading-tight text-slate-900">
+                {(settings.watermarkUrl || settings.logoUrl) && <img src={settings.watermarkUrl || settings.logoUrl} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 h-full w-full object-contain opacity-[0.24]" />}
+                <h3 className="relative z-10 text-[10px] font-extrabold tracking-wide text-amber-700">BS E-LEARNING &amp; IT ZONE</h3>
+                <p className="relative z-10 mt-0.5 text-[7px] font-bold">STUDENT IDENTITY CARD</p>
+                <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="relative z-10 mt-1 h-10 w-10 rounded-lg border border-amber-400 object-cover shrink-0" />
+                <h4 className="relative z-10 mt-2 w-full break-words text-[10px] font-extrabold">{idCardEnglish(student.englishName, 'STUDENT NAME')}</h4>
+                <div className="relative z-10 mt-1 w-full space-y-0.5 rounded-sm border border-slate-300 bg-white/75 p-1 text-left text-[6.5px] leading-tight text-slate-900">
                   <p><b>REGISTRATION NO:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
                   <p><b>ROLL NO:</b> {idCardEnglish(student.roll)}</p>
                   <p><b>ACADEMIC YEAR:</b> {idCardEnglish(student.academicYear)}</p>
@@ -1861,7 +1871,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <p><b>PHONE:</b> {idCardEnglish(student.phone)}</p>
                   <p><b>ADDRESS:</b> {idCardEnglish(student.addressEnglish, "NOT PROVIDED")}</p>
                 </div>
-                <div className="mt-auto w-full min-h-[38px] shrink-0 border-t border-slate-300 bg-white px-1 py-0.5 flex items-center justify-between">
+                <div className="relative z-10 mt-auto w-full min-h-[38px] shrink-0 border-t border-slate-300 bg-white/75 px-1 py-0.5 flex items-center justify-between">
                   <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="Official Seal" className="h-7 w-7 rounded-full bg-transparent object-contain" />
                   <div className="flex flex-col items-center">
                     <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="Principal Signature" className="h-5 w-[68px] bg-transparent object-contain" />
