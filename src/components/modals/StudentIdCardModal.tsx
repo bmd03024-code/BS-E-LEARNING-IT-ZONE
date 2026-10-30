@@ -112,8 +112,8 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
             <div className="id-card-line"><b>Roll:</b> {englishDigits(student.roll)} <span className="id-card-divider">|</span> <b>Session:</b> {englishDigits(student.academicYear)}</div>
             <div className="id-card-line"><b>Registration No.:</b> {englishDigits(student.registrationNo, 'Not Assigned')}</div>
             <div className="id-card-line"><b>Course:</b> {englishOrFallback(course?.titleEnglish, englishOrFallback(student.courseId, 'Course'))}</div>
-            <div className="id-card-line"><b>Father:</b> {englishOrFallback(student.fatherNameEnglish, 'Not Provided')}</div>
-            <div className="id-card-line"><b>Mother:</b> {englishOrFallback(student.motherNameEnglish, 'Not Provided')}</div>
+            <div className="id-card-line id-card-parent-line"><b>Father:</b><span>{englishOrFallback(student.fatherNameEnglish, 'Not Provided')}</span></div>
+            <div className="id-card-line id-card-parent-line"><b>Mother:</b><span>{englishOrFallback(student.motherNameEnglish, 'Not Provided')}</span></div>
             <div className="id-card-line"><b>Phone:</b> {englishDigits(student.phone)}</div>
           </div>
         </div>
@@ -150,6 +150,9 @@ export const StudentIdCardModal: React.FC<StudentIdCardModalProps> = ({ isOpen, 
         .id-card-student-name { font-size:8pt; line-height:1.1; font-weight:900; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:1mm; }
         .id-card-line { font-size:5.4pt; line-height:1.35; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .id-card-line b { color:#fcd34d; font-weight:700; }
+        .id-card-parent-line { display:grid; grid-template-columns:10mm minmax(0,1fr); column-gap:.5mm; text-align:left; }
+        .id-card-parent-line b { display:block; width:10mm; text-align:left; }
+        .id-card-parent-line span { min-width:0; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
         .id-card-divider { color:#64748b; padding:0 .7mm; }
         .id-card-footer { height:7mm; flex:none; border-top:.2mm solid #475569; padding-top:.8mm; display:flex; justify-content:space-between; align-items:flex-end; }
         .id-card-seal,.id-card-signature { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; min-width:15mm; max-width:28mm; }
