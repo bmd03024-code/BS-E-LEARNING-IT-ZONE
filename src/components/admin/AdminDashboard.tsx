@@ -40,15 +40,25 @@ const idCardCourseEnglish = (value?: string | null) => {
 
 const getIdCardCourseTitle = (courseId: string | null | undefined, courses: Course[]) => {
   const normalizedId = String(courseId ?? '').trim().toLowerCase();
-  const course = courses.find(item => String(item.id ?? '').trim().toLowerCase() === normalizedId);
-  return idCardCourseEnglish(course?.titleEnglish || course?.title || 'COURSE NOT FOUND');
+  if (!normalizedId) return 'COURSE TITLE NOT FOUND';
+  const normalize = (value?: string | null) => String(value ?? '').trim().toLowerCase();
+  const course = courses.find(item =>
+    normalize(item.id) === normalizedId ||
+    normalize(item.titleEnglish) === normalizedId ||
+    normalize(item.title) === normalizedId
+  );
+  const englishTitle = String(course?.titleEnglish ?? '').trim();
+  if (englishTitle && !/[\u0980-\u09FF]/.test(englishTitle)) {
+    return englishTitle.replace(/\s+/g, ' ');
+  }
+  const englishFallback = String(course?.title ?? '').trim();
+  if (englishFallback && !/[\u0980-\u09FF]/.test(englishFallback)) {
+    return englishFallback.replace(/\s+/g, ' ');
+  }
+  return 'ENGLISH COURSE TITLE NOT FOUND';
 };
 
-const getIdCardCourseTitle = (courseId: string | null | undefined, courses: Course[]) => {
-  const normalizedId = String(courseId ?? '').trim().toLowerCase();
-  const course = courses.find(item => String(item.id ?? '').trim().toLowerCase() === normalizedId);
-  return idCardCourseEnglish(course?.titleEnglish || course?.title || 'COURSE NOT FOUND');
-};
+
 import { aiKnowledgeStore, QAItem, TrainingChunk } from '../../services/aiKnowledgeStore';
 import {
   Settings,
@@ -1702,9 +1712,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             {/* High-Fidelity Printable Area with Watermark, Parents Names, Seal & Signature */}
             <div className="printable-area student-id-card relative mx-auto flex flex-col items-center bg-white text-slate-900 p-1 shadow-xl border-2 border-amber-400 text-center gap-0.5 overflow-hidden" style={{ width: "2.216in", height: "3.316in", boxSizing: "border-box", backgroundColor: "#ffffff" }}>
               {/* Background Subtle Watermark */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] select-none">
+              <div className="absolute inset-0 z-[1] flex items-center justify-center pointer-events-none opacity-[0.18] select-none">
                 {settings.logoUrl ? (
-                  <img src={settings.logoUrl} alt="Watermark" className="h-[94%] w-[94%] object-contain" />
+                  <img src={settings.logoUrl} alt="Watermark" className="h-full w-full object-contain" />
                 ) : (
                   <div className="w-48 h-48 rounded-full border-8 border-dashed border-amber-400 flex flex-col items-center justify-center text-center p-4">
                     <span className="text-xl font-black text-amber-300">BS ZONE</span>
@@ -1714,7 +1724,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Institution Header */}
-              <div className="relative z-10 w-full bg-white/75 pb-1 border-b border-amber-400/40 shrink-0 font-bold">
+              <div className="relative z-10 w-full bg-transparent pb-1 border-b border-amber-400/40 shrink-0 font-bold">
                 <div className="text-amber-400 font-extrabold text-sm tracking-wide">
                   BS E-LEARNING &amp; IT ZONE
                 </div>
@@ -1749,12 +1759,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Personal & Parents Details (পিতার নাম ও মাতার নাম স্পষ্টভাবে) */}
-              <div className="relative z-10 w-full shrink-0 bg-white/75 rounded-lg p-1 border border-slate-300 text-[6.5px] font-bold leading-[1.05] space-y-[2px] text-left">
+              <div className="relative z-10 w-full shrink-0 bg-transparent rounded-lg p-1 border border-slate-300 text-[6.5px] font-bold leading-[1.05] space-y-[2px] text-left">
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-700 font-bold shrink-0">Registration No:</span>
                   <span className="font-mono font-extrabold text-slate-900 text-right pl-2">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
                 </div>
-                <div className="flex flex-col items-start gap-0.5 border-b border-slate-300 bg-white pb-1">
+                <div className="flex flex-col items-start gap-0.5 border-b border-slate-300 bg-transparent pb-1">
                   <span className="text-amber-700 font-bold shrink-0">COURSE:</span>
                   <span className="block w-full whitespace-normal break-words text-left font-bold text-[6.5px] leading-[1.15] text-slate-900">
                     {getIdCardCourseTitle(selectedStudentForIdCard.courseId, courses)}
@@ -1787,7 +1797,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Bottom Official Seal & Principal Signature */}
-              <div className="relative z-10 w-full mt-auto shrink-0 min-h-[48px] border-t border-slate-300 px-1 py-0.5 flex items-center justify-between bg-white/75 font-bold">
+              <div className="relative z-10 w-full mt-auto shrink-0 min-h-[48px] border-t border-slate-300 px-1 py-0.5 flex items-center justify-between bg-transparent font-bold">
                 <div className="flex w-1/2 flex-col items-center justify-center">
                   <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="Official Institutional Seal" className="h-8 w-8 rounded-full bg-transparent object-contain" />
                   <span className="mt-0.5 text-[6px] font-bold tracking-wide text-slate-700">INSTITUTIONAL SEAL</span>
