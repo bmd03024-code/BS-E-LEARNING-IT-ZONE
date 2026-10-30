@@ -1773,9 +1773,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
               {/* Personal & Parents Details (পিতার নাম ও মাতার নাম স্পষ্টভাবে) */}
               <div className="relative z-10 w-full shrink-0 bg-transparent rounded-lg p-1 border border-slate-300 text-[6.5px] font-bold leading-[1.05] space-y-[2px] text-left">
-                <div className="flex justify-between border-b border-slate-800 pb-1">
+                <div className="flex flex-wrap items-baseline justify-start gap-x-1 border-b border-slate-800 pb-1 text-left">
                   <span className="text-amber-700 font-bold shrink-0">Registration No:</span>
-                  <span className="font-mono font-extrabold text-slate-900 text-right pl-2">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
+                  <span className="font-mono font-extrabold text-slate-900 text-left">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
                 </div>
                 <div className="flex flex-col items-start gap-0.5 border-b border-slate-300 bg-transparent pb-1">
                   <span className="text-amber-700 font-bold shrink-0">COURSE:</span>
@@ -1784,28 +1784,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   </span>
                 </div>
 
-                <div className="flex justify-between border-b border-slate-800 pb-1">
+                <div className="flex flex-wrap items-baseline justify-start gap-x-1 border-b border-slate-800 pb-1 text-left">
                   <span className="text-amber-700 font-bold shrink-0">FATHER:</span>
-                  <span className="font-extrabold text-slate-900 text-right pl-2">
+                  <span className="font-extrabold text-slate-900 text-left">
                     {idCardEnglish(selectedStudentForIdCard.fatherNameEnglish, 'NOT PROVIDED')}
                   </span>
                 </div>
 
-                <div className="flex justify-between border-b border-slate-800 pb-1">
+                <div className="flex flex-wrap items-baseline justify-start gap-x-1 border-b border-slate-800 pb-1 text-left">
                   <span className="text-amber-700 font-bold shrink-0">MOTHER:</span>
                   <span className="font-extrabold text-slate-900 text-right pl-2">
                     {idCardEnglish(selectedStudentForIdCard.motherNameEnglish, 'NOT PROVIDED')}
                   </span>
                 </div>
 
-                <div className="flex justify-between border-b border-slate-800 pb-1">
+                <div className="flex flex-wrap items-baseline justify-start gap-x-1 border-b border-slate-800 pb-1 text-left">
                   <span className="text-slate-600 font-semibold shrink-0">PHONE:</span>
-                  <span className="font-mono font-bold text-slate-800 text-right">{idCardEnglish(selectedStudentForIdCard.phone)}</span>
+                  <span className="font-mono font-bold text-slate-800 text-left">{idCardEnglish(selectedStudentForIdCard.phone)}</span>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex flex-wrap items-baseline justify-start gap-x-1 text-left">
                   <span className="text-slate-600 font-semibold shrink-0">ADDRESS:</span>
-                  <span className="min-w-0 max-w-[68%] whitespace-normal break-words font-bold text-slate-800 text-right pl-2 leading-tight">{idCardEnglish(selectedStudentForIdCard.addressEnglish, 'NOT PROVIDED')}</span>
+                  <span className="min-w-0 whitespace-normal break-words font-bold text-slate-800 text-left leading-tight">{idCardEnglish(selectedStudentForIdCard.addressEnglish, 'NOT PROVIDED')}</span>
                 </div>
               </div>
 
@@ -1865,14 +1865,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="relative z-10 mt-1 h-10 w-10 rounded-lg border border-amber-400 object-cover shrink-0" />
                 <h4 className="relative z-10 mt-2 w-full break-words text-[10px] font-extrabold">{idCardEnglish(student.englishName, 'STUDENT NAME')}</h4>
                 <div className="relative z-10 mt-1 w-full space-y-0.5 rounded-sm border border-slate-300 bg-white/75 p-1 text-left text-[6.5px] leading-tight text-slate-900">
-                  <p><b>REGISTRATION NO:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
-                  <p><b>ROLL NO:</b> {idCardEnglish(student.roll)}</p>
-                  <p><b>ACADEMIC YEAR:</b> {idCardEnglish(student.academicYear)}</p>
+                  <p className="text-left"><b>REGISTRATION NO:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
+                  <p className="text-left"><b>ROLL NO:</b> {idCardEnglish(student.roll)}</p>
+                  <p className="text-left"><b>ACADEMIC YEAR:</b> {idCardEnglish(student.academicYear)}</p>
                   <p className="flex flex-col items-start gap-0.5 border-b border-slate-200 pb-0.5"><b className="shrink-0">COURSE:</b><span className="block w-full whitespace-normal break-words text-left text-[7.5px] leading-[1.2]">{getIdCardCourseTitle(student.courseId, courses)}</span></p>
-                  <p><b>FATHER:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
-                  <p><b>MOTHER:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
-                  <p><b>PHONE:</b> {idCardEnglish(student.phone)}</p>
-                  <p><b>ADDRESS:</b> {idCardEnglish(student.addressEnglish, "NOT PROVIDED")}</p>
+                  <p className="text-left"><b>FATHER:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
+                  <p className="text-left"><b>MOTHER:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
+                  <p className="text-left"><b>PHONE:</b> {idCardEnglish(student.phone)}</p>
+                  <p className="text-left"><b>ADDRESS:</b> {idCardEnglish(student.addressEnglish, "NOT PROVIDED")}</p>
                 </div>
                 <div className="relative z-10 mt-auto w-full min-h-[38px] shrink-0 border-t border-slate-300 bg-white/75 px-1 py-0.5 flex items-center justify-between">
                   <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="Official Seal" className="h-7 w-7 rounded-full bg-transparent object-contain" />
