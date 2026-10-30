@@ -1779,7 +1779,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 </div>
                 <div className="flex flex-col items-start gap-0.5 border-b border-slate-300 bg-transparent pb-1">
                   <span className="text-amber-700 font-bold shrink-0">COURSE:</span>
-                  <span className="block w-full whitespace-normal break-words text-left font-bold text-[6.5px] leading-[1.15] text-slate-900">
+                  <span className="block w-full whitespace-normal break-words text-left font-bold text-[8px] leading-[1.2] text-slate-900">
                     {getIdCardCourseTitle(selectedStudentForIdCard.courseId, courses)}
                   </span>
                 </div>
@@ -1868,7 +1868,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <p><b>REGISTRATION NO:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
                   <p><b>ROLL NO:</b> {idCardEnglish(student.roll)}</p>
                   <p><b>ACADEMIC YEAR:</b> {idCardEnglish(student.academicYear)}</p>
-                  <p className="flex flex-col items-start gap-0.5 border-b border-slate-200 pb-0.5"><b className="shrink-0">COURSE:</b><span className="block w-full whitespace-normal break-words text-left text-[6px] leading-[1.1]">{getIdCardCourseTitle(student.courseId, courses)}</span></p>
+                  <p className="flex flex-col items-start gap-0.5 border-b border-slate-200 pb-0.5"><b className="shrink-0">COURSE:</b><span className="block w-full whitespace-normal break-words text-left text-[7.5px] leading-[1.2]">{getIdCardCourseTitle(student.courseId, courses)}</span></p>
                   <p><b>FATHER:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
                   <p><b>MOTHER:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
                   <p><b>PHONE:</b> {idCardEnglish(student.phone)}</p>
