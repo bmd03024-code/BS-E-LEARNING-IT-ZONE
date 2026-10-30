@@ -30,6 +30,12 @@ const idCardEnglish = (value?: string | number | null, fallback = '—') => {
   if (/[\u0980-\u09FF]/.test(text)) return fallback;
   return text.replace(/[০-৯]/g, digit => String('০১২৩৪৫৬৭৮৯'.indexOf(digit)));
 };
+
+const idCardCourseEnglish = (value?: string | null) => {
+  if (!value) return 'COURSE NAME';
+  const translated = value.replace(/কোর্স/g, 'Course').replace(/মাস/g, 'Month').replace(/মাসের/g, 'Month');
+  return translated.replace(/[\\u0980-\\u09FF]+/g, '').replace(/\\s{2,}/g, ' ').replace(/\\(\\s*\\)/g, '').trim() || 'COURSE NAME';
+};
 import { aiKnowledgeStore, QAItem, TrainingChunk } from '../../services/aiKnowledgeStore';
 import {
   Settings,
@@ -1322,7 +1328,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <span className="text-[8px] text-amber-300 mt-0.5">OFFICIAL SEAL</span>
                 </div>
                 <div className="text-center">
-                  <img src={settings.signatureUrl} alt="" className="h-4 w-auto mx-auto filter invert brightness-200" />
+                  <img src={settings.signatureUrl} alt="" className="h-6 max-w-[76px] object-contain mix-blend-screen bg-transparent" />
                   <span className="text-[8px] text-amber-300">অনুমোদিত স্বাক্ষর</span>
                 </div>
               </div>
@@ -1708,7 +1714,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Student Photo */}
-              <div className="relative z-10 w-14 h-14 mx-auto rounded-xl overflow-hidden border-2 border-amber-400 shadow-md bg-slate-800 shrink-0">
+              <div className="relative z-10 w-11 h-11 mx-auto rounded-xl overflow-hidden border-2 border-amber-400 shadow-md bg-slate-800 shrink-0">
                 <img
                   src={selectedStudentForIdCard.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'}
                   alt=""
@@ -1730,7 +1736,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Personal & Parents Details (পিতার নাম ও মাতার নাম স্পষ্টভাবে) */}
-              <div className="relative z-10 w-full bg-slate-900/80 rounded-lg p-2 border border-slate-700/60 text-[9px] leading-tight space-y-1 text-left">
+              <div className="relative z-10 w-full bg-slate-900/80 rounded-lg p-1.5 border border-slate-700/60 text-[8px] leading-[1.1] space-y-0.5 text-left shrink-0">
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-300 font-bold shrink-0">Registration No:</span>
                   <span className="font-mono font-extrabold text-white text-right pl-2">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
@@ -1738,7 +1744,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-300 font-bold shrink-0">Course:</span>
                   <span className="font-semibold text-white text-right truncate pl-2">
-                    {idCardEnglish(courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || selectedStudentForIdCard.courseId)}
+                    {idCardCourseEnglish(courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || selectedStudentForIdCard.courseId)}
                   </span>
                 </div>
 
@@ -1768,12 +1774,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Bottom Official Seal & Principal Signature */}
-              <div className="relative z-10 w-full mt-auto pt-1 border-t border-slate-700/80 flex items-end justify-between px-1 text-[8px] shrink-0">
+              <div className="relative z-10 w-full mt-auto pt-1 border-t border-slate-700/80 flex items-end justify-between px-2 text-[7px] shrink-0 min-h-[34px]">
                 <div className="flex flex-col items-center">
                   <img
                     src={settings.institutionSealUrl}
                     alt="Official Seal"
-                    className="h-5 w-auto object-contain filter drop-shadow"
+                    className="h-7 w-12 object-contain mix-blend-multiply bg-transparent"
                   />
                   <span className="text-[8px] text-amber-300 mt-0.5">OFFICIAL SEAL</span>
                 </div>
@@ -1834,13 +1840,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <p><b>Registration No:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
                   <p><b>Roll No:</b> {idCardEnglish(student.roll)}</p>
                   <p><b>Academic Year:</b> {idCardEnglish(student.academicYear)}</p>
-                  <p><b>Course:</b> {idCardEnglish(courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId)}</p>
+                  <p><b>Course:</b> {idCardCourseEnglish(courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId)}</p>
                   <p><b>Father:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
                   <p><b>Mother:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
                   <p><b>Phone:</b> {idCardEnglish(student.phone)}</p>
                   <p><b>Address:</b> {idCardEnglish(student.addressEnglish, "NOT PROVIDED")}</p>
                 </div>
-                <div className="mt-auto w-full pt-2 text-[6px] text-amber-200">AUTHORIZED STUDENT ID</div>
+                <div className="mt-auto w-full pt-1 border-t border-slate-600 flex items-end justify-between px-1">
+                  <img src={settings.institutionSealUrl} alt="Official Seal" className="h-6 w-10 object-contain mix-blend-multiply bg-transparent" />
+                  <div className="flex flex-col items-center">
+                    <img src={settings.signatureUrl} alt="Principal Signature" className="h-5 max-w-[64px] object-contain mix-blend-screen bg-transparent" />
+                    <span className="border-t border-slate-500 pt-0.5 text-[5px] text-white">{idCardEnglish(settings.founderNameEnglish, 'HEAD TEACHER')}</span>
+                    <span className="text-[5px] text-amber-300">HEAD TEACHER</span>
+                  </div>
+                </div>
               </article>
             ))}
           </div>
