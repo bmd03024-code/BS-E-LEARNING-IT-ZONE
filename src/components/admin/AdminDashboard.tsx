@@ -1743,7 +1743,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 </div>
                 <div className="flex items-start justify-between gap-1 border-b border-slate-800 pb-1">
                   <span className="text-amber-300 font-bold shrink-0">COURSE:</span>
-                  <span className="min-w-0 flex-1 whitespace-normal break-words text-right font-semibold leading-tight text-white pl-1 line-clamp-2">
+                  <span className="min-w-0 flex-1 whitespace-normal break-all text-right font-medium text-[6px] leading-[1.05] text-white pl-1 line-clamp-2">
                     {idCardCourseEnglish(courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || selectedStudentForIdCard.courseId)}
                   </span>
                 </div>
@@ -1831,7 +1831,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <p><b>REGISTRATION NO:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
                   <p><b>ROLL NO:</b> {idCardEnglish(student.roll)}</p>
                   <p><b>ACADEMIC YEAR:</b> {idCardEnglish(student.academicYear)}</p>
-                  <p className="flex items-start gap-1"><b className="shrink-0">COURSE:</b><span className="min-w-0 flex-1 whitespace-normal break-words line-clamp-2">{idCardCourseEnglish(courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId)}</span></p>
+                  <p className="flex items-start gap-1"><b className="shrink-0">COURSE:</b><span className="min-w-0 flex-1 whitespace-normal break-all text-[5px] leading-[1.05] line-clamp-2">{idCardCourseEnglish(courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId)}</span></p>
                   <p><b>FATHER:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
                   <p><b>MOTHER:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
                   <p><b>PHONE:</b> {idCardEnglish(student.phone)}</p>
