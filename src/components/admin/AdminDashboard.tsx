@@ -1742,44 +1742,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <span className="font-mono font-extrabold text-white text-right pl-2">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-800 pb-1">
-                  <span className="text-amber-300 font-bold shrink-0">Course:</span>
+                  <span className="text-amber-300 font-bold shrink-0">COURSE:</span>
                   <span className="font-semibold text-white text-right truncate pl-2">
                     {idCardCourseEnglish(courses.find(c => c.id === selectedStudentForIdCard.courseId)?.titleEnglish || selectedStudentForIdCard.courseId)}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
-                  <span className="text-amber-300 font-bold shrink-0">Father:</span>
+                  <span className="text-amber-300 font-bold shrink-0">FATHER:</span>
                   <span className="font-extrabold text-white text-right pl-2">
                     {idCardEnglish(selectedStudentForIdCard.fatherNameEnglish, 'NOT PROVIDED')}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
-                  <span className="text-amber-300 font-bold shrink-0">Mother:</span>
+                  <span className="text-amber-300 font-bold shrink-0">MOTHER:</span>
                   <span className="font-extrabold text-white text-right pl-2">
                     {idCardEnglish(selectedStudentForIdCard.motherNameEnglish, 'NOT PROVIDED')}
                   </span>
                 </div>
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
-                  <span className="text-slate-400 font-semibold shrink-0">Phone:</span>
+                  <span className="text-slate-400 font-semibold shrink-0">PHONE:</span>
                   <span className="font-mono text-slate-200 text-right">{idCardEnglish(selectedStudentForIdCard.phone)}</span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-slate-400 font-semibold shrink-0">Address:</span>
+                  <span className="text-slate-400 font-semibold shrink-0">ADDRESS:</span>
                   <span className="text-slate-200 text-right truncate pl-2">{idCardEnglish(selectedStudentForIdCard.addressEnglish, 'NOT PROVIDED')}</span>
                 </div>
               </div>
 
               {/* Bottom Official Seal & Principal Signature */}
-              <div className="relative z-10 w-full mt-auto pt-1 border-t border-slate-700/80 flex items-end justify-between px-2 text-[7px] shrink-0 min-h-[34px]">
+              <div className="relative z-10 w-full mt-auto pt-1 border-t border-slate-700/80 flex items-end justify-between px-1 text-[7px] shrink-0 min-h-[54px]">
                 <div className="flex flex-col items-center">
                   <img
                     src={settings.institutionSealUrl}
                     alt="Official Seal"
-                    className="h-7 w-12 object-contain mix-blend-multiply bg-transparent"
+                    className="h-10 w-10 rounded-full bg-white p-0.5 object-contain mix-blend-multiply"
                   />
                   <span className="text-[8px] text-amber-300 mt-0.5">OFFICIAL SEAL</span>
                 </div>
@@ -1788,7 +1788,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <img
                     src={settings.signatureUrl}
                     alt="Signature"
-                    className="h-6 w-auto mx-auto filter invert brightness-200"
+                    className="h-7 w-[76px] rounded-sm bg-white p-0.5 object-contain"
                   />
                   <div className="w-24 border-t border-slate-600 mt-0.5 pt-0.5">
                     <p className="text-[9px] font-bold text-white">{idCardEnglish(settings.founderNameEnglish, 'Head Teacher')}</p>
@@ -1837,19 +1837,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="mt-1 h-10 w-10 rounded-lg border border-amber-400 object-cover shrink-0" />
                 <h4 className="mt-2 w-full break-words text-[10px] font-extrabold">{idCardEnglish(student.englishName, 'STUDENT NAME')}</h4>
                 <div className="mt-1 w-full space-y-0.5 text-left text-[6.5px] leading-tight">
-                  <p><b>Registration No:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
-                  <p><b>Roll No:</b> {idCardEnglish(student.roll)}</p>
-                  <p><b>Academic Year:</b> {idCardEnglish(student.academicYear)}</p>
-                  <p><b>Course:</b> {idCardCourseEnglish(courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId)}</p>
-                  <p><b>Father:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
-                  <p><b>Mother:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
-                  <p><b>Phone:</b> {idCardEnglish(student.phone)}</p>
-                  <p><b>Address:</b> {idCardEnglish(student.addressEnglish, "NOT PROVIDED")}</p>
+                  <p><b>REGISTRATION NO:</b> {idCardEnglish(student.registrationNo, 'NOT ASSIGNED')}</p>
+                  <p><b>ROLL NO:</b> {idCardEnglish(student.roll)}</p>
+                  <p><b>ACADEMIC YEAR:</b> {idCardEnglish(student.academicYear)}</p>
+                  <p><b>COURSE:</b> {idCardCourseEnglish(courses.find(c => c.id === student.courseId)?.titleEnglish || student.courseId)}</p>
+                  <p><b>FATHER:</b> {idCardEnglish(student.fatherNameEnglish, 'NOT PROVIDED')}</p>
+                  <p><b>MOTHER:</b> {idCardEnglish(student.motherNameEnglish, 'NOT PROVIDED')}</p>
+                  <p><b>PHONE:</b> {idCardEnglish(student.phone)}</p>
+                  <p><b>ADDRESS:</b> {idCardEnglish(student.addressEnglish, "NOT PROVIDED")}</p>
                 </div>
                 <div className="mt-auto w-full pt-1 border-t border-slate-600 flex items-end justify-between px-1">
-                  <img src={settings.institutionSealUrl} alt="Official Seal" className="h-6 w-10 object-contain mix-blend-multiply bg-transparent" />
+                  <img src={settings.institutionSealUrl} alt="Official Seal" className="h-9 w-9 rounded-full bg-white p-0.5 object-contain mix-blend-multiply" />
                   <div className="flex flex-col items-center">
-                    <img src={settings.signatureUrl} alt="Principal Signature" className="h-5 max-w-[64px] object-contain invert brightness-200 mix-blend-screen bg-transparent" />
+                    <img src={settings.signatureUrl} alt="Principal Signature" className="h-6 w-[68px] rounded-sm bg-white p-0.5 object-contain" />
                     <span className="border-t border-slate-500 pt-0.5 text-[5px] text-white">{idCardEnglish(settings.founderNameEnglish, 'HEAD TEACHER')}</span>
                     <span className="text-[5px] text-amber-300">HEAD TEACHER</span>
                   </div>
