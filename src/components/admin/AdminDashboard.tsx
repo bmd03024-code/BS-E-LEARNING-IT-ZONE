@@ -32,10 +32,16 @@ const idCardEnglish = (value?: string | number | null, fallback = '—') => {
 };
 
 const idCardCourseEnglish = (value?: string | null) => {
-  if (!value) return 'COURSE NAME';
+  if (!value) return 'NOT PROVIDED';
   const text = String(value).trim();
-  if (/[\\u0980-\\u09FF]/.test(text)) return 'COURSE NAME';
-  return text.replace(/\\s+/g, ' ').trim() || 'COURSE NAME';
+  if (/[\u0980-\u09FF]/.test(text)) return 'NOT PROVIDED';
+  return text.replace(/\s+/g, ' ').trim() || 'NOT PROVIDED';
+};
+
+const getIdCardCourseTitle = (courseId: string | null | undefined, courses: Course[]) => {
+  const normalizedId = String(courseId ?? '').trim().toLowerCase();
+  const course = courses.find(item => String(item.id ?? '').trim().toLowerCase() === normalizedId);
+  return idCardCourseEnglish(course?.titleEnglish || course?.title || 'COURSE NOT FOUND');
 };
 
 const getIdCardCourseTitle = (courseId: string | null | undefined, courses: Course[]) => {
@@ -1308,7 +1314,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
             <div className="printable-area relative bg-gradient-to-b from-blue-950 via-slate-900 to-blue-950 text-white rounded-2xl p-6 shadow-xl border-2 border-amber-400 text-center space-y-3 overflow-hidden">
               {/* Background watermark */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] select-none">
+              <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-[0.20] select-none">
                 {settings.logoUrl && (
                   <img src={settings.logoUrl} alt="" className="w-44 h-44 object-contain" />
                 )}
@@ -1317,7 +1323,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="text-amber-400 font-extrabold text-sm tracking-wide">
                 BS E-LEARNING &amp; IT ZONE
               </div>
-              <div className="text-[10px] text-slate-700">শিক্ষক পরিচয়পত্র (TEACHER ID CARD)</div>
+              <div className="text-[10px] font-bold text-slate-700">শিক্ষক পরিচয়পত্র (TEACHER ID CARD)</div>
 
               <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-amber-400 shadow-md bg-slate-800">
                 <img src={selectedTeacherForCard.photoUrl} alt="" className="w-full h-full object-cover" />
@@ -1698,7 +1704,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               {/* Background Subtle Watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] select-none">
                 {settings.logoUrl ? (
-                  <img src={settings.logoUrl} alt="Watermark" className="w-52 h-52 object-contain" />
+                  <img src={settings.logoUrl} alt="Watermark" className="h-[94%] w-[94%] object-contain" />
                 ) : (
                   <div className="w-48 h-48 rounded-full border-8 border-dashed border-amber-400 flex flex-col items-center justify-center text-center p-4">
                     <span className="text-xl font-black text-amber-300">BS ZONE</span>
@@ -1708,7 +1714,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Institution Header */}
-              <div className="relative z-10 w-full bg-white pb-1 border-b border-amber-400/40 shrink-0">
+              <div className="relative z-10 w-full bg-white/75 pb-1 border-b border-amber-400/40 shrink-0 font-bold">
                 <div className="text-amber-400 font-extrabold text-sm tracking-wide">
                   BS E-LEARNING &amp; IT ZONE
                 </div>
@@ -1733,24 +1739,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="relative z-10">
                 <h5 className="text-sm font-bold text-slate-900 leading-tight">{idCardEnglish(selectedStudentForIdCard.englishName, 'STUDENT NAME')}</h5>
                 <div className="inline-flex items-center gap-2 mt-0.5">
-                  <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-900 font-mono font-black text-[10px] border border-amber-400/30">
+                  <span className="px-1.5 py-0.5 rounded-md bg-white/75 text-slate-900 font-mono font-black text-[10px] border border-amber-400/30">
                     Roll No: {idCardEnglish(selectedStudentForIdCard.roll)}
                   </span>
-                  <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-800 text-[9px] font-semibold">
+                  <span className="px-1.5 py-0.5 rounded-md bg-white/75 text-slate-800 text-[9px] font-bold">
                     Academic Year: {idCardEnglish(selectedStudentForIdCard.academicYear)}
                   </span>
                 </div>
               </div>
 
               {/* Personal & Parents Details (পিতার নাম ও মাতার নাম স্পষ্টভাবে) */}
-              <div className="relative z-10 w-full shrink-0 bg-white rounded-lg p-1 border border-slate-300 text-[6.5px] leading-[1.05] space-y-[2px] text-left">
+              <div className="relative z-10 w-full shrink-0 bg-white/75 rounded-lg p-1 border border-slate-300 text-[6.5px] font-bold leading-[1.05] space-y-[2px] text-left">
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-amber-700 font-bold shrink-0">Registration No:</span>
                   <span className="font-mono font-extrabold text-slate-900 text-right pl-2">{idCardEnglish(selectedStudentForIdCard.registrationNo, 'NOT ASSIGNED')}</span>
                 </div>
                 <div className="flex flex-col items-start gap-0.5 border-b border-slate-300 bg-white pb-1">
                   <span className="text-amber-700 font-bold shrink-0">COURSE:</span>
-                  <span className="block w-full whitespace-normal break-words text-left font-semibold text-[6.5px] leading-[1.15] text-slate-900">
+                  <span className="block w-full whitespace-normal break-words text-left font-bold text-[6.5px] leading-[1.15] text-slate-900">
                     {getIdCardCourseTitle(selectedStudentForIdCard.courseId, courses)}
                   </span>
                 </div>
@@ -1771,17 +1777,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
                 <div className="flex justify-between border-b border-slate-800 pb-1">
                   <span className="text-slate-600 font-semibold shrink-0">PHONE:</span>
-                  <span className="font-mono text-slate-800 text-right">{idCardEnglish(selectedStudentForIdCard.phone)}</span>
+                  <span className="font-mono font-bold text-slate-800 text-right">{idCardEnglish(selectedStudentForIdCard.phone)}</span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="text-slate-600 font-semibold shrink-0">ADDRESS:</span>
-                  <span className="min-w-0 max-w-[68%] whitespace-normal break-words text-slate-800 text-right pl-2 leading-tight">{idCardEnglish(selectedStudentForIdCard.addressEnglish, 'NOT PROVIDED')}</span>
+                  <span className="min-w-0 max-w-[68%] whitespace-normal break-words font-bold text-slate-800 text-right pl-2 leading-tight">{idCardEnglish(selectedStudentForIdCard.addressEnglish, 'NOT PROVIDED')}</span>
                 </div>
               </div>
 
               {/* Bottom Official Seal & Principal Signature */}
-              <div className="relative z-10 w-full mt-auto shrink-0 min-h-[48px] border-t border-slate-300 px-1 py-0.5 flex items-center justify-between bg-white">
+              <div className="relative z-10 w-full mt-auto shrink-0 min-h-[48px] border-t border-slate-300 px-1 py-0.5 flex items-center justify-between bg-white/75 font-bold">
                 <div className="flex w-1/2 flex-col items-center justify-center">
                   <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="Official Institutional Seal" className="h-8 w-8 rounded-full bg-transparent object-contain" />
                   <span className="mt-0.5 text-[6px] font-bold tracking-wide text-slate-700">INSTITUTIONAL SEAL</span>
