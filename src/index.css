@@ -195,12 +195,25 @@
 }
 
 
-/* Student ID card must remain white in preview and print, independent of theme styles. */
-.student-id-card,
-.student-id-card > div:not(.no-print) {
+/* Force every visible layer of student ID cards to a white base. */
+.student-id-card {
+  background: #ffffff !important;
   background-color: #ffffff !important;
   color: #0f172a !important;
+  isolation: isolate;
+}
+.student-id-card > div:not(.no-print) {
+  background-color: #ffffff !important;
 }
 .student-id-card img[alt="Watermark"] {
   opacity: 0.30 !important;
+}
+.bulk-id-card {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+.bulk-id-card > div,
+.bulk-id-card > p {
+  background-color: #ffffff !important;
 }
