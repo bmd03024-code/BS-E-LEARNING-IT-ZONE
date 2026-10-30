@@ -552,7 +552,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             <label className="block text-xs font-bold text-slate-700 mb-2">১. HEAD TEACHERের সিগনেচার (Headmaster's Signature)</label>
             <div className="flex items-center gap-4">
               <div className="w-24 h-14 bg-white rounded-lg border border-slate-300 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
-                <img src={settings.signatureUrl} alt="Signature" className="max-h-full max-w-full object-contain" />
+                <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="Signature" className="max-h-full max-w-full object-contain" />
               </div>
               <div className="space-y-1.5 grow">
                 <input
@@ -610,7 +610,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
             <label className="block text-xs font-bold text-slate-700 mb-2">৩. প্রতিষ্ঠানের OFFICIAL SEAL / স্ট্যাম্প (Institutional Seal)</label>
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white rounded-full border border-slate-300 flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-2xs">
-                <img src={settings.institutionSealUrl} alt="Seal" className="max-h-full max-w-full object-contain" />
+                <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="Seal" className="max-h-full max-w-full object-contain" />
               </div>
               <div className="space-y-1.5 grow">
                 <input
@@ -1324,11 +1324,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
               <div className="pt-3 border-t border-slate-700/80 flex items-end justify-between px-2 text-[10px]">
                 <div className="flex flex-col items-start">
-                  <img src={settings.institutionSealUrl} alt="" className="h-8 w-auto object-contain filter drop-shadow" />
+                  <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="" className="h-8 w-auto object-contain filter drop-shadow" />
                   <span className="text-[8px] text-amber-300 mt-0.5">OFFICIAL SEAL</span>
                 </div>
                 <div className="text-center">
-                  <img src={settings.signatureUrl} alt="" className="h-6 max-w-[76px] object-contain invert brightness-200 mix-blend-screen bg-transparent" />
+                  <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="" className="h-6 max-w-[76px] object-contain invert brightness-200 mix-blend-screen bg-transparent" />
                   <span className="text-[8px] text-amber-300">অনুমোদিত স্বাক্ষর</span>
                 </div>
               </div>
@@ -1777,7 +1777,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="relative z-10 w-full mt-auto pt-1 border-t border-slate-700/80 flex items-end justify-between px-1 text-[7px] shrink-0 min-h-[54px]">
                 <div className="flex flex-col items-center">
                   <img
-                    src={settings.institutionSealUrl}
+                    src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal}
                     alt="Official Seal"
                     className="h-10 w-10 rounded-full bg-white p-0.5 object-contain mix-blend-multiply"
                   />
@@ -1786,7 +1786,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
                 <div className="flex flex-col items-center text-center">
                   <img
-                    src={settings.signatureUrl}
+                    src={settings.signatureUrl || DEFAULT_ASSETS.signature}
                     alt="Signature"
                     className="h-7 w-[76px] rounded-sm bg-white p-0.5 object-contain"
                   />
@@ -1847,9 +1847,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <p><b>ADDRESS:</b> {idCardEnglish(student.addressEnglish, "NOT PROVIDED")}</p>
                 </div>
                 <div className="mt-auto w-full pt-1 border-t border-slate-600 flex items-end justify-between px-1">
-                  <img src={settings.institutionSealUrl} alt="Official Seal" className="h-9 w-9 rounded-full bg-white p-0.5 object-contain mix-blend-multiply" />
+                  <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="Official Seal" className="h-9 w-9 rounded-full bg-white p-0.5 object-contain mix-blend-multiply" />
                   <div className="flex flex-col items-center">
-                    <img src={settings.signatureUrl} alt="Principal Signature" className="h-6 w-[68px] rounded-sm bg-white p-0.5 object-contain" />
+                    <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="Principal Signature" className="h-6 w-[68px] rounded-sm bg-white p-0.5 object-contain" />
                     <span className="border-t border-slate-500 pt-0.5 text-[5px] text-white">{idCardEnglish(settings.founderNameEnglish, 'HEAD TEACHER')}</span>
                     <span className="text-[5px] text-amber-300">HEAD TEACHER</span>
                   </div>
@@ -6589,7 +6589,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               {/* Seal & Signatures Footer */}
               <div className="relative z-10 pt-4 flex items-end justify-between">
                 <div className="text-center">
-                  <img src={settings.institutionSealUrl} alt="" className="h-12 w-auto mx-auto object-contain" />
+                  <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="" className="h-12 w-auto mx-auto object-contain" />
                   <span className="text-[10px] font-bold text-slate-600 border-t border-slate-400 block mt-1 pt-0.5">OFFICIAL SEAL</span>
                 </div>
                 <div className="text-center">
@@ -6597,7 +6597,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <span className="text-[10px] font-bold text-slate-600 block">পরীক্ষার্থীর স্বাক্ষর</span>
                 </div>
                 <div className="text-center">
-                  <img src={settings.signatureUrl} alt="" className="h-10 w-auto mx-auto object-contain" />
+                  <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="" className="h-10 w-auto mx-auto object-contain" />
                   <div className="border-t border-slate-600 pt-0.5 mt-0.5">
                     <p className="text-[10px] font-bold text-slate-900">{idCardEnglish(settings.founderNameEnglish, 'Head Teacher')}</p>
                     <p className="text-[9px] text-slate-500 font-semibold">পরীক্ষা নিয়ন্ত্রক / HEAD TEACHER</p>
@@ -6730,7 +6730,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                         Date of Issue : {selectedCertForPrint.issueDate || '________________'}
                       </div>
                       <div className="text-center">
-                        {settings.signatureUrl ? <img src={settings.signatureUrl} alt="Authorized signature" className="mx-auto mb-1 h-[clamp(15px,3vw,34px)] max-w-[130px] object-contain" /> : <div className="h-[clamp(15px,3vw,34px)]" />}
+                        {settings.signatureUrl ? <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="Authorized signature" className="mx-auto mb-1 h-[clamp(15px,3vw,34px)] max-w-[130px] object-contain" /> : <div className="h-[clamp(15px,3vw,34px)]" />}
                         <div className="w-[clamp(110px,18vw,200px)] border-t border-[#111] pt-1 font-bold">{selectedCertForPrint.founderTitleEnglish || settings.founderTitleEnglish || 'Authorized Signatory'}</div>
                       </div>
                     </div>
