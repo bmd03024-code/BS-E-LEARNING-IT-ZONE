@@ -1328,7 +1328,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <span className="text-[8px] text-amber-300 mt-0.5">OFFICIAL SEAL</span>
                 </div>
                 <div className="text-center">
-                  <img src={settings.signatureUrl} alt="" className="h-6 max-w-[76px] object-contain mix-blend-screen bg-transparent" />
+                  <img src={settings.signatureUrl} alt="" className="h-6 max-w-[76px] object-contain invert brightness-200 mix-blend-screen bg-transparent" />
                   <span className="text-[8px] text-amber-300">অনুমোদিত স্বাক্ষর</span>
                 </div>
               </div>
@@ -1849,7 +1849,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <div className="mt-auto w-full pt-1 border-t border-slate-600 flex items-end justify-between px-1">
                   <img src={settings.institutionSealUrl} alt="Official Seal" className="h-6 w-10 object-contain mix-blend-multiply bg-transparent" />
                   <div className="flex flex-col items-center">
-                    <img src={settings.signatureUrl} alt="Principal Signature" className="h-5 max-w-[64px] object-contain mix-blend-screen bg-transparent" />
+                    <img src={settings.signatureUrl} alt="Principal Signature" className="h-5 max-w-[64px] object-contain invert brightness-200 mix-blend-screen bg-transparent" />
                     <span className="border-t border-slate-500 pt-0.5 text-[5px] text-white">{idCardEnglish(settings.founderNameEnglish, 'HEAD TEACHER')}</span>
                     <span className="text-[5px] text-amber-300">HEAD TEACHER</span>
                   </div>
