@@ -33,8 +33,9 @@ const idCardEnglish = (value?: string | number | null, fallback = '—') => {
 
 const idCardCourseEnglish = (value?: string | null) => {
   if (!value) return 'COURSE NAME';
-  const translated = value.replace(/কোর্স/g, 'Course').replace(/মাস/g, 'Month').replace(/মাসের/g, 'Month');
-  return translated.replace(/[\\u0980-\\u09FF]+/g, '').replace(/\\s{2,}/g, ' ').replace(/\\(\\s*\\)/g, '').trim() || 'COURSE NAME';
+  const text = value.trim();
+  if (/[\u0980-\u09FF]/.test(text)) return 'COURSE NAME';
+  return text.replace(/\s+/g, ' ').trim() || 'COURSE NAME';
 };
 import { aiKnowledgeStore, QAItem, TrainingChunk } from '../../services/aiKnowledgeStore';
 import {
