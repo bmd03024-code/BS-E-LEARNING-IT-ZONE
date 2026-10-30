@@ -1824,6 +1824,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
           <div className="bulk-id-print-grid mx-auto grid grid-cols-2 justify-items-center gap-2 p-3">
             {filteredStudents.map((student) => (
               <article key={student.id} className="bulk-id-card relative flex flex-col items-center overflow-hidden border-2 border-amber-500 bg-white p-2 text-center text-slate-900">
+                {settings.logoUrl && <img src={settings.logoUrl} alt="" aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-28 w-28 -translate-x-1/2 -translate-y-1/2 object-contain opacity-[0.22]" />}
                 <h3 className="text-[10px] font-extrabold tracking-wide text-amber-300">BS E-LEARNING &amp; IT ZONE</h3>
                 <p className="mt-0.5 text-[7px] font-bold">STUDENT IDENTITY CARD</p>
                 <img src={student.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'} alt="" className="mt-1 h-10 w-10 rounded-lg border border-amber-400 object-cover shrink-0" />
