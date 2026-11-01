@@ -169,6 +169,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
   const [isAddTeacherModalOpen, setIsAddTeacherModalOpen] = useState(false);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
   const [selectedAdmitCardForPrint, setSelectedAdmitCardForPrint] = useState<AdmitCardRecord | null>(null);
+  const [admitCardEdits, setAdmitCardEdits] = useState<Record<string, string>>({});
+  const [admitCardVisible, setAdmitCardVisible] = useState<Record<string, boolean>>({});
+  useEffect(() => { if (selectedAdmitCardForPrint) setAdmitCardEdits({ institute: 'BS E-LEARNING & IT ZONE', subtitle: settings.subName || 'Skills and Success: Your Digital Academy', address: settings.address || 'Dhaka, Bangladesh', phone: settings.phone || '01612118307', examType: selectedAdmitCardForPrint.examType || 'Examination', student: selectedAdmitCardForPrint.studentName || '', roll: selectedAdmitCardForPrint.roll || '', father: selectedAdmitCardForPrint.fatherName || 'Not provided', mother: selectedAdmitCardForPrint.motherName || 'Not provided', course: courses.find(c => c.id === selectedAdmitCardForPrint.courseId)?.title || selectedAdmitCardForPrint.courseId || '', year: selectedAdmitCardForPrint.academicYear || '', center: selectedAdmitCardForPrint.examCenter || '', date: selectedAdmitCardForPrint.examDate || '', time: selectedAdmitCardForPrint.examTime || '' }); }, [selectedAdmitCardForPrint]);
   const [selectedCertForPrint, setSelectedCertForPrint] = useState<CertificateRecord | null>(null);
 
   // New Teacher Entry Form State
@@ -1605,7 +1608,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="font-bold text-slate-600">শিক্ষার্থীর নাম:</label>
+                <label className="font-bold text-slate-600">Student Name:</label>
                 <input
                   type="text"
                   value={editingStudent.name}
@@ -1615,7 +1618,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <input type="text" value={editingStudent.englishName || ''} onChange={(e) => { setEditingStudent({ ...editingStudent, englishName: e.target.value }); }} placeholder="English translation..." aria-label="English translation for editingStudent.name" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
               <div>
-                <label className="font-bold text-slate-600">রোল নম্বর:</label>
+                <label className="font-bold text-slate-600">Roll Number:</label>
                 <input
                   type="text"
                   value={editingStudent.roll}
@@ -6511,9 +6514,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div>
                 <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
                   <Ticket className="w-5 h-5 text-blue-900" />
-                  <span>এডমিট কার্ড প্রিভিউ ও প্রিন্ট/ডাউনলোড</span>
+                  <span>Admit Card Preview and Print / Download</span>
                 </h4>
-                <p className="text-xs text-slate-500">প্রিন্ট বাটনে ক্লিক করে সরাসরি প্রিন্ট করুন অথবা পিডিএফ হিসেবে সংরক্ষণ করুন</p>
+                <p className="text-xs text-slate-500">Edit the fields below to update the preview instantly. Print or save as PDF when ready.</p>
               </div>
               <button
                 onClick={() => setSelectedAdmitCardForPrint(null)}
@@ -6523,6 +6526,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </button>
             </div>
 
+            <div className="no-print rounded-xl border border-blue-200 bg-blue-50 p-4"><h5 className="font-bold text-sm mb-3">Edit Admit Card Fields (check to show)</h5><div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{([['institute','Institute Name'],['subtitle','Subtitle'],['address','Address'],['phone','Phone / Hotline'],['examType','Exam Type'],['student','Student Name'],['roll','Roll Number'],['father',"Father's Name"],['mother',"Mother's Name"],['course','Course Name'],['year','Academic Year'],['center','Exam Center'],['date','Exam Date'],['time','Exam Time']] as [string,string][]).map(([key,label]) => <label key={key} className="text-xs font-semibold"><span className="flex items-center gap-2 mb-1"><input type="checkbox" checked={admitCardVisible[key] !== false} onChange={e => setAdmitCardVisible(p => ({...p,[key]:e.target.checked}))}/>{label}</span><input value={admitCardEdits[key] || ''} onChange={e => setAdmitCardEdits(p => ({...p,[key]:e.target.value}))} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-normal" /></label>)}</div></div>
             {/* High-Fidelity Printable Admit Card Area */}
             <div className="printable-area border-4 border-blue-950 p-6 sm:p-8 rounded-2xl bg-white text-slate-900 space-y-4 relative overflow-hidden shadow-md">
               {/* Watermark */}
@@ -6541,13 +6545,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 </div>
                 <div className="grow text-center">
                   <h2 className="text-lg sm:text-xl font-black text-blue-950 tracking-wide uppercase">
-                    BS E-LEARNING &amp; IT ZONE
+                    {admitCardVisible.institute !== false ? (admitCardEdits.institute || 'BS E-LEARNING & IT ZONE') : ''}
                   </h2>
                   <p className="text-xs text-slate-700 font-bold mt-0.5">
-                    {settings.subName || 'দক্ষতা ও সাফল্যের সেরা ডিজিটাল একাডেমি'}
+                    {admitCardVisible.subtitle !== false ? admitCardEdits.subtitle : ''}
                   </p>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    {settings.address || 'ঢাকা, বাংলাদেশ'} • হটলাইন: {settings.phone || '01612118307'}
+                    {admitCardVisible.address !== false ? admitCardEdits.address : ''} • {admitCardVisible.phone !== false ? `Phone: ${admitCardEdits.phone || ''}` : ''}
                   </p>
                 </div>
                 {/* Student Photo */}
@@ -6563,10 +6567,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               {/* Title Badge */}
               <div className="relative z-10 text-center">
                 <span className="inline-block px-4 py-1 rounded-full bg-blue-950 text-amber-300 font-black text-xs sm:text-sm tracking-widest uppercase shadow-xs">
-                  প্রবেশপত্র • ADMIT CARD
+                  ADMIT CARD
                 </span>
                 <p className="text-xs font-bold text-slate-800 mt-1">
-                  {selectedAdmitCardForPrint.examType}
+                  {admitCardVisible.examType !== false ? admitCardEdits.examType : ''}
                 </p>
               </div>
 
@@ -6574,63 +6578,52 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               <div className="relative z-10 grid grid-cols-2 gap-x-4 gap-y-2 text-xs border border-slate-300 rounded-xl p-4 bg-slate-50/50">
                 <div>
                   <span className="font-bold text-slate-500">শিক্ষার্থীর নাম:</span>
-                  <p className="font-extrabold text-sm text-slate-900">{selectedAdmitCardForPrint.studentName}</p>
+                  <p className="font-extrabold text-sm text-slate-900">{admitCardEdits.student}</p>
                 </div>
                 <div>
                   <span className="font-bold text-slate-500">রোল নম্বর:</span>
-                  <p className="font-mono font-black text-sm text-blue-950">{selectedAdmitCardForPrint.roll}</p>
+                  <p className="font-mono font-black text-sm text-blue-950">{admitCardEdits.roll}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">পিতার নাম:</span>
-                  <p className="font-semibold text-slate-800">{selectedAdmitCardForPrint.fatherName || 'মোঃ রফিকুল ইসলাম'}</p>
+                  <span className="font-bold text-slate-500">Father's Name:</span>
+                  <p className="font-semibold text-slate-800">{admitCardEdits.father}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">মাতার নাম:</span>
-                  <p className="font-semibold text-slate-800">{selectedAdmitCardForPrint.motherName || 'মোছাঃ ফাতেমা বেগম'}</p>
+                  <span className="font-bold text-slate-500">Mother's Name:</span>
+                  <p className="font-semibold text-slate-800">{admitCardEdits.mother}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">কোর্সের নাম:</span>
-                  <p className="font-bold text-blue-900">{courses.find(c => c.id === selectedAdmitCardForPrint.courseId)?.title || selectedAdmitCardForPrint.courseId}</p>
+                  <span className="font-bold text-slate-500">Course Name:</span>
+                  <p className="font-bold text-blue-900">{admitCardEdits.course}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">সেশন / শিক্ষাবর্ষ:</span>
-                  <p className="font-semibold text-slate-800">{selectedAdmitCardForPrint.academicYear} সেশন</p>
+                  <span className="font-bold text-slate-500">Academic Year:</span>
+                  <p className="font-semibold text-slate-800">{admitCardEdits.year}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">পরীক্ষা কেন্দ্র:</span>
-                  <p className="font-semibold text-slate-800">{selectedAdmitCardForPrint.examCenter}</p>
+                  <span className="font-bold text-slate-500">Exam Center:</span>
+                  <p className="font-semibold text-slate-800">{admitCardEdits.center}</p>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">পরীক্ষার তারিখ ও সময়:</span>
-                  <p className="font-semibold text-slate-800">{selectedAdmitCardForPrint.examDate} ({selectedAdmitCardForPrint.examTime})</p>
+                  <span className="font-bold text-slate-500">Exam Date & Time:</span>
+                  <p className="font-semibold text-slate-800">{admitCardEdits.date} {admitCardEdits.time}</p>
                 </div>
               </div>
 
               {/* Rules & Instructions */}
               <div className="relative z-10 p-3 bg-amber-50/50 rounded-xl border border-amber-200 text-[10px] text-slate-700 space-y-0.5">
-                <p className="font-bold text-amber-950">পরীক্ষার্থীদের জন্য বিশেষ নির্দেশনাবলী:</p>
-                <p>১. পরীক্ষার নির্ধারিত সময়ের অন্তত ২০ মিনিট পূর্বে পরীক্ষা কেন্দ্রে উপস্থিত হতে হবে।</p>
-                <p>২. মূল প্রবেশপত্র (Admit Card) ব্যতীত পরীক্ষা কক্ষে প্রবেশ সম্পূর্ণরূপে নিষিদ্ধ।</p>
-                <p>৩. পরীক্ষার হলে কোনো প্রকার ডিজিটাল ডিভাইস, মোবাইল ফোন বা অননুমোদিত কাগজ আনা যাবে না।</p>
+                <p className="font-bold text-amber-950">Instructions for Candidates:</p>
+                <p>1. Arrive at the examination center at least 20 minutes before the scheduled time.</p>
+                <p>2. Entry to the examination room is not permitted without the original admit card.</p>
+                <p>3. Digital devices, mobile phones, and unauthorized papers are prohibited in the examination hall.</p>
               </div>
 
               {/* Seal & Signatures Footer */}
-              <div className="relative z-10 pt-4 flex items-end justify-between">
-                <div className="text-center">
-                  <img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="" className="h-12 w-auto mx-auto object-contain" />
-                  <span className="text-[10px] font-bold text-slate-600 border-t border-slate-400 block mt-1 pt-0.5">OFFICIAL SEAL</span>
-                </div>
-                <div className="text-center">
-                  <div className="h-10 w-28 border-b border-dashed border-slate-400 mb-1 mx-auto flex items-end justify-center text-[9px] text-slate-400">পরীক্ষার্থীর স্বাক্ষর</div>
-                  <span className="text-[10px] font-bold text-slate-600 block">পরীক্ষার্থীর স্বাক্ষর</span>
-                </div>
-                <div className="text-center">
-                  <img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="" className="h-10 w-auto mx-auto object-contain" />
-                  <div className="border-t border-slate-600 pt-0.5 mt-0.5">
-                    <p className="text-[10px] font-bold text-slate-900">{idCardEnglish(settings.founderNameEnglish, 'Head Teacher')}</p>
-                    <p className="text-[9px] text-slate-500 font-semibold">পরীক্ষা নিয়ন্ত্রক / HEAD TEACHER</p>
-                  </div>
-                </div>
+              <div className="relative z-10 pt-4 grid grid-cols-3 items-end gap-3">
+                <div className="text-center"><div className="h-10 w-28 border-b border-dashed border-slate-400 mb-1 mx-auto" /><span className="text-[10px] font-bold text-slate-600 block">Student Signature</span></div>
+                <div className="text-center flex items-end justify-center"><img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="" className="h-12 w-12 mx-auto object-contain bg-transparent" /></div>
+                <div className="text-center"><img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="" className="h-10 w-auto mx-auto object-contain bg-transparent" /><div className="border-t border-slate-600 pt-0.5 mt-0.5"><p className="text-[10px] font-bold text-slate-900">{idCardEnglish(settings.founderNameEnglish, 'Head Teacher')}</p><p className="text-[9px] text-slate-500 font-semibold">Head Teacher</p></div></div>
+              </div>           </div>
               </div>
             </div>
 
