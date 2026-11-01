@@ -6577,36 +6577,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               {/* Student Details Grid */}
               <div className="relative z-10 grid grid-cols-2 gap-x-4 gap-y-2 text-xs border border-slate-300 rounded-xl p-4 bg-slate-50/50">
                 <div>
-                  <span className="font-bold text-slate-500">শিক্ষার্থীর নাম:</span>
-                  <p className="font-extrabold text-sm text-slate-900">{admitCardEdits.student}</p>
+                  {admitCardVisible.student !== false && <span className="font-bold text-slate-500">Student Name:</span>}
+                  {admitCardVisible.student !== false && <p className="font-extrabold text-sm text-slate-900">{admitCardEdits.student}</p>}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">রোল নম্বর:</span>
-                  <p className="font-mono font-black text-sm text-blue-950">{admitCardEdits.roll}</p>
+                  {admitCardVisible.roll !== false && <span className="font-bold text-slate-500">Roll Number:</span>}
+                  {admitCardVisible.roll !== false && <p className="font-mono font-black text-sm text-blue-950">{admitCardEdits.roll}</p>}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">Father's Name:</span>
-                  <p className="font-semibold text-slate-800">{admitCardEdits.father}</p>
+                  {admitCardVisible.father !== false && <span className="font-bold text-slate-500">Father's Name:</span>}
+                  {admitCardVisible.father !== false && <p className="font-semibold text-slate-800">{admitCardEdits.father}</p>}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">Mother's Name:</span>
-                  <p className="font-semibold text-slate-800">{admitCardEdits.mother}</p>
+                  {admitCardVisible.mother !== false && <span className="font-bold text-slate-500">Mother's Name:</span>}
+                  {admitCardVisible.mother !== false && <p className="font-semibold text-slate-800">{admitCardEdits.mother}</p>}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">Course Name:</span>
-                  <p className="font-bold text-blue-900">{admitCardEdits.course}</p>
+                  {admitCardVisible.course !== false && <span className="font-bold text-slate-500">Course Name:</span>}
+                  {admitCardVisible.course !== false && <p className="font-bold text-blue-900">{admitCardEdits.course}</p>}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">Academic Year:</span>
-                  <p className="font-semibold text-slate-800">{admitCardEdits.year}</p>
+                  {admitCardVisible.year !== false && <span className="font-bold text-slate-500">Academic Year:</span>}
+                  {admitCardVisible.year !== false && <p className="font-semibold text-slate-800">{admitCardEdits.year}</p>}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">Exam Center:</span>
-                  <p className="font-semibold text-slate-800">{admitCardEdits.center}</p>
+                  {admitCardVisible.center !== false && <span className="font-bold text-slate-500">Exam Center:</span>}
+                  {admitCardVisible.center !== false && <p className="font-semibold text-slate-800">{admitCardEdits.center}</p>}
                 </div>
                 <div>
-                  <span className="font-bold text-slate-500">Exam Date & Time:</span>
-                  <p className="font-semibold text-slate-800">{admitCardEdits.date} {admitCardEdits.time}</p>
+                  {admitCardVisible.date !== false && <span className="font-bold text-slate-500">Exam Date & Time:</span>}
+                  {admitCardVisible.date !== false && <p className="font-semibold text-slate-800">{admitCardEdits.date} {admitCardVisible.time !== false ? admitCardEdits.time : ''}</p>}
                 </div>
               </div>
 
@@ -6623,7 +6623,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 <div className="text-center"><div className="h-10 w-28 border-b border-dashed border-slate-400 mb-1 mx-auto" /><span className="text-[10px] font-bold text-slate-600 block">Student Signature</span></div>
                 <div className="text-center flex items-end justify-center"><img src={settings.institutionSealUrl || DEFAULT_ASSETS.institutionSeal} alt="" className="h-12 w-12 mx-auto object-contain bg-transparent" /></div>
                 <div className="text-center"><img src={settings.signatureUrl || DEFAULT_ASSETS.signature} alt="" className="h-10 w-auto mx-auto object-contain bg-transparent" /><div className="border-t border-slate-600 pt-0.5 mt-0.5"><p className="text-[10px] font-bold text-slate-900">{idCardEnglish(settings.founderNameEnglish, 'Head Teacher')}</p><p className="text-[9px] text-slate-500 font-semibold">Head Teacher</p></div></div>
-              </div>           </div>
               </div>
             </div>
 
