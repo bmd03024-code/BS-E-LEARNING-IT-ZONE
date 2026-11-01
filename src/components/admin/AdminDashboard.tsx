@@ -1385,7 +1385,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 className="px-4 py-2 text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 rounded-xl flex items-center gap-1.5 shadow-sm"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span>প্রিন্ট করুন</span>
+                <span>Print Admit Card</span>
               </button>
             </div>
           </div>
@@ -1608,7 +1608,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="font-bold text-slate-600">Student Name:</label>
+                <label className="font-bold text-slate-600">শিক্ষার্থীর নাম:</label>
                 <input
                   type="text"
                   value={editingStudent.name}
@@ -1618,7 +1618,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                   <input type="text" value={editingStudent.englishName || ''} onChange={(e) => { setEditingStudent({ ...editingStudent, englishName: e.target.value }); }} placeholder="English translation..." aria-label="English translation for editingStudent.name" className="mt-1 w-full rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs text-slate-900" />
               </div>
               <div>
-                <label className="font-bold text-slate-600">Roll Number:</label>
+                <label className="font-bold text-slate-600">রোল নম্বর:</label>
                 <input
                   type="text"
                   value={editingStudent.roll}
@@ -6526,7 +6526,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </button>
             </div>
 
-            <div className="no-print rounded-xl border border-blue-200 bg-blue-50 p-4"><h5 className="font-bold text-sm mb-3">Edit Admit Card Fields (check to show)</h5><div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{([['institute','Institute Name'],['subtitle','Subtitle'],['address','Address'],['phone','Phone / Hotline'],['examType','Exam Type'],['student','Student Name'],['roll','Roll Number'],['father',"Father's Name"],['mother',"Mother's Name"],['course','Course Name'],['year','Academic Year'],['center','Exam Center'],['date','Exam Date'],['time','Exam Time']] as [string,string][]).map(([key,label]) => <label key={key} className="text-xs font-semibold"><span className="flex items-center gap-2 mb-1"><input type="checkbox" checked={admitCardVisible[key] !== false} onChange={e => setAdmitCardVisible(p => ({...p,[key]:e.target.checked}))}/>{label}</span><input value={admitCardEdits[key] || ''} onChange={e => setAdmitCardEdits(p => ({...p,[key]:e.target.value}))} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-normal" /></label>)}</div></div>
+            <div className="no-print rounded-xl border border-blue-200 bg-blue-50 p-4"><h5 className="font-bold text-sm mb-3">Edit Admit Card Fields (check to show)</h5><div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{([['institute','Institute Name'],['subtitle','Subtitle'],['address','Address'],['phone','Phone / Hotline'],['examType','Exam Type'],['student','Student Name'],['roll','Roll Number'],['father',"Father's Name"],['mother',"Mother's Name"],['course','Course Name'],['year','Academic Year'],['center','Exam Center'],['date','Exam Date'],['time','Exam Time'],['instructions','Instructions']] as [string,string][]).map(([key,label]) => <label key={key} className="text-xs font-semibold"><span className="flex items-center gap-2 mb-1"><input type="checkbox" checked={admitCardVisible[key] !== false} onChange={e => setAdmitCardVisible(p => ({...p,[key]:e.target.checked}))}/>{label}</span><input value={admitCardEdits[key] || ''} onChange={e => setAdmitCardEdits(p => ({...p,[key]:e.target.value}))} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-normal" /></label>)}</div></div>
             {/* High-Fidelity Printable Admit Card Area */}
             <div className="printable-area border-4 border-blue-950 p-6 sm:p-8 rounded-2xl bg-white text-slate-900 space-y-4 relative overflow-hidden shadow-md">
               {/* Watermark */}
@@ -6611,12 +6611,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
               </div>
 
               {/* Rules & Instructions */}
-              <div className="relative z-10 p-3 bg-amber-50/50 rounded-xl border border-amber-200 text-[10px] text-slate-700 space-y-0.5">
+              {admitCardVisible.instructions !== false && <div className="relative z-10 p-3 bg-amber-50/50 rounded-xl border border-amber-200 text-[10px] text-slate-700 space-y-0.5">
                 <p className="font-bold text-amber-950">Instructions for Candidates:</p>
                 <p>1. Arrive at the examination center at least 20 minutes before the scheduled time.</p>
                 <p>2. Entry to the examination room is not permitted without the original admit card.</p>
                 <p>3. Digital devices, mobile phones, and unauthorized papers are prohibited in the examination hall.</p>
-              </div>
+              </div>}
 
               {/* Seal & Signatures Footer */}
               <div className="relative z-10 pt-4 grid grid-cols-3 items-end gap-3">
@@ -6646,7 +6646,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-600 rounded-xl flex items-center gap-1.5 shadow-md"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>ডাউনলোড (Save as PDF)</span>
+                <span>Download (Save as PDF)</span>
               </button>
             </div>
           </div>
