@@ -6639,7 +6639,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, onView
                 className="px-4 py-2 text-xs font-bold text-white bg-blue-900 hover:bg-blue-800 rounded-xl flex items-center gap-1.5 shadow-md"
               >
                 <Printer className="w-3.5 h-3.5 text-amber-400" />
-                <span>প্রিন্ট করুন</span>
+                <span>Print Admit Card</span>
               </button>
               <button
                 onClick={() => window.print()}
